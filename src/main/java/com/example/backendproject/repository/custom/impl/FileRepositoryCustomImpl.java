@@ -1,13 +1,13 @@
 package com.example.backendproject.repository.custom.impl;
 
+import com.example.backendproject.entity.FileEntity;
+import com.example.backendproject.model.FileExportFilter;
+import com.example.backendproject.repository.custom.FileRepositoryCustom;
 import io.micrometer.core.instrument.util.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import vn.ghtk.ewallet.admin.entity.FileEntity;
-import vn.ghtk.ewallet.admin.model.admin.FileExportFilter;
-import vn.ghtk.ewallet.admin.repository.admin.custom.FileRepositoryCustom;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +16,7 @@ public class FileRepositoryCustomImpl implements FileRepositoryCustom {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public FileRepositoryCustomImpl(@Qualifier("adminJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public FileRepositoryCustomImpl(@Qualifier("sc5JdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 

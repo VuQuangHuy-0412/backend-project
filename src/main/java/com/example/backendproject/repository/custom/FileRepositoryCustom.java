@@ -1,7 +1,7 @@
 package com.example.backendproject.repository.custom;
 
-import vn.ghtk.ewallet.admin.entity.FileEntity;
-import vn.ghtk.ewallet.admin.model.admin.FileExportFilter;
+import com.example.backendproject.entity.FileEntity;
+import com.example.backendproject.model.FileExportFilter;
 
 import java.util.List;
 

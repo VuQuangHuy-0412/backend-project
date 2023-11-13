@@ -1,13 +1,11 @@
 package com.example.backendproject.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
-import vn.ghtk.ewallet.commonlib.util.generator.Generator;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -22,10 +20,7 @@ public class FileEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(generator = Generator.SNOW_FLAKE)
-    @GenericGenerator(name = Generator.SNOW_FLAKE,
-            parameters = @org.hibernate.annotations.Parameter(name = "generator", value = "vn.ghtk.ewallet.commonlib.util.generator.DefaultUniqueGenerator"),
-            strategy = Generator.CLIENT_ID_CLASS)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 

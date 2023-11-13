@@ -20,8 +20,8 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-        entityManagerFactoryRef = "adminEntityManager",
-        transactionManagerRef = "adminTransactionManager",
+        entityManagerFactoryRef = "sc5EntityManager",
+        transactionManagerRef = "sc5TransactionManager",
         basePackages = {"com.example.backendproject.repository"}
 )
 public class Sc5DbConfig {
@@ -53,12 +53,9 @@ public class Sc5DbConfig {
     public LocalContainerEntityManagerFactoryBean sc5EntityManager(@Qualifier("sc5DataSource") HikariDataSource sc5HikariDataSource) {
         return new LocalContainerEntityManagerFactoryBean() {{
             setDataSource(sc5HikariDataSource);
-            Properties properties = new Properties();
-            properties.put("hibernate.session_factory.statement_inspector", "com.example.backendproject.config.commonlib.SqlCommentStatementInspector");
-            setJpaProperties(properties);
             setPersistenceProviderClass(HibernatePersistenceProvider.class);
             setPersistenceUnitName(PersistenceUnitName.SC5);
-            setPackagesToScan("vn.ghtk.ewallet.admin.entity");
+            setPackagesToScan("com.example.backendproject.entity");
         }};
     }
 

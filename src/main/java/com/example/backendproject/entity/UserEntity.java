@@ -2,12 +2,10 @@ package com.example.backendproject.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.GenericGenerator;
-import vn.ghtk.ewallet.commonlib.util.generator.Generator;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
@@ -26,8 +24,7 @@ public class UserEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(generator = Generator.SNOW_FLAKE)
-    @GenericGenerator(name = Generator.SNOW_FLAKE, strategy = Generator.CLIENT_ID_CLASS)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 

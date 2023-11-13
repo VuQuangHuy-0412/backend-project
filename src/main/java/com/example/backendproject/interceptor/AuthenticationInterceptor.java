@@ -1,7 +1,6 @@
 package com.example.backendproject.interceptor;
 
 import com.example.backendproject.config.constant.ErrorEnum;
-import com.example.backendproject.config.constant.RedisKey;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.model.AccessTokenPayload;
 import com.example.backendproject.service.CipherService;
@@ -18,16 +17,12 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class AuthenticationInterceptor implements HandlerInterceptor {
@@ -35,14 +30,11 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     private static final List<String> PUBLIC_APIS = List.of("/login", "/auth/token/refresh");
     private static final List<String> AUTHENTICATED_APIS = List.of("/logout", "/change-password", "/profile");
 
-    @Value("${ewallet.secretKey}")
+    @Value("${sc5.secretKey}")
     private String secretKey;
 
-    @Value("${ewallet.secretIV}")
+    @Value("${sc5.secretIV}")
     private String secretIV;
-
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     private RoleService roleService;
@@ -88,7 +80,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             throw new Sc5Exception(ErrorEnum.SESSION_EXPIRED);
         }
 
-        Set<String> members = redisTemplate.opsForSet().members(RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + tokenPayload.getUserId());
+//        Set<String> members = redisTemplate.opsForSet().members(RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + tokenPayload.getUserId());
+        Set<String> members = new HashSet<>();
         if (members == null) {
             throw new Sc5Exception(ErrorEnum.SESSION_EXPIRED);
         }

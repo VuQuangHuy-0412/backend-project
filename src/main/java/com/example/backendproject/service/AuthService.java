@@ -2,7 +2,6 @@ package com.example.backendproject.service;
 
 import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.constant.GrantType;
-import com.example.backendproject.config.constant.RedisKey;
 import com.example.backendproject.config.constant.UserStatusEnum;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.UserEntity;
@@ -17,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+//import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -38,10 +37,6 @@ public class AuthService {
 
     @Autowired
     private AdminLogService adminLogService;
-
-
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
 
     public LoginPwdResponse login(LoginRequest request) {
         log.info("User login: {}", request.getUsername());
@@ -71,14 +66,15 @@ public class AuthService {
         }
 
         response.setRequestId(uuid);
-        String redisKey = RedisKey.OTP_PREFIX + response.getRequestId();
-        this.redisTemplate.opsForValue().set(redisKey, CommonUtil.toJson(userEntity), 3, TimeUnit.MINUTES);
+//        String redisKey = RedisKey.OTP_PREFIX + response.getRequestId();
+//        this.redisTemplate.opsForValue().set(redisKey, CommonUtil.toJson(userEntity), 3, TimeUnit.MINUTES);
         return response;
     }
 
     public LoginResponse active2FA(VerifyLoginOTPRequest verifyRequest) {
-        String redisKey = RedisKey.OTP_PREFIX + verifyRequest.getRequestId();
-        String value = redisTemplate.opsForValue().get(redisKey);
+//        String redisKey = RedisKey.OTP_PREFIX + verifyRequest.getRequestId();
+//        String value = redisTemplate.opsForValue().get(redisKey);
+        String value = null;
         if (StringUtils.isBlank(value)) {
             throw new Sc5Exception(ErrorEnum.OTP_AlREADY_CONFIRM);
         }
@@ -93,21 +89,22 @@ public class AuthService {
         UserEntity user = optional.get();
         user.setSotpId(userEntity.getSotpId());
         userRepository.save(user);
-        redisTemplate.delete(redisKey);
+//        redisTemplate.delete(redisKey);
         adminLogService.log(userEntity.getId(), userEntity.getUserName(), "active2FA", verifyRequest.getRequestId());
         return createLoginResponse(userEntity, "");
     }
 
     public LoginResponse verify(VerifyLoginOTPRequest verifyRequest) {
-        String redisKey = RedisKey.OTP_PREFIX + verifyRequest.getRequestId();
-        String value = redisTemplate.opsForValue().get(redisKey);
+//        String redisKey = RedisKey.OTP_PREFIX + verifyRequest.getRequestId();
+//        String value = redisTemplate.opsForValue().get(redisKey);
+        String value = null;
         if (StringUtils.isBlank(value)) {
             throw new Sc5Exception(ErrorEnum.OTP_AlREADY_CONFIRM);
         }
         UserEntity userEntity = CommonUtil.fromJson(value, UserEntity.class);
 //        twoFactorAuthenticationService.verify(verifyRequest.getOtp(), userEntity.getSotpId());
 
-        redisTemplate.delete(redisKey);
+//        redisTemplate.delete(redisKey);
         adminLogService.log(userEntity.getId(), userEntity.getUserName(), "verify-by-sotp", verifyRequest.getRequestId());
         return createLoginResponse(userEntity, "");
     }
@@ -121,8 +118,8 @@ public class AuthService {
             ret.setAccessTokenExpiredIn(ACCESS_TOKEN_EXPIRED_MINUTES * 60);
             return ret;
         }
-        String redisKey = RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + userEntity.getId();
-        this.redisTemplate.delete(redisKey);
+//        String redisKey = RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + userEntity.getId();
+//        this.redisTemplate.delete(redisKey);
         String accessToken = generateAccessToken(userEntity);
         String refreshToken = generateRefreshToken(userEntity);
         ret.setAccessToken(accessToken);
@@ -132,8 +129,8 @@ public class AuthService {
     }
 
     public void invalidateSession(Long userId) {
-        String redisKey = RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + userId;
-        this.redisTemplate.delete(redisKey);
+//        String redisKey = RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + userId;
+//        this.redisTemplate.delete(redisKey);
     }
 
     public String generateAccessToken(UserEntity userEntity) {
@@ -147,8 +144,8 @@ public class AuthService {
         String accessToken = cipherService.encrypt(accessTokenPayload);
         String accessTokenHash = cipherService.adminHash(accessToken);
 
-        String redisKey = RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + accessTokenPayload.getUserId();
-        this.redisTemplate.opsForSet().add(redisKey, accessTokenHash);
+//        String redisKey = RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + accessTokenPayload.getUserId();
+//        this.redisTemplate.opsForSet().add(redisKey, accessTokenHash);
 
         return accessToken;
     }
@@ -164,8 +161,8 @@ public class AuthService {
         String token = cipherService.encrypt(tokenPayload);
         String tokenHash = cipherService.adminHash(token);
 
-        String redisKey = RedisKey.ADMIN_REFRESH_TOKEN_PREFIX + tokenPayload.getUserId();
-        this.redisTemplate.opsForValue().set(redisKey, tokenHash, REFRESH_TOKEN_EXPIRED_HOURS, TimeUnit.HOURS);
+//        String redisKey = RedisKey.ADMIN_REFRESH_TOKEN_PREFIX + tokenPayload.getUserId();
+//        this.redisTemplate.opsForValue().set(redisKey, tokenHash, REFRESH_TOKEN_EXPIRED_HOURS, TimeUnit.HOURS);
 
         return token;
     }
@@ -218,8 +215,9 @@ public class AuthService {
             throw new Sc5Exception(ErrorEnum.INVALID_ACCESS_TOKEN);
         }
 
-        String redisKey = RedisKey.ADMIN_REFRESH_TOKEN_PREFIX + tokenPayload.getUserId();
-        String storedTokenHash = this.redisTemplate.opsForValue().get(redisKey);
+//        String redisKey = RedisKey.ADMIN_REFRESH_TOKEN_PREFIX + tokenPayload.getUserId();
+//        String storedTokenHash = this.redisTemplate.opsForValue().get(redisKey);
+        String storedTokenHash = null;
         if (!cipherService.check(refreshToken, storedTokenHash)) {
             throw new Sc5Exception(ErrorEnum.INVALID_ACCESS_TOKEN);
         }
@@ -232,11 +230,11 @@ public class AuthService {
     public void logout(Long userId) {
         log.info("User logout: {}", userId);
 
-        String redisKey = RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + userId;
-        this.redisTemplate.delete(redisKey);
-
-        String redisRefreshKey = RedisKey.ADMIN_REFRESH_TOKEN_PREFIX + userId;
-        this.redisTemplate.delete(redisRefreshKey);
+//        String redisKey = RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + userId;
+//        this.redisTemplate.delete(redisKey);
+//
+//        String redisRefreshKey = RedisKey.ADMIN_REFRESH_TOKEN_PREFIX + userId;
+//        this.redisTemplate.delete(redisRefreshKey);
 
         adminLogService.log("logout", null);
     }

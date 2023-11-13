@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 public class JdbcTemplateConfig {
 
     @Bean
-    NamedParameterJdbcTemplate financeJdbcTemplate(@Qualifier("sc5DataSource") DataSource dataSource) {
+    NamedParameterJdbcTemplate sc5JdbcTemplate(@Qualifier("sc5DataSource") DataSource dataSource) {
         return new NamedParameterJdbcTemplate(dataSource);
     }
 }

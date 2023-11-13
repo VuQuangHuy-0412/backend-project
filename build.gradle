@@ -1,7 +1,11 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.1.5'
-	id 'io.spring.dependency-management' version '1.1.3'
+	id 'org.springframework.boot' version '3.0.2'
+	id 'io.spring.dependency-management' version '1.1.0'
+}
+
+ext {
+	SPRING_BOOT_VERSION = '3.0.2'
 }
 
 group = 'com.example'
@@ -16,38 +20,30 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
-	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.0'
-	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
-	implementation group: 'com.jcraft', name: 'jsch', version: '0.1.55'
-	implementation group: 'org.jxls', name: 'jxls-poi', version: '2.11.0'
-	implementation group: 'org.jxls', name: 'jxls', version: '2.11.0'
-	implementation group: 'io.minio', name: 'minio', version: '8.2.1'
-	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
-	implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-	implementation group: 'org.mindrot', name: 'jbcrypt', version: '0.4'
-	implementation group: 'com.itextpdf', name: 'itextpdf', version: '5.5.13.2'
-	implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.4.2.Final'
-	implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.1'
-
-	compileOnly 'org.projectlombok:lombok'
-
-	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
-	runtimeOnly 'mysql:mysql-connector-java'
-
-	annotationProcessor 'org.projectlombok:lombok'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
-
-	testCompileOnly 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	compileOnly 'org.projectlombok:lombok:'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok:'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+	implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.28'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: "${SPRING_BOOT_VERSION}"
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-sleuth', version: '3.1.1'
+	compileOnly 'org.mapstruct:mapstruct:1.5.3.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+	implementation group: 'org.jxls', name: 'jxls-poi', version: '2.11.0'
+	implementation group: 'com.twilio.sdk', name: 'twilio', version: '9.1.3'
+	implementation group: 'com.google.guava', name: 'guava', version: '23.0'
+	implementation "javax.xml.bind:jaxb-api:2.3.0"
+	implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.1'
+	implementation group: 'org.mindrot', name: 'jbcrypt', version: '0.4'
 }
 
 tasks.named('test') {

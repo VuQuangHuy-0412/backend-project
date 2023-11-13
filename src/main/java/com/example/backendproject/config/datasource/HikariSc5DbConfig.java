@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "spring.admin.datasource")
+@ConfigurationProperties(prefix = "spring.sc5.datasource")
 @Validated
 public class HikariSc5DbConfig {
     @NotEmpty(message = "Missing database connection username")
@@ -27,14 +27,14 @@ public class HikariSc5DbConfig {
     @Getter
     @Setter
     public static class HikariConfig {
-        @Value("${spring.admin.datasource.hikari.minimumIdle}")
+        @Value("${spring.sc5.datasource.hikari.minimumIdle}")
         private Integer minimumIdle;
-        @Value("${spring.admin.datasource.hikari.maximumpoolsize}")
+        @Value("${spring.sc5.datasource.hikari.maximumpoolsize}")
         private Integer maximumPoolSize ;
         private Integer idleTimeout = 30000;
         private Integer maxLifetime = 2000000;
         private Integer connectionTimeout = 30000;
-        private String poolName = "HikariPoolEwallet";
+        private String poolName = "HikariPoolSc5";
     }
 }
 

@@ -1,0 +1,9 @@
+{
+  "SPRING_SC5_DATASOURCE_HIKARI_maximumPoolSize": "30",
+  "SPRING_SC5_DATASOURCE_HIKARI_minimumIdle": "10",
+  "SPRING_SC5_DATASOURCE_JDBC_URL": "jdbc:mysql://localhost:3306/sc5?useUnicode=yes&characterEncoding=UTF-8",
+  "SPRING_SC5_DATASOURCE_PASSWORD": "12345678",
+  "SPRING_SC5_DATASOURCE_USERNAME": "root",
+  "SC5_SECRETIV": "5WUO3jBK14p4GbMO",
+  "SC5_SECRETKEY": "R8L!OIsS6N0M@cg#d_8mkI28so0so8tLpbvx1UhteGCos+3vKeMyufdneuS_u^wod3R8sOKeds|ZkG-OC6YG9@F^8Uii5yWucg"
+}

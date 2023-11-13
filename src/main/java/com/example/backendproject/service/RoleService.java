@@ -8,7 +8,6 @@ import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
@@ -26,9 +25,6 @@ public class RoleService {
 
     @Autowired
     private ApplicationContext context;
-
-    @Autowired
-    private CacheManager cacheManager;
 
     public List<RoleEntity> list() {
         return roleRepository.findAll();
@@ -93,7 +89,7 @@ public class RoleService {
         role.setDescription(request.getDescription());
         role.setPermissions(request.getPermissions());
         roleRepository.save(role);
-        Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).evict(role.getCode());
+//        Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).evict(role.getCode());
     }
 
     private String makeCorrectPermission(String input) {
