@@ -30,7 +30,7 @@ public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
 
         String where = buildWhereSqlCommand(params, request);
 
-        sql += where + " order by f.id desc limit :offset, :limit ";
+        sql += where + " order by t.id desc limit :offset, :limit ";
         params.addValue("offset", request.getPage() * request.getPageSize());
         params.addValue("limit", request.getPageSize());
 
