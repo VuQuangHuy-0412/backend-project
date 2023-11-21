@@ -38,7 +38,7 @@ public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
         try {
             result = namedParameterJdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(Teacher.class));
         } catch (Exception exception) {
-            log.error("Query search teacher failed: ", exception);
+            log.error("Query search teacher failed!", exception);
             result = Collections.emptyList();
         }
         return result;

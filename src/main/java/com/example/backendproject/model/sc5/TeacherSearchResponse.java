@@ -9,6 +9,6 @@ import java.util.List;
 @Setter
 public class TeacherSearchResponse {
     private Integer page;
-    private Integer limit;
+    private Integer pageSize;
     private List<Teacher> data;
 }
