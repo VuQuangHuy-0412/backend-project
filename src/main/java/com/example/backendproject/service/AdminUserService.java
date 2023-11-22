@@ -233,22 +233,4 @@ public class AdminUserService {
         userRepository.save(entity);
         adminLogService.log("updateAdminUserPassword", null);
     }
-
-    @Transactional(rollbackFor = Exception.class)
-    public void resetSotp(UserEntity request) {
-        if (request.getId() == null) {
-            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
-        }
-        Optional<UserEntity> optional = userRepository.findById(request.getId());
-        if (optional.isEmpty()) {
-            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
-        }
-        UserEntity entity = optional.get();
-        if (StringUtils.isBlank(entity.getSotpId())) {
-            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
-        }
-        entity.setSotpId(null);
-        userRepository.save(entity);
-        adminLogService.log("resetSotp", "userId: " + entity.getId().toString() + ", username: " + entity.getUserName());
-    }
 }

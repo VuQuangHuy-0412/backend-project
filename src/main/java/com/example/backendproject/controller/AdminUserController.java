@@ -31,20 +31,8 @@ public class AdminUserController {
 
     @PostMapping(value = "/login")
     @ApiDescription(checkRole = false, show = false)
-    public LoginPwdResponse login(@RequestBody LoginRequest request) {
+    public LoginResponse login(@RequestBody LoginRequest request) {
         return authService.login(request);
-    }
-
-    @PostMapping(value = "/login/active-soft-otp")
-    @ApiDescription(checkRole = false, show = false)
-    public LoginResponse activeSoftOtp(@RequestBody VerifyLoginOTPRequest request) {
-        return authService.active2FA(request);
-    }
-
-    @PostMapping(value = "/login/verify-soft-otp")
-    @ApiDescription(checkRole = false, show = false)
-    public LoginResponse verifySoftOtp(@RequestBody VerifyLoginOTPRequest request) {
-        return authService.verify(request);
     }
 
     @PostMapping(value = "/auth/token/refresh")
@@ -109,12 +97,6 @@ public class AdminUserController {
     public void changeUserPassword(@RequestBody UserEntity request) {
         Long userId = AdminCommonUtil.getCurrentUserId();
         adminUserService.updateUserPassword(userId, request);
-    }
-
-    @PostMapping(value = "/admin/user/sotp/reset")
-    @ApiDescription(value = "Đặt lại smart otp cho user admin ewallet", code = "admin_user_reset_sotp")
-    public void resetSotp(@RequestBody UserEntity request) {
-        adminUserService.resetSotp(request);
     }
 
 }

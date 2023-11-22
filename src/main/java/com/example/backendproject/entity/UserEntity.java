@@ -59,9 +59,6 @@ public class UserEntity implements Serializable {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "sotpId")
-    private String sotpId;
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
