@@ -69,25 +69,25 @@ public class AdminUserController {
     }
 
     @PostMapping(value = "/admin/user/list")
-    @ApiDescription(value = "Danh sách user của hệ thống admin ewallet", code = "admin_user_list")
+    @ApiDescription(value = "Danh sách user của hệ thống admin sc5", code = "admin_user_list")
     public List<UserEntity> list(@RequestBody SearchAdminRequest request) {
         return adminUserService.list(request);
     }
 
     @PostMapping(value = "/admin/user/insert")
-    @ApiDescription(value = "Thêm mới user của hệ thống admin ewallet", code = "admin_user_insert")
+    @ApiDescription(value = "Thêm mới user của hệ thống admin sc5", code = "admin_user_insert")
     public void insert(@RequestBody UserEntity request) {
         adminUserService.insert(request);
     }
 
     @PostMapping(value = "/admin/user/status/update")
-    @ApiDescription(value = "Cập nhật trạng thái user hệ thống admin ewallet", code = "admin_user_update_status")
+    @ApiDescription(value = "Cập nhật trạng thái user hệ thống admin sc5", code = "admin_user_update_status")
     public void updateStatus(@RequestBody UserEntity request) {
         adminUserService.updateStatus(request);
     }
 
     @PostMapping(value = "/admin/user/role/update")
-    @ApiDescription(value = "Cập nhật vài trò cho user hệ thống admin ewallet", code = "admin_user_update_roles")
+    @ApiDescription(value = "Cập nhật vài trò cho user hệ thống admin sc5", code = "admin_user_update_roles")
     public void updateRoles(@RequestBody UserEntity request) {
         adminUserService.updateRoles(request);
     }

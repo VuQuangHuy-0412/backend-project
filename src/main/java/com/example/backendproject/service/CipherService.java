@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CipherService {
-    @Value("${ewallet.secretKey:}")
+    @Value("${sc5.secretKey}")
     private String secretKey;
 
-    @Value("${ewallet.secretIV:}")
+    @Value("${sc5.secretIV}")
     private String secretIV;
 
     @Value("${hash_salt:+WW=2c*8eW#da*5#&8M#}")
