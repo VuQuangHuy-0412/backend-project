@@ -89,7 +89,6 @@ public class RoleService {
         role.setDescription(request.getDescription());
         role.setPermissions(request.getPermissions());
         roleRepository.save(role);
-//        Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).evict(role.getCode());
     }
 
     private String makeCorrectPermission(String input) {

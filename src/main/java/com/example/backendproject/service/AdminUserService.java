@@ -1,5 +1,6 @@
 package com.example.backendproject.service;
 
+import com.example.backendproject.config.constant.AdminUserStatus;
 import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.UserEntity;
@@ -45,6 +46,12 @@ public class AdminUserService {
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private UserAccessTokenService userAccessTokenService;
+
+    @Autowired
+    private UserRefreshTokenService userRefreshTokenService;
 
     @Value("${password_regex}")
     private String passwordRegex;
@@ -153,7 +160,7 @@ public class AdminUserService {
         entity.setFullName(request.getFullName().trim());
         entity.setRoles(request.getRoles().replaceAll("\\s", ""));
         entity.setLoginFailCount(0);
-//        entity.setStatus(AdminUserStatus.ACTIVE);
+        entity.setStatus(AdminUserStatus.ACTIVE);
         entity.setCreatedAt(new Date());
         entity.setMobile(mobile);
         entity.setEmail(request.getEmail());
@@ -167,9 +174,9 @@ public class AdminUserService {
         if (request.getId() == null || request.getStatus() == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
-//        if (!AdminUserStatus.LIST_STATUS.contains(request.getStatus())) {
-//            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
-//        }
+        if (!AdminUserStatus.LIST_STATUS.contains(request.getStatus())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
         Optional<UserEntity> entityOpt = userRepository.findById(request.getId());
         if (entityOpt.isEmpty()) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
@@ -179,12 +186,10 @@ public class AdminUserService {
         if (oldStatus.equals(request.getStatus())) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
-//        if (AdminUserStatus.LOCKED.equals(request.getStatus())) {
-//            Set<String> accessKeys = redisTemplate.keys(RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + entity.getId() + "*");
-//            redisTemplate.delete(accessKeys);
-//            Set<String> refreshKeys = redisTemplate.keys(RedisKey.ADMIN_REFRESH_TOKEN_PREFIX + entity.getId() + "*");
-//            redisTemplate.delete(refreshKeys);
-//        }
+        if (AdminUserStatus.LOCKED.equals(request.getStatus())) {
+            userAccessTokenService.deleteAllAccessTokenByUserId(entity.getId());
+            userRefreshTokenService.deleteAllRefreshTokenByUserId(entity.getId());
+        }
         entity.setStatus(request.getStatus());
         entity.setLoginFailCount(0);
         userRepository.save(entity);

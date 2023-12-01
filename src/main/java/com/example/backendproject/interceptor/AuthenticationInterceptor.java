@@ -6,6 +6,7 @@ import com.example.backendproject.model.AccessTokenPayload;
 import com.example.backendproject.service.CipherService;
 import com.example.backendproject.service.PermissionServiceHelper;
 import com.example.backendproject.service.RoleService;
+import com.example.backendproject.service.UserAccessTokenService;
 import com.example.backendproject.util.AES;
 import com.example.backendproject.util.ApiDescription;
 import com.example.backendproject.util.CommonUtil;
@@ -41,6 +42,9 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Autowired
     private CipherService cipherService;
+
+    @Autowired
+    private UserAccessTokenService userAccessTokenService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -80,8 +84,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             throw new Sc5Exception(ErrorEnum.SESSION_EXPIRED);
         }
 
-//        Set<String> members = redisTemplate.opsForSet().members(RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + tokenPayload.getUserId());
-        Set<String> members = new HashSet<>();
+        Set<String> members = userAccessTokenService.getListAccessTokenByUserId(tokenPayload.getUserId());
         if (members == null) {
             throw new Sc5Exception(ErrorEnum.SESSION_EXPIRED);
         }

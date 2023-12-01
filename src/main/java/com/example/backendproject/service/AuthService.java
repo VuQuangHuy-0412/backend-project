@@ -32,6 +32,12 @@ public class AuthService {
     @Autowired
     private AdminLogService adminLogService;
 
+    @Autowired
+    private UserAccessTokenService userAccessTokenService;
+
+    @Autowired
+    private UserRefreshTokenService userRefreshTokenService;
+
     public LoginResponse login(LoginRequest request) {
         log.info("User login: {}", request.getUsername());
 
@@ -49,9 +55,6 @@ public class AuthService {
 
         checkPassword(username, password, userEntity);
         adminLogService.log(userEntity.getId(), username, "login", "login with password");
-
-        //        String redisKey = RedisKey.OTP_PREFIX + response.getRequestId();
-//        this.redisTemplate.opsForValue().set(redisKey, CommonUtil.toJson(userEntity), 3, TimeUnit.MINUTES);
         return createLoginResponse(userEntity, "");
     }
 
@@ -64,8 +67,8 @@ public class AuthService {
             ret.setAccessTokenExpiredIn(ACCESS_TOKEN_EXPIRED_MINUTES * 60);
             return ret;
         }
-//        String redisKey = RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + userEntity.getId();
-//        this.redisTemplate.delete(redisKey);
+        userAccessTokenService.deleteAllAccessTokenByUserId(userEntity.getId());
+
         String accessToken = generateAccessToken(userEntity);
         String refreshToken = generateRefreshToken(userEntity);
         ret.setAccessToken(accessToken);
@@ -75,8 +78,7 @@ public class AuthService {
     }
 
     public void invalidateSession(Long userId) {
-//        String redisKey = RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + userId;
-//        this.redisTemplate.delete(redisKey);
+        userAccessTokenService.deleteAllAccessTokenByUserId(userId);
     }
 
     public String generateAccessToken(UserEntity userEntity) {
@@ -90,8 +92,7 @@ public class AuthService {
         String accessToken = cipherService.encrypt(accessTokenPayload);
         String accessTokenHash = cipherService.adminHash(accessToken);
 
-//        String redisKey = RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + accessTokenPayload.getUserId();
-//        this.redisTemplate.opsForSet().add(redisKey, accessTokenHash);
+        userAccessTokenService.saveNewAccessToken(accessTokenPayload.getUserId(), accessTokenHash);
 
         return accessToken;
     }
@@ -107,9 +108,7 @@ public class AuthService {
         String token = cipherService.encrypt(tokenPayload);
         String tokenHash = cipherService.adminHash(token);
 
-//        String redisKey = RedisKey.ADMIN_REFRESH_TOKEN_PREFIX + tokenPayload.getUserId();
-//        this.redisTemplate.opsForValue().set(redisKey, tokenHash, REFRESH_TOKEN_EXPIRED_HOURS, TimeUnit.HOURS);
-
+        userRefreshTokenService.saveNewRefreshToken(tokenPayload.getUserId(), tokenHash);
         return token;
     }
 
@@ -120,9 +119,9 @@ public class AuthService {
             userEntity = userRepository.findByUserName(username);
         }
 
-//        if (UserStatusEnum.LOCKED.getCode().equals(userEntity.getStatus())) {
-//            throw new GhtkException(ErrorEnum.USER_IS_LOCKED);
-//        }
+        if (UserStatusEnum.LOCKED.getCode().equals(userEntity.getStatus())) {
+            throw new Sc5Exception(ErrorEnum.USER_IS_LOCKED);
+        }
 
         Integer failCount = userEntity.getLoginFailCount();
         if (!cipherService.check(password, userEntity.getPassword())) {
@@ -161,9 +160,7 @@ public class AuthService {
             throw new Sc5Exception(ErrorEnum.INVALID_ACCESS_TOKEN);
         }
 
-//        String redisKey = RedisKey.ADMIN_REFRESH_TOKEN_PREFIX + tokenPayload.getUserId();
-//        String storedTokenHash = this.redisTemplate.opsForValue().get(redisKey);
-        String storedTokenHash = null;
+        String storedTokenHash = userRefreshTokenService.getRefreshTokenByUserId(tokenPayload.getUserId());
         if (!cipherService.check(refreshToken, storedTokenHash)) {
             throw new Sc5Exception(ErrorEnum.INVALID_ACCESS_TOKEN);
         }
@@ -176,11 +173,8 @@ public class AuthService {
     public void logout(Long userId) {
         log.info("User logout: {}", userId);
 
-//        String redisKey = RedisKey.ADMIN_ACCESS_TOKENS_PREFIX + userId;
-//        this.redisTemplate.delete(redisKey);
-//
-//        String redisRefreshKey = RedisKey.ADMIN_REFRESH_TOKEN_PREFIX + userId;
-//        this.redisTemplate.delete(redisRefreshKey);
+        userAccessTokenService.deleteAllAccessTokenByUserId(userId);
+        userRefreshTokenService.deleteAllRefreshTokenByUserId(userId);
 
         adminLogService.log("logout", null);
     }
