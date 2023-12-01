@@ -19,19 +19,19 @@ public class StudentProjectController {
     }
 
     @GetMapping(value = "/student-project/search")
-    @ApiDescription(value = "Danh sách giảng viên", code = "student_project_search")
+    @ApiDescription(value = "Danh sách sinh viên đăng kí đồ án", code = "student_project_search")
     public StudentProjectSearchResponse searchStudentProject(StudentProjectSearchRequest request) {
         return studentProjectService.searchStudentProject(request);
     }
 
     @PostMapping(value = "/student-project/create")
-    @ApiDescription(value = "Thêm mới giảng viên", code = "student_project_create")
+    @ApiDescription(value = "Thêm mới sinh viên đăng kí đồ án", code = "student_project_create")
     public void createStudentProject(@RequestBody StudentProject studentProject) {
         studentProjectService.createStudentProject(studentProject);
     }
 
     @PostMapping(value = "/student-project/update")
-    @ApiDescription(value = "Cập nhật thông tin giảng viên", code = "student_project_update")
+    @ApiDescription(value = "Cập nhật sinh viên đăng kí đồ án", code = "student_project_update")
     public void updateStudentProject(@RequestBody StudentProject studentProject) {
         studentProjectService.updateStudentProject(studentProject);
     }
