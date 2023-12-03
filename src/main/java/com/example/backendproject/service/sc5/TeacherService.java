@@ -35,7 +35,7 @@ public class TeacherService {
 
     public TeacherSearchResponse searchTeacher(TeacherSearchRequest request) {
         TeacherSearchResponse response = new TeacherSearchResponse();
-        response.setPage(request.getPage());
+        response.setPage(request.getPage() + 1);
         response.setPageSize(request.getPageSize());
 
         List<Teacher> data = teacherRepository.searchTeacherByFilter(request);

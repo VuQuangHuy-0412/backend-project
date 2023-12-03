@@ -25,6 +25,9 @@ public class UserRefreshTokenEntity implements Serializable {
     @Column(name = "refresh_token")
     private String refreshToken;
 
+    @Column(name = "expire_time")
+    private Date expireTime;
+
     @Column(name = "created_at")
     private Date createdAt;
 

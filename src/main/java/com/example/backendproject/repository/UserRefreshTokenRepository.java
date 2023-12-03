@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface UserRefreshTokenRepository extends JpaRepository<UserRefreshTokenEntity, Long> {
-    UserRefreshTokenEntity findByUserId(Long userId);
+    List<UserRefreshTokenEntity> findByUserId(Long userId);
 
     @Modifying
     @Transactional
