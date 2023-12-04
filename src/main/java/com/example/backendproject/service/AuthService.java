@@ -20,7 +20,7 @@ import java.util.Date;
 @Slf4j
 @Service
 public class AuthService {
-    public static Integer ACCESS_TOKEN_EXPIRED_MINUTES = 15;
+    public static Integer ACCESS_TOKEN_EXPIRED_MINUTES = 120;
     public static Integer REFRESH_TOKEN_EXPIRED_HOURS = 50;
 
     @Autowired
