@@ -7,12 +7,14 @@ import com.example.backendproject.mapper.TeacherMapper;
 import com.example.backendproject.model.sc5.Teacher;
 import com.example.backendproject.model.sc5.TeacherSearchRequest;
 import com.example.backendproject.model.sc5.TeacherSearchResponse;
+import com.example.backendproject.model.sc5.UploadTeacherRequest;
 import com.example.backendproject.repository.sc5.TeacherRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -96,6 +98,16 @@ public class TeacherService {
         } catch (Exception exception) {
             log.error("Update teacher error!", exception);
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public void uploadFileTeacher(UploadTeacherRequest request) {
+        if (request == null || CollectionUtils.isEmpty(request.getTeacherCreateRequests())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        for (Teacher teacher : request.getTeacherCreateRequests()) {
+            validateCreateTeacherRequest(teacher);
         }
     }
 }
