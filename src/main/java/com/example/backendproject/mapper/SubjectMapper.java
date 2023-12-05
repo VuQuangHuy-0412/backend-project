@@ -7,4 +7,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface SubjectMapper {
     Subject toDto(SubjectEntity subjectEntity);
+
+    SubjectEntity toEntity(Subject subject);
 }
