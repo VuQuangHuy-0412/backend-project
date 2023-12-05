@@ -109,5 +109,11 @@ public class TeacherService {
         for (Teacher teacher : request.getTeacherCreateRequests()) {
             validateCreateTeacherRequest(teacher);
         }
+
+        List<TeacherEntity> entities = teacherMapper.toEntities(request.getTeacherCreateRequests());
+        entities.forEach(x -> x.setCreatedAt(new Date()));
+        entities.forEach(x -> x.setUpdatedAt(new Date()));
+
+        teacherRepository.saveAll(entities);
     }
 }

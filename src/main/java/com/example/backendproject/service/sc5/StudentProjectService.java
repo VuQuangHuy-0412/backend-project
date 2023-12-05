@@ -7,11 +7,13 @@ import com.example.backendproject.mapper.StudentProjectMapper;
 import com.example.backendproject.model.sc5.StudentProject;
 import com.example.backendproject.model.sc5.StudentProjectSearchRequest;
 import com.example.backendproject.model.sc5.StudentProjectSearchResponse;
+import com.example.backendproject.model.sc5.UploadStudentProjectRequest;
 import com.example.backendproject.repository.sc5.StudentProjectRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -90,5 +92,21 @@ public class StudentProjectService {
             log.error("Update studentProject error!", exception);
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public void uploadFileStudentProject(UploadStudentProjectRequest request) {
+        if (request == null || CollectionUtils.isEmpty(request.getStudentProjectCreateRequests())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        for (StudentProject studentProject : request.getStudentProjectCreateRequests()) {
+            validateCreateStudentProjectRequest(studentProject);
+        }
+
+        List<StudentProjectEntity> entities = studentProjectMapper.toEntities(request.getStudentProjectCreateRequests());
+        entities.forEach(x -> x.setCreatedAt(new Date()));
+        entities.forEach(x -> x.setUpdatedAt(new Date()));
+
+        studentProjectRepository.saveAll(entities);
     }
 }

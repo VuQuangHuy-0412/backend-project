@@ -7,12 +7,14 @@ import com.example.backendproject.mapper.SubjectMapper;
 import com.example.backendproject.model.sc5.Subject;
 import com.example.backendproject.model.sc5.SubjectSearchRequest;
 import com.example.backendproject.model.sc5.SubjectSearchResponse;
+import com.example.backendproject.model.sc5.UploadSubjectRequest;
 import com.example.backendproject.repository.sc5.SubjectRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -96,5 +98,21 @@ public class SubjectService {
             log.error("Update subject error!", exception);
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public void uploadFileSubject(UploadSubjectRequest request) {
+        if (request == null || CollectionUtils.isEmpty(request.getSubjectCreateRequests())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        for (Subject subject : request.getSubjectCreateRequests()) {
+            validateCreateSubjectRequest(subject);
+        }
+
+        List<SubjectEntity> entities = subjectMapper.toEntities(request.getSubjectCreateRequests());
+        entities.forEach(x -> x.setCreatedAt(new Date()));
+        entities.forEach(x -> x.setUpdatedAt(new Date()));
+
+        subjectRepository.saveAll(entities);
     }
 }

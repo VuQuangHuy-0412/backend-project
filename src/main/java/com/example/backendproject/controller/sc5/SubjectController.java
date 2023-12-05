@@ -1,8 +1,6 @@
 package com.example.backendproject.controller.sc5;
 
-import com.example.backendproject.model.sc5.Subject;
-import com.example.backendproject.model.sc5.SubjectSearchRequest;
-import com.example.backendproject.model.sc5.SubjectSearchResponse;
+import com.example.backendproject.model.sc5.*;
 import com.example.backendproject.service.sc5.SubjectService;
 import com.example.backendproject.util.ApiDescription;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,5 +32,11 @@ public class SubjectController {
     @ApiDescription(value = "Cập nhật thông tin học phần", code = "subject_update")
     public void updateSubject(@RequestBody Subject subject) {
         subjectService.updateSubject(subject);
+    }
+
+    @PostMapping(value = "/subject/upload-excel")
+    @ApiDescription(value = "Upload danh sách HP sử dụng excel", code = "subject_upload_excel")
+    public void uploadFileSubject(@RequestBody UploadSubjectRequest request) {
+        subjectService.uploadFileSubject(request);
     }
 }

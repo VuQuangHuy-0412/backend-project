@@ -3,17 +3,18 @@ package com.example.backendproject.service.sc5;
 import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.sc5.GroupTeacherEntity;
-import com.example.backendproject.entity.sc5.TeacherEntity;
 import com.example.backendproject.mapper.GroupTeacherMapper;
-import com.example.backendproject.mapper.TeacherMapper;
-import com.example.backendproject.model.sc5.*;
+import com.example.backendproject.model.sc5.GroupTeacher;
+import com.example.backendproject.model.sc5.GroupTeacherSearchRequest;
+import com.example.backendproject.model.sc5.GroupTeacherSearchResponse;
+import com.example.backendproject.model.sc5.UploadGroupTeacherRequest;
 import com.example.backendproject.repository.sc5.GroupTeacherRepository;
-import com.example.backendproject.repository.sc5.TeacherRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -89,5 +90,21 @@ public class GroupTeacherService {
             log.error("Update group teacher error!", exception);
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public void uploadFileGroupTeacher(UploadGroupTeacherRequest request) {
+        if (request == null || CollectionUtils.isEmpty(request.getGroupTeacherCreateRequests())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        for (GroupTeacher teacher : request.getGroupTeacherCreateRequests()) {
+            validateCreateGroupTeacherRequest(teacher);
+        }
+
+        List<GroupTeacherEntity> entities = groupTeacherMapper.toEntities(request.getGroupTeacherCreateRequests());
+        entities.forEach(x -> x.setCreatedAt(new Date()));
+        entities.forEach(x -> x.setUpdatedAt(new Date()));
+
+        groupTeacherRepository.saveAll(entities);
     }
 }

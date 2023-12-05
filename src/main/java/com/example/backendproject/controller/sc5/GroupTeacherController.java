@@ -1,8 +1,6 @@
 package com.example.backendproject.controller.sc5;
 
-import com.example.backendproject.model.sc5.GroupTeacher;
-import com.example.backendproject.model.sc5.GroupTeacherSearchRequest;
-import com.example.backendproject.model.sc5.GroupTeacherSearchResponse;
+import com.example.backendproject.model.sc5.*;
 import com.example.backendproject.service.sc5.GroupTeacherService;
 import com.example.backendproject.util.ApiDescription;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,5 +32,11 @@ public class GroupTeacherController {
     @ApiDescription(value = "Cập nhật thông tin nhóm chuyên môn", code = "group_teacher_update")
     public void updateGroupTeacher(@RequestBody GroupTeacher groupTeacher) {
         groupTeacherService.updateGroupTeacher(groupTeacher);
+    }
+
+    @PostMapping(value = "/group-teacher/upload-excel")
+    @ApiDescription(value = "Upload danh sách NCM sử dụng excel", code = "group_teacher_upload_excel")
+    public void uploadFileGroupTeacher(@RequestBody UploadGroupTeacherRequest request) {
+        groupTeacherService.uploadFileGroupTeacher(request);
     }
 }

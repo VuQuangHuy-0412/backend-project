@@ -7,12 +7,13 @@ import com.example.backendproject.mapper.ClassMapper;
 import com.example.backendproject.model.sc5.Class;
 import com.example.backendproject.model.sc5.ClassSearchRequest;
 import com.example.backendproject.model.sc5.ClassSearchResponse;
+import com.example.backendproject.model.sc5.UploadClassRequest;
 import com.example.backendproject.repository.sc5.ClassRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -92,5 +93,21 @@ public class ClassService {
             log.error("Update class error!", exception);
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public void uploadFileClass(UploadClassRequest request) {
+        if (request == null || CollectionUtils.isEmpty(request.getClassCreateRequests())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        for (Class classDto : request.getClassCreateRequests()) {
+            validateCreateClassRequest(classDto);
+        }
+
+        List<ClassEntity> entities = classMapper.toEntities(request.getClassCreateRequests());
+        entities.forEach(x -> x.setCreatedAt(new Date()));
+        entities.forEach(x -> x.setUpdatedAt(new Date()));
+
+        classRepository.saveAll(entities);
     }
 }

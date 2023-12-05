@@ -1,8 +1,7 @@
 package com.example.backendproject.controller.sc5;
 
+import com.example.backendproject.model.sc5.*;
 import com.example.backendproject.model.sc5.Class;
-import com.example.backendproject.model.sc5.ClassSearchRequest;
-import com.example.backendproject.model.sc5.ClassSearchResponse;
 import com.example.backendproject.service.sc5.ClassService;
 import com.example.backendproject.util.ApiDescription;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,5 +33,11 @@ public class ClassController {
     @ApiDescription(value = "Cập nhật thông tin lớp học", code = "class_update")
     public void updateClass(@RequestBody Class classDto) {
         classService.updateClass(classDto);
+    }
+
+    @PostMapping(value = "/class/upload-excel")
+    @ApiDescription(value = "Upload danh sách LH sử dụng excel", code = "class_upload_excel")
+    public void uploadFileClass(@RequestBody UploadClassRequest request) {
+        classService.uploadFileClass(request);
     }
 }
