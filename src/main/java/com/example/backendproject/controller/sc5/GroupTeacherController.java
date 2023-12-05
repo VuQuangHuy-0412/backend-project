@@ -39,4 +39,10 @@ public class GroupTeacherController {
     public void uploadFileGroupTeacher(@RequestBody UploadGroupTeacherRequest request) {
         groupTeacherService.uploadFileGroupTeacher(request);
     }
+
+    @GetMapping(value = "/group-teacher/all")
+    @ApiDescription(value = "Lấy danh sách toàn bộ nhóm chuyên môn", code = "group_teacher_get_all")
+    public GroupTeacherSearchResponse getAllGroupTeacher() {
+        return groupTeacherService.getAllGroupTeacher();
+    }
 }

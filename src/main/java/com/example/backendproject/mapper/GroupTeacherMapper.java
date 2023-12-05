@@ -10,6 +10,8 @@ import java.util.List;
 public interface GroupTeacherMapper {
     GroupTeacher toDto(GroupTeacherEntity groupTeacherEntity);
 
+    List<GroupTeacher> toDtos(List<GroupTeacherEntity> groupTeacherEntities);
+
     GroupTeacherEntity toEntity(GroupTeacher groupTeacher);
 
     List<GroupTeacherEntity> toEntities(List<GroupTeacher> groupTeachers);

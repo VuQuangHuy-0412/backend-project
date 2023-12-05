@@ -5,6 +5,9 @@ import com.example.backendproject.repository.sc5.custom.GroupTeacherRepositoryCu
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface GroupTeacherRepository extends JpaRepository<GroupTeacherEntity, Long>, GroupTeacherRepositoryCustom {
+    List<GroupTeacherEntity> findAllByIdIn(List<Long> ids);
 }

@@ -107,4 +107,12 @@ public class GroupTeacherService {
 
         groupTeacherRepository.saveAll(entities);
     }
+
+    public GroupTeacherSearchResponse getAllGroupTeacher() {
+        GroupTeacherSearchResponse response = new GroupTeacherSearchResponse();
+        List<GroupTeacherEntity> allGroup = groupTeacherRepository.findAll();
+
+        response.setData(groupTeacherMapper.toDtos(allGroup));
+        return response;
+    }
 }

@@ -2,12 +2,14 @@ package com.example.backendproject.service.sc5;
 
 import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.exception.Sc5Exception;
+import com.example.backendproject.entity.sc5.GroupTeacherEntity;
+import com.example.backendproject.entity.sc5.GroupTeacherMappingEntity;
 import com.example.backendproject.entity.sc5.TeacherEntity;
+import com.example.backendproject.mapper.GroupTeacherMapper;
 import com.example.backendproject.mapper.TeacherMapper;
-import com.example.backendproject.model.sc5.Teacher;
-import com.example.backendproject.model.sc5.TeacherSearchRequest;
-import com.example.backendproject.model.sc5.TeacherSearchResponse;
-import com.example.backendproject.model.sc5.UploadTeacherRequest;
+import com.example.backendproject.model.sc5.*;
+import com.example.backendproject.repository.sc5.GroupTeacherMappingRepository;
+import com.example.backendproject.repository.sc5.GroupTeacherRepository;
 import com.example.backendproject.repository.sc5.TeacherRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.util.CommonUtil;
@@ -16,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -26,13 +29,22 @@ public class TeacherService {
     private final TeacherRepository teacherRepository;
     private final AdminLogService adminLogService;
     private final TeacherMapper teacherMapper;
+    private final GroupTeacherMappingRepository groupTeacherMappingRepository;
+    private final GroupTeacherRepository groupTeacherRepository;
+    private final GroupTeacherMapper groupTeacherMapper;
 
     public TeacherService(TeacherRepository teacherRepository,
                           AdminLogService adminLogService,
-                          TeacherMapper teacherMapper) {
+                          TeacherMapper teacherMapper,
+                          GroupTeacherMappingRepository groupTeacherMappingRepository,
+                          GroupTeacherRepository groupTeacherRepository,
+                          GroupTeacherMapper groupTeacherMapper) {
         this.teacherRepository = teacherRepository;
         this.adminLogService = adminLogService;
         this.teacherMapper = teacherMapper;
+        this.groupTeacherMappingRepository = groupTeacherMappingRepository;
+        this.groupTeacherRepository = groupTeacherRepository;
+        this.groupTeacherMapper = groupTeacherMapper;
     }
 
     public TeacherSearchResponse searchTeacher(TeacherSearchRequest request) {
@@ -40,7 +52,24 @@ public class TeacherService {
         response.setPage(request.getPage() + 1);
         response.setPageSize(request.getPageSize());
 
+        if (request.getGroupTeacher() != null) {
+            List<GroupTeacherMappingEntity> groupTeacherMappingEntities = groupTeacherMappingRepository.findAllByGroupId(request.getGroupTeacher());
+            if (CollectionUtils.isEmpty(groupTeacherMappingEntities)) {
+                response.setData(new ArrayList<>());
+                return response;
+            }
+
+            request.setIds(groupTeacherMappingEntities.stream().map(GroupTeacherMappingEntity::getTeacherId).toList());
+        }
+
         List<Teacher> data = teacherRepository.searchTeacherByFilter(request);
+        for (Teacher teacher : data) {
+            List<GroupTeacherMappingEntity> mappingEntities = groupTeacherMappingRepository.findAllByTeacherId(teacher.getId());
+            List<Long> groupIds = mappingEntities.stream().map(GroupTeacherMappingEntity::getGroupId).toList();
+            List<GroupTeacherEntity> groupTeacherEntities = groupTeacherRepository.findAllByIdIn(groupIds);
+
+            teacher.setGroupTeacher(groupTeacherMapper.toDtos(groupTeacherEntities));
+        }
         response.setData(data);
         return response;
     }

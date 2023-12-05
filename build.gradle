@@ -39,6 +39,7 @@ dependencies {
 	compileOnly 'org.mapstruct:mapstruct:1.5.3.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 	implementation group: 'org.jxls', name: 'jxls-poi', version: '2.11.0'
+	implementation 'commons-io:commons-io:2.15.1'
 	implementation group: 'com.google.guava', name: 'guava', version: '23.0'
 	implementation "javax.xml.bind:jaxb-api:2.3.0"
 	implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.1'

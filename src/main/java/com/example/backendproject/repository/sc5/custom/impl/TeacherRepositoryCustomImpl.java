@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -59,6 +60,21 @@ public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
         if (!StringUtils.isBlank(request.getRankAndDegree())) {
             where += " and t.rank_and_degree = :rankAndDegree ";
             params.addValue("rankAndDegree", request.getFullName());
+        }
+
+        if (!CollectionUtils.isEmpty(request.getIds())) {
+            where += " and t.id in (:ids) ";
+            params.addValue("ids", request.getIds());
+        }
+
+        if (StringUtils.isNotBlank(request.getStartTimeFrom())) {
+            where += " and t.start_time >= :startTimeFrom ";
+            params.addValue("startTimeFrom", request.getStartTimeFrom());
+        }
+
+        if (StringUtils.isNotBlank(request.getStartTimeTo())) {
+            where += " and t.start_time < :startTimeTo ";
+            params.addValue("startTimeTo", request.getStartTimeTo());
         }
 
         return where;
