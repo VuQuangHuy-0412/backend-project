@@ -10,6 +10,8 @@ import java.util.List;
 public interface TeacherMapper {
     Teacher toDto(TeacherEntity teacherEntity);
 
+    List<Teacher> toDtos(List<TeacherEntity> teacherEntities);
+
     TeacherEntity toEntity(Teacher teacher);
 
     List<TeacherEntity> toEntities(List<Teacher> teachers);

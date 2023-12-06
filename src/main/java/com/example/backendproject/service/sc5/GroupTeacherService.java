@@ -3,12 +3,15 @@ package com.example.backendproject.service.sc5;
 import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.sc5.GroupTeacherEntity;
+import com.example.backendproject.entity.sc5.TeacherEntity;
 import com.example.backendproject.mapper.GroupTeacherMapper;
+import com.example.backendproject.mapper.TeacherMapper;
 import com.example.backendproject.model.sc5.GroupTeacher;
 import com.example.backendproject.model.sc5.GroupTeacherSearchRequest;
 import com.example.backendproject.model.sc5.GroupTeacherSearchResponse;
 import com.example.backendproject.model.sc5.UploadGroupTeacherRequest;
 import com.example.backendproject.repository.sc5.GroupTeacherRepository;
+import com.example.backendproject.repository.sc5.TeacherRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -26,13 +29,19 @@ public class GroupTeacherService {
     private final GroupTeacherRepository groupTeacherRepository;
     private final AdminLogService adminLogService;
     private final GroupTeacherMapper groupTeacherMapper;
+    private final TeacherRepository teacherRepository;
+    private final TeacherMapper teacherMapper;
 
     public GroupTeacherService(GroupTeacherRepository groupTeacherRepository,
                                AdminLogService adminLogService,
-                               GroupTeacherMapper groupTeacherMapper) {
+                               GroupTeacherMapper groupTeacherMapper,
+                               TeacherRepository teacherRepository,
+                               TeacherMapper teacherMapper) {
         this.groupTeacherRepository = groupTeacherRepository;
         this.groupTeacherMapper = groupTeacherMapper;
         this.adminLogService = adminLogService;
+        this.teacherRepository = teacherRepository;
+        this.teacherMapper = teacherMapper;
     }
 
     public GroupTeacherSearchResponse searchGroupTeacher(GroupTeacherSearchRequest request) {
@@ -41,6 +50,12 @@ public class GroupTeacherService {
         response.setPageSize(request.getPageSize());
 
         List<GroupTeacher> data = groupTeacherRepository.searchGroupTeacherByFilter(request);
+        for (GroupTeacher groupTeacher : data) {
+            if (groupTeacher.getLeader() != null) {
+                Optional<TeacherEntity> teacherEntity = teacherRepository.findById(groupTeacher.getLeader());
+                teacherEntity.ifPresent(entity -> groupTeacher.setLeaderInfo(teacherMapper.toDto(entity)));
+            }
+        }
         response.setData(data);
         return response;
     }

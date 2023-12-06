@@ -19,4 +19,6 @@ public class GroupTeacher {
     private Date createdAt;
 
     private Date updatedAt;
+
+    private Teacher leaderInfo;
 }

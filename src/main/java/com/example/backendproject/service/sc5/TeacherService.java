@@ -1,6 +1,7 @@
 package com.example.backendproject.service.sc5;
 
 import com.example.backendproject.config.constant.ErrorEnum;
+import com.example.backendproject.config.constant.GroupTeacherMappingConstant;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.sc5.GroupTeacherEntity;
 import com.example.backendproject.entity.sc5.GroupTeacherMappingEntity;
@@ -13,6 +14,7 @@ import com.example.backendproject.repository.sc5.GroupTeacherRepository;
 import com.example.backendproject.repository.sc5.TeacherRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.util.CommonUtil;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -74,6 +76,7 @@ public class TeacherService {
         return response;
     }
 
+    @Transactional(rollbackOn = Exception.class)
     public void createTeacher(Teacher teacher) {
         adminLogService.log("createTeacher", CommonUtil.toJson(teacher));
         log.info("Create teacher with data: " + CommonUtil.toJson(teacher));
@@ -82,12 +85,32 @@ public class TeacherService {
         TeacherEntity teacherEntity = teacherMapper.toEntity(teacher);
         teacherEntity.setCreatedAt(new Date());
         teacherEntity.setUpdatedAt(new Date());
+
         try {
-            teacherRepository.save(teacherEntity);
+            teacherEntity = teacherRepository.save(teacherEntity);
+            if (!CollectionUtils.isEmpty(teacher.getGroupTeacher())) {
+                List<GroupTeacherMappingEntity> mappingEntities = getGroupTeacherMappingEntities(teacher, teacherEntity);
+                if (!CollectionUtils.isEmpty(mappingEntities)) {
+                    groupTeacherMappingRepository.saveAll(mappingEntities);
+                }
+            }
+
         } catch (Exception exception) {
             log.error("Save teacher error!", exception);
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private static List<GroupTeacherMappingEntity> getGroupTeacherMappingEntities(Teacher teacher, TeacherEntity teacherEntity) {
+        List<GroupTeacherMappingEntity> mappingEntities = new ArrayList<>();
+        for (GroupTeacher groupTeacher : teacher.getGroupTeacher()) {
+            GroupTeacherMappingEntity entity = new GroupTeacherMappingEntity();
+            entity.setTeacherId(teacherEntity.getId());
+            entity.setGroupId(groupTeacher.getId());
+            entity.setRole(GroupTeacherMappingConstant.Role.TEACHER);
+            mappingEntities.add(entity);
+        }
+        return mappingEntities;
     }
 
     private void validateCreateTeacherRequest(Teacher teacher) {
@@ -124,6 +147,14 @@ public class TeacherService {
 
         try {
             teacherRepository.save(teacherEntity);
+            List<GroupTeacherMappingEntity> existed = groupTeacherMappingRepository.findAllByTeacherId(teacher.getId());
+            List<Long> groupIds = existed.stream().map(GroupTeacherMappingEntity::getGroupId).toList();
+
+            List<GroupTeacherMappingEntity> allGroup = getGroupTeacherMappingEntities(teacher, teacherEntity);
+            List<GroupTeacherMappingEntity> mappingExisted = allGroup.stream().filter(x -> groupIds.contains(x.getGroupId())).toList();
+
+            allGroup.removeAll(mappingExisted);
+            groupTeacherMappingRepository.saveAll(allGroup);
         } catch (Exception exception) {
             log.error("Update teacher error!", exception);
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
@@ -144,5 +175,29 @@ public class TeacherService {
         entities.forEach(x -> x.setUpdatedAt(new Date()));
 
         teacherRepository.saveAll(entities);
+    }
+
+    public TeacherSearchResponse getAllTeacherByGroup(Long groupId) {
+        if (groupId == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        Optional<GroupTeacherEntity> groupTeacherEntity = groupTeacherRepository.findById(groupId);
+        if (groupTeacherEntity.isEmpty()) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Không tìm thấy thông tin nhóm chuyên môn");
+        }
+
+        TeacherSearchResponse response = new TeacherSearchResponse();
+        List<GroupTeacherMappingEntity> mappingEntities = groupTeacherMappingRepository.findAllByGroupId(groupId);
+        if (CollectionUtils.isEmpty(mappingEntities)) {
+            response.setData(new ArrayList<>());
+            return response;
+        }
+
+        List<Long> teacherIds = mappingEntities.stream().map(GroupTeacherMappingEntity::getTeacherId).toList();
+        List<TeacherEntity> teachers = teacherRepository.findAllById(teacherIds);
+
+        response.setData(teacherMapper.toDtos(teachers));
+        return response;
     }
 }
