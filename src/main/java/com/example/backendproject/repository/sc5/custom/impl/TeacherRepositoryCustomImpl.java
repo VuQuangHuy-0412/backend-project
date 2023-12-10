@@ -79,4 +79,23 @@ public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
 
         return where;
     }
+
+    @Override
+    public List<Teacher> getAllTeacherOfAGroup(Long groupId) {
+        String sql = "select t.*, gtm.role from group_teacher_mapping gtm " +
+                " join teacher t on gtm.teacher_id = t.id " +
+                " where 1=1 " +
+                " and gtm.group_id = :groupId ";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("groupId", groupId);
+
+        List<Teacher> result;
+        try {
+            result = namedParameterJdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(Teacher.class));
+        } catch (Exception exception) {
+            log.error("Query search teacher failed!", exception);
+            result = Collections.emptyList();
+        }
+        return result;
+    }
 }

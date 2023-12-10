@@ -8,22 +8,20 @@ import java.util.List;
 
 @Getter
 @Setter
-public class Teacher {
+public class GroupTeacherDetail {
     private Long id;
 
-    private String fullName;
+    private String name;
 
-    private String rankAndDegree;
+    private String description;
 
-    private Date startTime;
-
-    private Date birthday;
+    private Long leader;
 
     private Date createdAt;
 
     private Date updatedAt;
 
-    private List<GroupTeacher> groupTeacher;
+    private Teacher leaderInfo;
 
-    private String role;
+    private List<Teacher> members;
 }

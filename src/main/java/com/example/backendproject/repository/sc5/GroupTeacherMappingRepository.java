@@ -11,4 +11,6 @@ public interface GroupTeacherMappingRepository extends JpaRepository<GroupTeache
     List<GroupTeacherMappingEntity> findAllByTeacherId(Long teacherId);
 
     List<GroupTeacherMappingEntity> findAllByGroupId(Long groupId);
+
+    GroupTeacherMappingEntity findByGroupIdAndTeacherId(Long groupId, Long teacherId);
 }

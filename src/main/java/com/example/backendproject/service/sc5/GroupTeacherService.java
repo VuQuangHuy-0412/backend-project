@@ -1,15 +1,15 @@
 package com.example.backendproject.service.sc5;
 
 import com.example.backendproject.config.constant.ErrorEnum;
+import com.example.backendproject.config.constant.GroupTeacherMappingConstant;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.sc5.GroupTeacherEntity;
+import com.example.backendproject.entity.sc5.GroupTeacherMappingEntity;
 import com.example.backendproject.entity.sc5.TeacherEntity;
 import com.example.backendproject.mapper.GroupTeacherMapper;
 import com.example.backendproject.mapper.TeacherMapper;
-import com.example.backendproject.model.sc5.GroupTeacher;
-import com.example.backendproject.model.sc5.GroupTeacherSearchRequest;
-import com.example.backendproject.model.sc5.GroupTeacherSearchResponse;
-import com.example.backendproject.model.sc5.UploadGroupTeacherRequest;
+import com.example.backendproject.model.sc5.*;
+import com.example.backendproject.repository.sc5.GroupTeacherMappingRepository;
 import com.example.backendproject.repository.sc5.GroupTeacherRepository;
 import com.example.backendproject.repository.sc5.TeacherRepository;
 import com.example.backendproject.service.AdminLogService;
@@ -31,17 +31,20 @@ public class GroupTeacherService {
     private final GroupTeacherMapper groupTeacherMapper;
     private final TeacherRepository teacherRepository;
     private final TeacherMapper teacherMapper;
+    private final GroupTeacherMappingRepository groupTeacherMappingRepository;
 
     public GroupTeacherService(GroupTeacherRepository groupTeacherRepository,
                                AdminLogService adminLogService,
                                GroupTeacherMapper groupTeacherMapper,
                                TeacherRepository teacherRepository,
-                               TeacherMapper teacherMapper) {
+                               TeacherMapper teacherMapper,
+                               GroupTeacherMappingRepository groupTeacherMappingRepository) {
         this.groupTeacherRepository = groupTeacherRepository;
         this.groupTeacherMapper = groupTeacherMapper;
         this.adminLogService = adminLogService;
         this.teacherRepository = teacherRepository;
         this.teacherMapper = teacherMapper;
+        this.groupTeacherMappingRepository = groupTeacherMappingRepository;
     }
 
     public GroupTeacherSearchResponse searchGroupTeacher(GroupTeacherSearchRequest request) {
@@ -129,5 +132,75 @@ public class GroupTeacherService {
 
         response.setData(groupTeacherMapper.toDtos(allGroup));
         return response;
+    }
+
+    public GroupTeacherDetail getGroupTeacherDetail(Long id) {
+        if (id == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Không tìm thấy thông tin nhóm chuyên môn");
+        }
+
+        Optional<GroupTeacherEntity> groupTeacherEntityOptional = groupTeacherRepository.findById(id);
+        if (groupTeacherEntityOptional.isEmpty()) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Không tìm thấy thông tin nhóm chuyên môn");
+        }
+
+        GroupTeacherEntity entity = groupTeacherEntityOptional.get();
+        GroupTeacherDetail groupTeacherDetail = new GroupTeacherDetail();
+        groupTeacherDetail.setId(entity.getId());
+        groupTeacherDetail.setName(entity.getName());
+        groupTeacherDetail.setDescription(entity.getDescription());
+        groupTeacherDetail.setCreatedAt(entity.getCreatedAt());
+        groupTeacherDetail.setUpdatedAt(entity.getUpdatedAt());
+        groupTeacherDetail.setLeader(entity.getLeader());
+
+        if (groupTeacherDetail.getLeader() != null) {
+            Optional<TeacherEntity> teacherEntity = teacherRepository.findById(groupTeacherDetail.getLeader());
+            teacherEntity.ifPresent(e -> groupTeacherDetail.setLeaderInfo(teacherMapper.toDto(e)));
+        }
+
+        List<Teacher> members = teacherRepository.getAllTeacherOfAGroup(groupTeacherDetail.getId());
+        groupTeacherDetail.setMembers(members);
+        return groupTeacherDetail;
+    }
+
+    public void addTeacherToGroup(AddTeacherToGroupRequest request) {
+        if (request.getTeacherId() == null || request.getGroupId() == null || StringUtils.isBlank(request.getRole())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        if (!GroupTeacherMappingConstant.Role.LIST_ROLE.contains(request.getRole())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vai trò không hợp lệ");
+        }
+
+        GroupTeacherMappingEntity existed = groupTeacherMappingRepository.findByGroupIdAndTeacherId(request.getGroupId(), request.getTeacherId());
+        if (existed != null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Giảng viên đã nằm trong nhóm");
+        }
+
+        GroupTeacherMappingEntity entity = new GroupTeacherMappingEntity();
+        entity.setGroupId(request.getGroupId());
+        entity.setTeacherId(request.getTeacherId());
+        entity.setRole(request.getRole());
+
+        groupTeacherMappingRepository.save(entity);
+    }
+
+    public void updateTeacherToGroup(AddTeacherToGroupRequest request) {
+        if (request.getTeacherId() == null || request.getGroupId() == null || StringUtils.isBlank(request.getRole())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        if (!GroupTeacherMappingConstant.Role.LIST_ROLE.contains(request.getRole())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vai trò không hợp lệ");
+        }
+
+        GroupTeacherMappingEntity existed = groupTeacherMappingRepository.findByGroupIdAndTeacherId(request.getGroupId(), request.getTeacherId());
+        if (existed == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Giảng viên không nằm trong nhóm");
+        }
+
+        existed.setRole(request.getRole());
+
+        groupTeacherMappingRepository.save(existed);
     }
 }
