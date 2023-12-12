@@ -7,6 +7,7 @@ import com.example.backendproject.entity.sc5.GroupTeacherEntity;
 import com.example.backendproject.entity.sc5.GroupTeacherMappingEntity;
 import com.example.backendproject.entity.sc5.TeacherEntity;
 import com.example.backendproject.mapper.GroupTeacherMapper;
+import com.example.backendproject.mapper.GroupTeacherMappingMapper;
 import com.example.backendproject.mapper.TeacherMapper;
 import com.example.backendproject.model.sc5.*;
 import com.example.backendproject.repository.sc5.GroupTeacherMappingRepository;
@@ -32,19 +33,22 @@ public class GroupTeacherService {
     private final TeacherRepository teacherRepository;
     private final TeacherMapper teacherMapper;
     private final GroupTeacherMappingRepository groupTeacherMappingRepository;
+    private final GroupTeacherMappingMapper groupTeacherMappingMapper;
 
     public GroupTeacherService(GroupTeacherRepository groupTeacherRepository,
                                AdminLogService adminLogService,
                                GroupTeacherMapper groupTeacherMapper,
                                TeacherRepository teacherRepository,
                                TeacherMapper teacherMapper,
-                               GroupTeacherMappingRepository groupTeacherMappingRepository) {
+                               GroupTeacherMappingRepository groupTeacherMappingRepository,
+                               GroupTeacherMappingMapper groupTeacherMappingMapper) {
         this.groupTeacherRepository = groupTeacherRepository;
         this.groupTeacherMapper = groupTeacherMapper;
         this.adminLogService = adminLogService;
         this.teacherRepository = teacherRepository;
         this.teacherMapper = teacherMapper;
         this.groupTeacherMappingRepository = groupTeacherMappingRepository;
+        this.groupTeacherMappingMapper = groupTeacherMappingMapper;
     }
 
     public GroupTeacherSearchResponse searchGroupTeacher(GroupTeacherSearchRequest request) {
@@ -202,5 +206,25 @@ public class GroupTeacherService {
         existed.setRole(request.getRole());
 
         groupTeacherMappingRepository.save(existed);
+    }
+
+    public void uploadExcelGroupTeacherMapping(UploadGroupTeacherMappingRequest request) {
+        if (request == null || CollectionUtils.isEmpty(request.getGroupTeacherMappingCreateRequests())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        for (GroupTeacherMapping groupTeacherMapping : request.getGroupTeacherMappingCreateRequests()) {
+            if (groupTeacherMapping.getTeacherId() == null || groupTeacherMapping.getGroupId() == null || StringUtils.isBlank(groupTeacherMapping.getRole())) {
+                throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+            }
+
+            if (!GroupTeacherMappingConstant.Role.LIST_ROLE.contains(groupTeacherMapping.getRole())) {
+                throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vai trò không hợp lệ");
+            }
+        }
+
+        List<GroupTeacherMappingEntity> entities = groupTeacherMappingMapper.toEntities(request.getGroupTeacherMappingCreateRequests());
+
+        groupTeacherMappingRepository.saveAll(entities);
     }
 }

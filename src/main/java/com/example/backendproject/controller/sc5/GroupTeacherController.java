@@ -60,4 +60,10 @@ public class GroupTeacherController {
     public void updateTeacherToGroup(@RequestBody AddTeacherToGroupRequest request) {
         groupTeacherService.updateTeacherToGroup(request);
     }
+
+    @PostMapping(value = "/group-teacher-mapping/upload-excel")
+    @ApiDescription(value = "Upload excel danh sách GV thuộc nhóm chuyên môn", code = "group_teacher_mapping_upload")
+    public void uploadExcelGroupTeacherMapping(@RequestBody UploadGroupTeacherMappingRequest request) {
+        groupTeacherService.uploadExcelGroupTeacherMapping(request);
+    }
 }

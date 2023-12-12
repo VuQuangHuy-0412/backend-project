@@ -43,9 +43,15 @@ public class TeacherController {
         teacherService.uploadFileTeacher(request);
     }
 
-    @PostMapping(value = "/teacher/all-by-group")
+    @GetMapping(value = "/teacher/all-by-group")
     @ApiDescription(value = "Lấy toàn bộ danh sách GV thuộc nhóm chuyên môn", code = "all_teacher_by_group")
     public TeacherSearchResponse getAllTeacherByGroup(Long groupId) {
         return teacherService.getAllTeacherByGroup(groupId);
+    }
+
+    @GetMapping(value = "/teacher/all")
+    @ApiDescription(value = "Lấy toàn bộ danh sách GV", code = "all_teacher")
+    public TeacherSearchResponse getAllTeacher() {
+        return teacherService.getAllTeacher();
     }
 }

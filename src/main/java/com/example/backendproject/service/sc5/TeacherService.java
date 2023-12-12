@@ -200,4 +200,12 @@ public class TeacherService {
         response.setData(teacherMapper.toDtos(teachers));
         return response;
     }
+
+    public TeacherSearchResponse getAllTeacher() {
+        TeacherSearchResponse response = new TeacherSearchResponse();
+        List<TeacherEntity> entities = teacherRepository.findAll();
+
+        response.setData(teacherMapper.toDtos(entities));
+        return response;
+    }
 }
