@@ -25,7 +25,7 @@ public class StudentProjectRepositoryCustomImpl implements StudentProjectReposit
 
     @Override
     public List<StudentProject> searchStudentProjectByFilter(StudentProjectSearchRequest request) {
-        String sql = "select sp.* from student_project sp where 1=1 ";
+        String sql = "select sp.*, sp.teacher_1_id as teacher1Id, sp.teacher_2_id as teacher2Id, sp.teacher_3_id as teacher3Id from student_project sp where 1=1 ";
         MapSqlParameterSource params = new MapSqlParameterSource();
 
         String where = buildWhereSqlCommand(params, request);

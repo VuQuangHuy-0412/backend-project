@@ -23,6 +23,12 @@ public class Teacher {
 
     private Date updatedAt;
 
+    private Integer gdTime;
+
+    private Integer hdTime;
+
+    private Float rating;
+
     private List<GroupTeacher> groupTeacher;
 
     private String role;

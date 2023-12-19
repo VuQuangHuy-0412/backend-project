@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "language")
+@Table(name = "student_project")
 @Getter
 @Setter
 public class StudentProjectEntity implements Serializable {

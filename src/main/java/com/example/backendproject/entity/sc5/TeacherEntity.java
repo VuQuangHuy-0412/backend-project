@@ -32,6 +32,15 @@ public class TeacherEntity implements Serializable {
     @Column(name = "birthday")
     private Date birthday;
 
+    @Column(name = "gd_time")
+    private Integer gdTime;
+
+    @Column(name = "hd_time")
+    private Integer hdTime;
+
+    @Column(name = "rating")
+    private Float rating;
+
     @Column(name = "created_at")
     private Date createdAt;
 

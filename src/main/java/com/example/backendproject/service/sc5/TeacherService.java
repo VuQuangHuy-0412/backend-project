@@ -143,18 +143,13 @@ public class TeacherService {
         teacherEntity.setRankAndDegree(teacher.getRankAndDegree());
         teacherEntity.setStartTime(teacher.getStartTime());
         teacherEntity.setBirthday(teacher.getBirthday());
+        teacherEntity.setGdTime(teacher.getGdTime());
+        teacherEntity.setHdTime(teacher.getHdTime());
+        teacherEntity.setRating(teacher.getRating());
         teacherEntity.setUpdatedAt(new Date());
 
         try {
             teacherRepository.save(teacherEntity);
-            List<GroupTeacherMappingEntity> existed = groupTeacherMappingRepository.findAllByTeacherId(teacher.getId());
-            List<Long> groupIds = existed.stream().map(GroupTeacherMappingEntity::getGroupId).toList();
-
-            List<GroupTeacherMappingEntity> allGroup = getGroupTeacherMappingEntities(teacher, teacherEntity);
-            List<GroupTeacherMappingEntity> mappingExisted = allGroup.stream().filter(x -> groupIds.contains(x.getGroupId())).toList();
-
-            allGroup.removeAll(mappingExisted);
-            groupTeacherMappingRepository.saveAll(allGroup);
         } catch (Exception exception) {
             log.error("Update teacher error!", exception);
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
