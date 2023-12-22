@@ -1,18 +1,13 @@
-# syntax=docker/dockerfile:1
-FROM eclipse-temurin:17-jdk-jammy AS builder
-RUN $JAVA_HOME/bin/jlink \
-    --add-modules java.se \
-    --strip-debug \
-    --no-man-pages \
-    --no-header-files \
-    --compress=2 \
-    --output /jre/
+# Stage 1: Build the Spring Boot application
+FROM openjdk:17-jdk-alpine AS build
+WORKDIR /app
+COPY . /app
+RUN ./gradlew build    # Or replace with your build command (e.g., Maven or Gradle)
 
-FROM ubuntu:jammy
-ENV JAVA_HOME=/opt/java/jre
-ENV PATH "${JAVA_HOME}/bin:${PATH}"
-COPY --from=builder /jre/ $JAVA_HOME
+# Stage 2: Create the final image with only the built artifact
+FROM openjdk:17-jdk-alpine
+WORKDIR /app
+COPY --from=build /app/build/libs/backend-project-0.0.1-SNAPSHOT.jar /app/backend-project.jar
 
-# Use Fat JAR for simplicity
-COPY ./target/backend-project.jar ./backend-project.jar
-ENTRYPOINT ["java", "-jar", "./backend-project.jar"]
+EXPOSE 8080
+CMD ["java", "-jar", "backend-project.jar"]
