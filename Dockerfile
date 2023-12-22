@@ -14,5 +14,5 @@ ENV PATH "${JAVA_HOME}/bin:${PATH}"
 COPY --from=builder /jre/ $JAVA_HOME
 
 # Use Fat JAR for simplicity
-COPY ./target/app.jar ./app.jar
-ENTRYPOINT ["java", "-jar", "./app.jar"]
+COPY ./target/backend-project.jar ./backend-project.jar
+ENTRYPOINT ["java", "-jar", "./backend-project.jar"]
