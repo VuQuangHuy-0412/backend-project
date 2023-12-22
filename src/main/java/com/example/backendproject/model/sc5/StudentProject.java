@@ -14,7 +14,7 @@ public class StudentProject {
 
     private String studentCode;
 
-    private Long classId;
+    private Integer timeHd;
 
     private Integer isAssigned;
 

@@ -26,8 +26,8 @@ public class StudentProjectEntity implements Serializable {
     @Column(name = "student_code")
     private String studentCode;
 
-    @Column(name = "class_id")
-    private Long classId;
+    @Column(name = "time_hd")
+    private Integer timeHd;
 
     @Column(name = "is_assigned")
     private Integer isAssigned;

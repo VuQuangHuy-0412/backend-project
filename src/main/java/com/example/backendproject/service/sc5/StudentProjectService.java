@@ -78,7 +78,7 @@ public class StudentProjectService {
         StudentProjectEntity studentProjectEntity = studentProjectEntityOptional.get();
         studentProjectEntity.setName(studentProject.getName());
         studentProjectEntity.setStudentCode(studentProject.getStudentCode());
-        studentProjectEntity.setClassId(studentProject.getClassId());
+        studentProjectEntity.setTimeHd(studentProject.getTimeHd());
         studentProjectEntity.setIsAssigned(studentProject.getIsAssigned());
         studentProjectEntity.setTeacher1Id(studentProject.getTeacher1Id());
         studentProjectEntity.setTeacher2Id(studentProject.getTeacher2Id());

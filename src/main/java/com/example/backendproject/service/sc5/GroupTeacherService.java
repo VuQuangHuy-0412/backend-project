@@ -20,9 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -127,7 +125,17 @@ public class GroupTeacherService {
         entities.forEach(x -> x.setCreatedAt(new Date()));
         entities.forEach(x -> x.setUpdatedAt(new Date()));
 
-        groupTeacherRepository.saveAll(entities);
+        entities = groupTeacherRepository.saveAll(entities);
+
+        List<GroupTeacherMappingEntity> mappingEntities = new ArrayList<>();
+        for (GroupTeacherEntity teacher : entities) {
+            GroupTeacherMappingEntity newLeader = new GroupTeacherMappingEntity();
+            newLeader.setTeacherId(teacher.getLeader());
+            newLeader.setGroupId(teacher.getId());
+            newLeader.setRole("leader");
+            mappingEntities.add(newLeader);
+        }
+        groupTeacherMappingRepository.saveAll(mappingEntities);
     }
 
     public GroupTeacherSearchResponse getAllGroupTeacher() {
@@ -223,8 +231,16 @@ public class GroupTeacherService {
             }
         }
 
-        List<GroupTeacherMappingEntity> entities = groupTeacherMappingMapper.toEntities(request.getGroupTeacherMappingCreateRequests());
+        List<GroupTeacherMapping> requests = request.getGroupTeacherMappingCreateRequests();
+        for (GroupTeacherMapping groupTeacherMapping : request.getGroupTeacherMappingCreateRequests()) {
+            GroupTeacherMappingEntity entity = groupTeacherMappingRepository.findByGroupIdAndTeacherId(groupTeacherMapping.getGroupId(), groupTeacherMapping.getTeacherId());
+            if (entity != null) {
+                List<GroupTeacherMapping> filter = requests.stream().filter(x -> Objects.equals(x.getGroupId(), groupTeacherMapping.getGroupId()) && Objects.equals(x.getTeacherId(), groupTeacherMapping.getTeacherId())).toList();
+                requests.removeAll(filter);
+            }
+        }
 
+        List<GroupTeacherMappingEntity> entities = groupTeacherMappingMapper.toEntities(request.getGroupTeacherMappingCreateRequests());
         groupTeacherMappingRepository.saveAll(entities);
     }
 }
