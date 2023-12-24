@@ -2,6 +2,7 @@ package com.example.backendproject.service.sc5;
 
 import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.constant.GroupTeacherMappingConstant;
+import com.example.backendproject.config.constant.TeacherConstant;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.sc5.GroupTeacherEntity;
 import com.example.backendproject.entity.sc5.GroupTeacherMappingEntity;
@@ -125,6 +126,10 @@ public class TeacherService {
         if (teacher.getBirthday() == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Thiếu thông tin ngày sinh.");
         }
+
+        if (teacher.getStatus() == null || !TeacherConstant.Status.LIST_STATUS_VALID.contains(teacher.getStatus())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Trạng thái không hợp lệ.");
+        }
     }
 
     public void updateTeacher(Teacher teacher) {
@@ -146,6 +151,7 @@ public class TeacherService {
         teacherEntity.setGdTime(teacher.getGdTime());
         teacherEntity.setHdTime(teacher.getHdTime());
         teacherEntity.setRating(teacher.getRating());
+        teacherEntity.setStatus(teacher.getStatus());
         teacherEntity.setUpdatedAt(new Date());
 
         try {

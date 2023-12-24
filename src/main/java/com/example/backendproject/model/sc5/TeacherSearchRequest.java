@@ -15,6 +15,7 @@ public class TeacherSearchRequest extends BaseFilterRequest {
     private String rankAndDegree;
     private String startTimeFrom;
     private String startTimeTo;
+    private Integer status;
     private Long groupTeacher;
     private List<Long> ids;
 }

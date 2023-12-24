@@ -29,6 +29,8 @@ public class Teacher {
 
     private Float rating;
 
+    private Integer status;
+
     private List<GroupTeacher> groupTeacher;
 
     private String role;

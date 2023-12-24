@@ -77,6 +77,11 @@ public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
             params.addValue("startTimeTo", request.getStartTimeTo());
         }
 
+        if (request.getStatus() != null) {
+            where += " and t.status = :status ";
+            params.addValue("status", request.getStatus());
+        }
+
         return where;
     }
 

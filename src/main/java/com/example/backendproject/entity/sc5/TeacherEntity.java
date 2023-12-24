@@ -46,4 +46,7 @@ public class TeacherEntity implements Serializable {
 
     @Column(name = "updated_at")
     private Date updatedAt;
+
+    @Column(name = "status")
+    private Integer status;
 }
