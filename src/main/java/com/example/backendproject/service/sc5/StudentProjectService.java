@@ -36,7 +36,7 @@ public class StudentProjectService {
 
     public StudentProjectSearchResponse searchStudentProject(StudentProjectSearchRequest request) {
         StudentProjectSearchResponse response = new StudentProjectSearchResponse();
-        response.setPage(request.getPage());
+        response.setPage(request.getPage() + 1);
         response.setPageSize(request.getPageSize());
 
         List<StudentProject> data = studentProjectRepository.searchStudentProjectByFilter(request);

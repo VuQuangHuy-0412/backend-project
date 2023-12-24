@@ -51,7 +51,7 @@ public class GroupTeacherService {
 
     public GroupTeacherSearchResponse searchGroupTeacher(GroupTeacherSearchRequest request) {
         GroupTeacherSearchResponse response = new GroupTeacherSearchResponse();
-        response.setPage(request.getPage());
+        response.setPage(request.getPage() + 1);
         response.setPageSize(request.getPageSize());
 
         List<GroupTeacher> data = groupTeacherRepository.searchGroupTeacherByFilter(request);

@@ -37,7 +37,7 @@ public class ClassService {
 
     public ClassSearchResponse searchClass(ClassSearchRequest request) {
         ClassSearchResponse response = new ClassSearchResponse();
-        response.setPage(request.getPage());
+        response.setPage(request.getPage() + 1);
         response.setPageSize(request.getPageSize());
 
         List<Class> data = classRepository.searchClassByFilter(request);

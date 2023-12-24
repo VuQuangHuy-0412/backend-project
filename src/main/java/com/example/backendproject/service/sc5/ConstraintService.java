@@ -2,83 +2,116 @@ package com.example.backendproject.service.sc5;
 
 import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.exception.Sc5Exception;
-import com.example.backendproject.entity.sc5.ClassEntity;
-import com.example.backendproject.entity.sc5.ConstraintEntity;
-import com.example.backendproject.mapper.ClassMapper;
-import com.example.backendproject.mapper.ConstraintMapper;
+import com.example.backendproject.entity.sc5.CustomConstraintEntity;
+import com.example.backendproject.entity.sc5.RequiredConstraintEntity;
+import com.example.backendproject.mapper.CustomConstraintMapper;
+import com.example.backendproject.mapper.RequiredConstraintMapper;
 import com.example.backendproject.model.sc5.*;
-import com.example.backendproject.model.sc5.Class;
-import com.example.backendproject.repository.sc5.ClassRepository;
-import com.example.backendproject.repository.sc5.ConstraintRepository;
+import com.example.backendproject.repository.sc5.CustomConstraintRepository;
+import com.example.backendproject.repository.sc5.RequiredConstraintRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @Slf4j
 public class ConstraintService {
-    private final ConstraintRepository constraintRepository;
+    private final CustomConstraintRepository customConstraintRepository;
+    private final RequiredConstraintRepository requiredConstraintRepository;
     private final AdminLogService adminLogService;
-    private final ConstraintMapper constraintMapper;
+    private final CustomConstraintMapper customConstraintMapper;
+    private final RequiredConstraintMapper requiredConstraintMapper;
 
-    public ConstraintService(ConstraintRepository constraintRepository,
+    public ConstraintService(CustomConstraintRepository customConstraintRepository,
+                             RequiredConstraintRepository requiredConstraintRepository,
                              AdminLogService adminLogService,
-                             ConstraintMapper constraintMapper) {
-        this.constraintRepository = constraintRepository;
+                             CustomConstraintMapper customConstraintMapper,
+                             RequiredConstraintMapper requiredConstraintMapper) {
+        this.customConstraintRepository = customConstraintRepository;
+        this.requiredConstraintRepository = requiredConstraintRepository;
         this.adminLogService = adminLogService;
-        this.constraintMapper = constraintMapper;
+        this.customConstraintMapper = customConstraintMapper;
+        this.requiredConstraintMapper = requiredConstraintMapper;
     }
 
     public ConstraintSearchResponse searchConstraint(ConstraintSearchRequest request) {
         ConstraintSearchResponse response = new ConstraintSearchResponse();
-        response.setPage(request.getPage());
-        response.setPageSize(request.getPageSize());
 
-//        List<Constraint> data = constraintRepository.searchConstraintByFilter(request);
-//        response.setData(data);
+        List<CustomConstraint> customConstraints = customConstraintRepository.searchCustomConstraintByFilter(request);
+        response.setCustomConstraints(customConstraints);
+
+        List<RequiredConstraint> requiredConstraints = requiredConstraintRepository.searchRequiredConstraintByFilter(request);
+        response.setRequiredConstraints(requiredConstraints);
+
         return response;
     }
 
-    public void createConstraint(Constraint constraint) {
-        adminLogService.log("createConstraint", CommonUtil.toJson(constraint));
-        log.info("Create constraint with data: " + CommonUtil.toJson(constraint));
+    public void createCustomConstraint(CustomConstraint customConstraint) {
+        adminLogService.log("createCustomConstraint", CommonUtil.toJson(customConstraint));
+        log.info("Create custom constraint with data: " + CommonUtil.toJson(customConstraint));
 
-        validateCreateConstraintRequest(constraint);
-        ConstraintEntity constraintEntity = constraintMapper.toEntity(constraint);
+        CustomConstraintEntity customConstraintEntity = customConstraintMapper.toEntity(customConstraint);
         try {
-            constraintRepository.save(constraintEntity);
+            customConstraintRepository.save(customConstraintEntity);
         } catch (Exception exception) {
-            log.error("Save constraint error!", exception);
+            log.error("Save custom constraint error!", exception);
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private void validateCreateConstraintRequest(Constraint constraint) {
-
-    }
-
-    public void updateConstraint(Constraint constraint) {
-        if (constraint.getId() == null) {
+    public void updateCustomConstraint(CustomConstraint customConstraint) {
+        if (customConstraint.getId() == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Không tìm thấy ràng buộc.");
         }
-        validateCreateConstraintRequest(constraint);
 
-        Optional<ConstraintEntity> constraintEntityOptional = constraintRepository.findById(constraint.getId());
+        Optional<CustomConstraintEntity> constraintEntityOptional = customConstraintRepository.findById(customConstraint.getId());
         if (constraintEntityOptional.isEmpty()) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Không tìm thấy ràng buộc.");
         }
 
-        ConstraintEntity constraintEntity = constraintEntityOptional.get();
+        CustomConstraintEntity customConstraintEntity = constraintEntityOptional.get();
 
         try {
-            constraintRepository.save(constraintEntity);
+            customConstraintRepository.save(customConstraintEntity);
         } catch (Exception exception) {
-            log.error("Update constraint error!", exception);
+            log.error("Update custom constraint error!", exception);
+            throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public void createRequiredConstraint(RequiredConstraint requiredConstraint) {
+        adminLogService.log("createRequiredConstraint", CommonUtil.toJson(requiredConstraint));
+        log.info("Create required constraint with data: " + CommonUtil.toJson(requiredConstraint));
+
+        RequiredConstraintEntity requiredConstraintEntity = requiredConstraintMapper.toEntity(requiredConstraint);
+        try {
+            requiredConstraintRepository.save(requiredConstraintEntity);
+        } catch (Exception exception) {
+            log.error("Save required constraint error!", exception);
+            throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public void updateRequiredConstraint(RequiredConstraint requiredConstraint) {
+        if (requiredConstraint.getId() == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Không tìm thấy ràng buộc.");
+        }
+
+        Optional<RequiredConstraintEntity> requiredConstraintEntityOptional = requiredConstraintRepository.findById(requiredConstraint.getId());
+        if (requiredConstraintEntityOptional.isEmpty()) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Không tìm thấy ràng buộc.");
+        }
+
+        RequiredConstraintEntity requiredConstraintEntity = requiredConstraintEntityOptional.get();
+
+        try {
+            requiredConstraintRepository.save(requiredConstraintEntity);
+        } catch (Exception exception) {
+            log.error("Update required constraint error!", exception);
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
         }
     }

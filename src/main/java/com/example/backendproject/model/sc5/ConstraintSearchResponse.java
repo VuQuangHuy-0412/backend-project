@@ -8,7 +8,6 @@ import java.util.List;
 @Getter
 @Setter
 public class ConstraintSearchResponse {
-    private Integer page;
-    private Integer pageSize;
-    private List<Constraint> data;
+    private List<CustomConstraint> customConstraints;
+    private List<RequiredConstraint> requiredConstraints;
 }

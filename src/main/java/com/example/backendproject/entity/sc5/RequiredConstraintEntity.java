@@ -7,12 +7,10 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.Date;
 
-@Entity
-@Table(name = "constraint")
 @Getter
 @Setter
-public class ConstraintEntity implements Serializable {
-
+@Table(name = "required_constraint")
+public class RequiredConstraintEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -20,21 +18,18 @@ public class ConstraintEntity implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "teacher_id")
-    private Long teacherId;
+    @Column(name = "code")
+    private String code;
 
-    @Column(name = "class_id")
-    private Long classId;
-
-    @Column(name = "compare")
-    private String compare;
-
-    @Column(name = "column_compare")
-    private String columnCompare;
-
-    @Column(name = "value_compare")
-    private String valueCompare;
+    @Column(name = "value")
+    private String value;
 
     @Column(name = "status")
     private Integer status;
+
+    @Column(name = "created_at")
+    private Date createdAt;
+
+    @Column(name = "updated_at")
+    private Date updatedAt;
 }
