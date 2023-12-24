@@ -10,6 +10,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Table(name = "required_constraint")
+@Entity
 public class RequiredConstraintEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

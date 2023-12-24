@@ -14,6 +14,7 @@ import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,6 +56,8 @@ public class ConstraintService {
         log.info("Create custom constraint with data: " + CommonUtil.toJson(customConstraint));
 
         CustomConstraintEntity customConstraintEntity = customConstraintMapper.toEntity(customConstraint);
+        customConstraintEntity.setCreatedAt(new Date());
+        customConstraintEntity.setUpdatedAt(new Date());
         try {
             customConstraintRepository.save(customConstraintEntity);
         } catch (Exception exception) {
@@ -74,6 +77,14 @@ public class ConstraintService {
         }
 
         CustomConstraintEntity customConstraintEntity = constraintEntityOptional.get();
+        customConstraintEntity.setTeacherColumnCompare(customConstraint.getTeacherColumnCompare());
+        customConstraintEntity.setTeacherCompare(customConstraint.getTeacherCompare());
+        customConstraintEntity.setTeacherValueCompare(customConstraintEntity.getTeacherValueCompare());
+        customConstraintEntity.setClassCompare(customConstraint.getClassCompare());
+        customConstraintEntity.setClassValueCompare(customConstraint.getClassValueCompare());
+        customConstraintEntity.setClassColumnCompare(customConstraint.getClassColumnCompare());
+        customConstraintEntity.setStatus(customConstraint.getStatus());
+        customConstraintEntity.setUpdatedAt(new Date());
 
         try {
             customConstraintRepository.save(customConstraintEntity);
@@ -88,6 +99,8 @@ public class ConstraintService {
         log.info("Create required constraint with data: " + CommonUtil.toJson(requiredConstraint));
 
         RequiredConstraintEntity requiredConstraintEntity = requiredConstraintMapper.toEntity(requiredConstraint);
+        requiredConstraintEntity.setCreatedAt(new Date());
+        requiredConstraintEntity.setUpdatedAt(new Date());
         try {
             requiredConstraintRepository.save(requiredConstraintEntity);
         } catch (Exception exception) {
@@ -107,6 +120,10 @@ public class ConstraintService {
         }
 
         RequiredConstraintEntity requiredConstraintEntity = requiredConstraintEntityOptional.get();
+        requiredConstraintEntity.setCode(requiredConstraint.getCode());
+        requiredConstraintEntity.setValue(requiredConstraintEntity.getValue());
+        requiredConstraintEntity.setStatus(requiredConstraintEntity.getStatus());
+        requiredConstraintEntity.setUpdatedAt(new Date());
 
         try {
             requiredConstraintRepository.save(requiredConstraintEntity);

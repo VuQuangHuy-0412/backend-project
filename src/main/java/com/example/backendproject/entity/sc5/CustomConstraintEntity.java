@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "constraint")
+@Table(name = "custom_constraint")
 @Getter
 @Setter
 public class CustomConstraintEntity implements Serializable {
