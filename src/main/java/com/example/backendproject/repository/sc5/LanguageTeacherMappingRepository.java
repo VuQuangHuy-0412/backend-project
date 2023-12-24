@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LanguageTeacherMappingRepository extends JpaRepository<LanguageTeacherMappingEntity, Long> {
+    LanguageTeacherMappingEntity findByTeacherIdAndLanguageId(Long teacherId, Long languageId);
 }

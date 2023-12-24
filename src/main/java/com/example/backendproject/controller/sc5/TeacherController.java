@@ -1,9 +1,6 @@
 package com.example.backendproject.controller.sc5;
 
-import com.example.backendproject.model.sc5.Teacher;
-import com.example.backendproject.model.sc5.TeacherSearchRequest;
-import com.example.backendproject.model.sc5.TeacherSearchResponse;
-import com.example.backendproject.model.sc5.UploadTeacherRequest;
+import com.example.backendproject.model.sc5.*;
 import com.example.backendproject.service.sc5.TeacherService;
 import com.example.backendproject.util.ApiDescription;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,5 +50,11 @@ public class TeacherController {
     @ApiDescription(value = "Lấy toàn bộ danh sách GV", code = "all_teacher")
     public TeacherSearchResponse getAllTeacher() {
         return teacherService.getAllTeacher();
+    }
+
+    @PostMapping(value = "/language-teacher/upload-excel")
+    @ApiDescription(value = "Upload danh sách GV sử dụng ngôn ngữ sử dụng excel", code = "language_teacher_upload_excel")
+    public void uploadFileLanguageTeacherMapping(@RequestBody UploadLanguageTeacherRequest request) {
+        teacherService.uploadFileLanguageTeacherMapping(request);
     }
 }

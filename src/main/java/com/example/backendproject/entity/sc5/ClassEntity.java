@@ -47,6 +47,12 @@ public class ClassEntity implements Serializable {
     @Column(name = "teacher_id")
     private Long teacherId;
 
+    @Column(name = "building")
+    private String building;
+
+    @Column(name = "room")
+    private String room;
+
     @Column(name = "created_at")
     private Date createdAt;
 

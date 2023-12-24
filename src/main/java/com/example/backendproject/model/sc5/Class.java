@@ -28,6 +28,10 @@ public class Class {
 
     private Long teacherId;
 
+    private String building;
+
+    private String room;
+
     private Date createdAt;
 
     private Date updatedAt;

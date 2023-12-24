@@ -12,6 +12,7 @@ import com.example.backendproject.repository.sc5.ClassRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -61,7 +62,9 @@ public class ClassService {
     }
 
     private void validateCreateClassRequest(Class classDto) {
-
+        if (StringUtils.isBlank(classDto.getName()) || StringUtils.isBlank(classDto.getCode())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Thiếu thông tin tên hoặc mã lớp học");
+        }
     }
 
     public void updateClass(Class classDto) {
@@ -85,6 +88,8 @@ public class ClassService {
         classEntity.setTimeOfDay(classDto.getTimeOfDay());
         classEntity.setIsAssigned(classDto.getIsAssigned());
         classEntity.setTeacherId(classDto.getTeacherId());
+        classEntity.setBuilding(classDto.getBuilding());
+        classEntity.setRoom(classDto.getRoom());
         classEntity.setUpdatedAt(new Date());
 
         try {

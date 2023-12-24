@@ -6,12 +6,15 @@ import com.example.backendproject.config.constant.TeacherConstant;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.sc5.GroupTeacherEntity;
 import com.example.backendproject.entity.sc5.GroupTeacherMappingEntity;
+import com.example.backendproject.entity.sc5.LanguageTeacherMappingEntity;
 import com.example.backendproject.entity.sc5.TeacherEntity;
 import com.example.backendproject.mapper.GroupTeacherMapper;
+import com.example.backendproject.mapper.LanguageTeacherMappingMapper;
 import com.example.backendproject.mapper.TeacherMapper;
 import com.example.backendproject.model.sc5.*;
 import com.example.backendproject.repository.sc5.GroupTeacherMappingRepository;
 import com.example.backendproject.repository.sc5.GroupTeacherRepository;
+import com.example.backendproject.repository.sc5.LanguageTeacherMappingRepository;
 import com.example.backendproject.repository.sc5.TeacherRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.util.CommonUtil;
@@ -21,10 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -33,6 +33,8 @@ public class TeacherService {
     private final AdminLogService adminLogService;
     private final TeacherMapper teacherMapper;
     private final GroupTeacherMappingRepository groupTeacherMappingRepository;
+    private final LanguageTeacherMappingRepository languageTeacherMappingRepository;
+    private final LanguageTeacherMappingMapper languageTeacherMappingMapper;
     private final GroupTeacherRepository groupTeacherRepository;
     private final GroupTeacherMapper groupTeacherMapper;
 
@@ -40,12 +42,16 @@ public class TeacherService {
                           AdminLogService adminLogService,
                           TeacherMapper teacherMapper,
                           GroupTeacherMappingRepository groupTeacherMappingRepository,
+                          LanguageTeacherMappingRepository languageTeacherMappingRepository,
+                          LanguageTeacherMappingMapper languageTeacherMappingMapper,
                           GroupTeacherRepository groupTeacherRepository,
                           GroupTeacherMapper groupTeacherMapper) {
         this.teacherRepository = teacherRepository;
         this.adminLogService = adminLogService;
         this.teacherMapper = teacherMapper;
         this.groupTeacherMappingRepository = groupTeacherMappingRepository;
+        this.languageTeacherMappingRepository = languageTeacherMappingRepository;
+        this.languageTeacherMappingMapper = languageTeacherMappingMapper;
         this.groupTeacherRepository = groupTeacherRepository;
         this.groupTeacherMapper = groupTeacherMapper;
     }
@@ -208,5 +214,32 @@ public class TeacherService {
 
         response.setData(teacherMapper.toDtos(entities));
         return response;
+    }
+
+    public void uploadFileLanguageTeacherMapping(UploadLanguageTeacherRequest request) {
+        if (request == null || CollectionUtils.isEmpty(request.getLanguageTeacherCreateRequests())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        for (LanguageTeacherMapping languageTeacherMapping : request.getLanguageTeacherCreateRequests()) {
+            if (languageTeacherMapping.getTeacherId() == null || languageTeacherMapping.getLanguageId() == null) {
+                throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+            }
+        }
+
+        List<LanguageTeacherMapping> requests = request.getLanguageTeacherCreateRequests();
+        for (LanguageTeacherMapping languageTeacherMapping : request.getLanguageTeacherCreateRequests()) {
+            LanguageTeacherMappingEntity entity = languageTeacherMappingRepository.findByTeacherIdAndLanguageId(
+                    languageTeacherMapping.getTeacherId(), languageTeacherMapping.getLanguageId());
+            if (entity != null) {
+                List<LanguageTeacherMapping> filter = requests.stream().filter(x ->
+                        Objects.equals(x.getLanguageId(), languageTeacherMapping.getLanguageId()) &&
+                                Objects.equals(x.getTeacherId(), languageTeacherMapping.getTeacherId())).toList();
+                requests.removeAll(filter);
+            }
+        }
+
+        List<LanguageTeacherMappingEntity> entities = languageTeacherMappingMapper.toEntities(request.getLanguageTeacherCreateRequests());
+        languageTeacherMappingRepository.saveAll(entities);
     }
 }
