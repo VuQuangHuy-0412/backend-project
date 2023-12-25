@@ -1,4 +1,4 @@
-package com.example.backendproject.model.sc5;
+package com.example.backendproject.model.geneticalgorithm;
 
 import com.example.backendproject.entity.sc5.*;
 import lombok.Getter;
@@ -17,6 +17,8 @@ public class InputData {
     private List<GroupTeacherEntity> groupTeachers;
     private List<StudentProjectEntity> studentProjects;
     private List<LanguageEntity> languages;
+    private List<RequiredConstraintEntity> requiredConstraints;
+    private List<CustomConstraintEntity> customConstraints;
 
     private Integer numOfTeachers;
     private Integer numOfLanguages;
@@ -24,4 +26,7 @@ public class InputData {
     private Integer numOfClasses;
     private Integer numOfSubjects;
     private Integer numOfStudents;
+
+    private Double averageGD;
+    private Double averageHD;
 }

@@ -1,6 +1,6 @@
 package com.example.backendproject.controller.sc5;
 
-import com.example.backendproject.service.TimetablingService;
+import com.example.backendproject.service.sc5.TimetablingService;
 import com.example.backendproject.util.ApiDescription;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;

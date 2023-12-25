@@ -86,6 +86,8 @@ public class ClassService {
         classEntity.setWeek(classDto.getWeek());
         classEntity.setDayOfWeek(classDto.getDayOfWeek());
         classEntity.setTimeOfDay(classDto.getTimeOfDay());
+        classEntity.setTimeOfClass(classDto.getTimeOfClass());
+        classEntity.setLanguageId(classDto.getLanguageId());
         classEntity.setIsAssigned(classDto.getIsAssigned());
         classEntity.setTeacherId(classDto.getTeacherId());
         classEntity.setBuilding(classDto.getBuilding());

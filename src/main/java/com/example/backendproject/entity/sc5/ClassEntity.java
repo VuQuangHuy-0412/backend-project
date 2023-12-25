@@ -41,6 +41,12 @@ public class ClassEntity implements Serializable {
     @Column(name = "time_of_day")
     private String timeOfDay;
 
+    @Column(name = "time_of_class")
+    private Integer timeOfClass;
+
+    @Column(name = "language_id")
+    private Long languageId;
+
     @Column(name = "is_assigned")
     private Integer isAssigned;
 

@@ -24,6 +24,10 @@ public class Class {
 
     private String timeOfDay;
 
+    private Integer timeOfClass;
+
+    private Long languageId;
+
     private Integer isAssigned;
 
     private Long teacherId;
