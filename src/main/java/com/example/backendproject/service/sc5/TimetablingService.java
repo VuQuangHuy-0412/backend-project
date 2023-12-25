@@ -210,6 +210,37 @@ public class TimetablingService {
                     }
                 }
             }
+
+            // CT4: Each teacher has at least 1 class
+            if (!CollectionUtils.isEmpty(CT4)) {
+                for (TeacherEntity teacherEntity : inputData.getTeachers()) {
+                    int ct4 = 0;
+                    for (ClassEntity classEntity : inputData.getClasses()) {
+                        if (isTeacherOfClass(member, teacherEntity, classEntity) == 1) {
+                            ct4 += 1;
+                        }
+                    }
+                    if (ct4 < 1) {
+                        member.setObjective(member.getObjective() + 100000);
+                    }
+                }
+            }
+
+            // CT5: Số giờ được phân công cho 1 GV không được vượt quá 120% * gdTime của GV * averageGD
+            if (!CollectionUtils.isEmpty(CT5)) {
+                for (TeacherEntity teacherEntity : inputData.getTeachers()) {
+                    int ct5 = 0;
+                    for (ClassEntity classEntity : inputData.getClasses()) {
+                        if (isTeacherOfClass(member, teacherEntity, classEntity) == 1) {
+                            ct5 += classEntity.getTimeOfClass();
+                        }
+                    }
+                    double maxTime = 1.2 * teacherEntity.getGdTime() * inputData.getAverageGD();
+                    if (ct5 > maxTime) {
+                        member.setObjective(member.getObjective() + 100000);
+                    }
+                }
+            }
         }
         return population;
     }
