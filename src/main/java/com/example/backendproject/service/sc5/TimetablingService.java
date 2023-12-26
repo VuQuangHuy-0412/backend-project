@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -61,6 +62,38 @@ public class TimetablingService {
     public void timetablingTeacher() {
         adminLogService.log("timetablingTeacher", null);
 
+        InputData inputData = getInputData();
+        Population population = initPopulation(inputData);
+
+        for (int i = 0; i < NUM_LOOP; i++) {
+            evaluateConstraint(inputData, population);
+            if (i == NUM_LOOP - 1) {
+                break;
+            }
+            selection(population);
+            crossover(inputData, population);
+            mutation(inputData, population);
+        }
+
+        Population.Member bestSolution = getTheMostObjectiveResult(population);
+        if (bestSolution != null) {
+            bestSolution.setObjective(objectiveFunction(inputData, bestSolution));
+        }
+    }
+
+    private Population.Member getTheMostObjectiveResult(Population population) {
+        List<Population.Member> listMember = population.getPopulation();
+        List<Double> objectiveTemp = new ArrayList<>(listMember.stream().map(Population.Member::getObjective).toList());
+        Collections.sort(objectiveTemp);
+
+        Double mostObjective = objectiveTemp.get(0);
+        for (Population.Member member : listMember) {
+            if (member.getObjective().equals(mostObjective)) {
+                return member;
+            }
+        }
+
+        return null;
     }
 
     private InputData getInputData() {
@@ -145,8 +178,8 @@ public class TimetablingService {
         return objective;
     }
 
-    private Population evaluateConstraint(InputData inputData, Population population) {
-        population = clearPopulationObjective(population);
+    private void evaluateConstraint(InputData inputData, Population population) {
+        clearPopulationObjective(population);
         List<RequiredConstraintEntity> requiredConstraints = inputData.getRequiredConstraints();
         List<RequiredConstraintEntity> CT1 = requiredConstraints.stream().filter(x -> x.getCode().equals("CT1") && x.getStatus().equals(1)).toList();
         List<RequiredConstraintEntity> CT2 = requiredConstraints.stream().filter(x -> x.getCode().equals("CT2") && x.getStatus().equals(1)).toList();
@@ -154,7 +187,6 @@ public class TimetablingService {
         List<RequiredConstraintEntity> CT4 = requiredConstraints.stream().filter(x -> x.getCode().equals("CT4") && x.getStatus().equals(1)).toList();
         List<RequiredConstraintEntity> CT5 = requiredConstraints.stream().filter(x -> x.getCode().equals("CT5") && x.getStatus().equals(1)).toList();
         List<RequiredConstraintEntity> CT6 = requiredConstraints.stream().filter(x -> x.getCode().equals("CT6") && x.getStatus().equals(1)).toList();
-        List<RequiredConstraintEntity> CT7 = requiredConstraints.stream().filter(x -> x.getCode().equals("CT7") && x.getStatus().equals(1)).toList();
 
         for (Population.Member member : population.getPopulation()) {
             member.setObjective(objectiveFunction(inputData, member));
@@ -241,16 +273,123 @@ public class TimetablingService {
                     }
                 }
             }
+
+            // CT6: 2 lớp bị conflict lịch học hoặc phòng học không được xếp cùng 1 GV
+            if (!CollectionUtils.isEmpty(CT6)) {
+                for (TeacherEntity teacherEntity : inputData.getTeachers()) {
+                    for (ClassEntity classEntity1 : inputData.getClasses()) {
+                        for (ClassEntity classEntity2 : inputData.getClasses()) {
+                            if (isTeacherOfClass(member, teacherEntity, classEntity1) == 1 &&
+                                    isTeacherOfClass(member, teacherEntity, classEntity2) == 1 &&
+                                    isConflictClass(classEntity1, classEntity2) == 1) {
+                                member.setObjective(member.getObjective() + 100000);
+                            }
+                        }
+                    }
+                }
+            }
         }
-        return population;
     }
 
-    private Population clearPopulationObjective(Population population) {
-        for (Population.Member member : population.getPopulation()) {
-            member.setObjective(null);
-        }
+    private void selection(Population population) {
+        List<Population.Member> listMember = population.getPopulation();
+        List<Double> objectiveTemp = new ArrayList<>(listMember.stream().map(Population.Member::getObjective).toList());
+        Collections.sort(objectiveTemp);
 
-        return population;
+        int limitIndex = listMember.size() * 80 / 100;
+        Double objectiveLimit = objectiveTemp.get(limitIndex);
+
+        for (Population.Member member : listMember) {
+            if (member.getObjective() > objectiveLimit) {
+                Random rand = new Random();
+                member.setDetails(listMember.get(rand.nextInt(listMember.size())).getDetails());
+            }
+        }
+    }
+
+    private void crossover(InputData inputData, Population population) {
+        List<Population.Member> listMember = population.getPopulation();
+        for (int i = 0; i < NUM_OF_CROSS; i++) {
+            Random rand = new Random();
+            int father = rand.nextInt(listMember.size());
+            int mother = rand.nextInt(listMember.size());
+            for (int j = 0; j < inputData.getNumOfClasses(); j++) {
+                // keep 1/2 father and replace 1/2 father by mother and same mother
+                if (j % 2 == 0) {
+                    for (TeacherEntity teacher1 : inputData.getTeachers()) {
+                        for (TeacherEntity teacher2 : inputData.getTeachers()) {
+                            if (isTeacherOfClass(listMember.get(father), teacher1, inputData.getClasses().get(j)) == 1 &&
+                                    isTeacherOfClass(listMember.get(mother), teacher2, inputData.getClasses().get(j)) == 1) {
+                                setTeacherForClass(listMember.get(father), teacher2, inputData.getClasses().get(j));
+                                setTeacherForClass(listMember.get(mother), teacher1, inputData.getClasses().get(j));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void mutation(InputData inputData, Population population) {
+        Random rand = new Random();
+        Population.Member member = population.getPopulation().get(rand.nextInt(population.getPopulation().size()));
+
+        ClassEntity class1 = inputData.getClasses().get(rand.nextInt(inputData.getNumOfClasses()));
+        List<ClassEntity> newList = inputData.getClasses().stream().filter(x -> !x.getId().equals(class1.getId())).toList();
+        ClassEntity class2 = newList.get(rand.nextInt(inputData.getNumOfClasses() - 1));
+
+        for (TeacherEntity teacher1 : inputData.getTeachers()) {
+            for (TeacherEntity teacher2 : inputData.getTeachers()) {
+                if (isTeacherOfClass(member, teacher1, class1) == 1 && isTeacherOfClass(member, teacher2, class2) == 1) {
+                    setTeacherForClass(member, teacher1, class2);
+                    setTeacherForClass(member, teacher2, class1);
+                }
+            }
+        }
+    }
+
+    private void setTeacherForClass(Population.Member member, TeacherEntity teacherEntity, ClassEntity classEntity) {
+        for (Population.Member.MemberDetail detail : member.getDetails()) {
+            if (detail.getClassId().equals(classEntity.getId())) {
+                detail.setTeacherId(teacherEntity.getId());
+            }
+        }
+    }
+
+    private int isConflictClass(ClassEntity class1, ClassEntity class2) {
+        try {
+            if (class1.equals(class2)) {
+                return 0;
+            }
+            String[] timeOfDay1 = class1.getTimeOfDay().split(",");
+            String[] timeOfDay2 = class1.getTimeOfDay().split(",");
+            if (class1.getDayOfWeek().equals(class2.getDayOfWeek())) {
+                for (String t1 : timeOfDay1) {
+                    for (String t2 : timeOfDay2) {
+                        if (t1.equals(t2)) {
+                            return 1;
+                        }
+                    }
+                }
+            }
+
+            if (!class1.getBuilding().equals(class2.getBuilding())) {
+                if (Integer.parseInt(timeOfDay1[timeOfDay1.length - 1]) + 1 == Integer.parseInt(timeOfDay2[0]) ||
+                        Integer.parseInt(timeOfDay2[timeOfDay2.length - 1]) + 1 == Integer.parseInt(timeOfDay1[0])) {
+                    return 1;
+                }
+            }
+            return 0;
+        } catch(Exception ex) {
+            log.error("Check class conflict failed", ex);
+            return 0;
+        }
+    }
+
+    private void clearPopulationObjective(Population population) {
+        for (Population.Member member : population.getPopulation()) {
+            member.setObjective(0D);
+        }
     }
 
     private int isTeacherOfClass(Population.Member member, TeacherEntity teacherEntity, ClassEntity classEntity) {
