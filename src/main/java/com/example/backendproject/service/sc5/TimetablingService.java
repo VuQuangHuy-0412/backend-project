@@ -9,6 +9,8 @@ import com.example.backendproject.model.geneticalgorithm.Population;
 import com.example.backendproject.repository.sc5.*;
 import com.example.backendproject.service.AdminLogService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -59,8 +61,9 @@ public class TimetablingService {
         this.adminLogService = adminLogService;
     }
 
+    @Async("async-thread-pool")
     public void timetablingTeacher() {
-        adminLogService.log("timetablingTeacher", null);
+//        adminLogService.log("timetablingTeacher", null);
 
         InputData inputData = getInputData();
         Population population = initPopulation(inputData);
@@ -73,6 +76,7 @@ public class TimetablingService {
             selection(population);
             crossover(inputData, population);
             mutation(inputData, population);
+            log.info("End loop {}", i);
         }
 
         Population.Member bestSolution = getTheMostObjectiveResult(population);
@@ -172,7 +176,7 @@ public class TimetablingService {
                     timeTeaching += classEntity.getTimeOfClass();
                 }
             }
-            double diff = inputData.getAverageGD() * teacherEntity.getGdTime() - timeTeaching;
+            double diff = Math.abs(inputData.getAverageGD() * teacherEntity.getGdTime() - timeTeaching);
             objective = Math.max(objective, diff);
         }
         return objective;
@@ -189,6 +193,7 @@ public class TimetablingService {
         List<RequiredConstraintEntity> CT6 = requiredConstraints.stream().filter(x -> x.getCode().equals("CT6") && x.getStatus().equals(1)).toList();
 
         for (Population.Member member : population.getPopulation()) {
+            log.info("Start member {}", member);
             member.setObjective(objectiveFunction(inputData, member));
 
             // CT1: Language - Teacher - Class
@@ -279,7 +284,7 @@ public class TimetablingService {
                 for (TeacherEntity teacherEntity : inputData.getTeachers()) {
                     for (ClassEntity classEntity1 : inputData.getClasses()) {
                         for (ClassEntity classEntity2 : inputData.getClasses()) {
-                            if (isTeacherOfClass(member, teacherEntity, classEntity1) == 1 &&
+                            if (classEntity1.getId() < classEntity2.getId() && isTeacherOfClass(member, teacherEntity, classEntity1) == 1 &&
                                     isTeacherOfClass(member, teacherEntity, classEntity2) == 1 &&
                                     isConflictClass(classEntity1, classEntity2) == 1) {
                                 member.setObjective(member.getObjective() + 100000);
@@ -363,7 +368,7 @@ public class TimetablingService {
             }
             String[] timeOfDay1 = class1.getTimeOfDay().split(",");
             String[] timeOfDay2 = class1.getTimeOfDay().split(",");
-            if (class1.getDayOfWeek().equals(class2.getDayOfWeek())) {
+            if (!StringUtils.isBlank(class1.getDayOfWeek()) && !StringUtils.isBlank(class2.getDayOfWeek()) && class1.getDayOfWeek().equals(class2.getDayOfWeek())) {
                 for (String t1 : timeOfDay1) {
                     for (String t2 : timeOfDay2) {
                         if (t1.equals(t2)) {
@@ -373,7 +378,7 @@ public class TimetablingService {
                 }
             }
 
-            if (!class1.getBuilding().equals(class2.getBuilding())) {
+            if (!StringUtils.isBlank(class1.getBuilding()) && !StringUtils.isBlank(class2.getBuilding()) && !class1.getBuilding().equals(class2.getBuilding())) {
                 if (Integer.parseInt(timeOfDay1[timeOfDay1.length - 1]) + 1 == Integer.parseInt(timeOfDay2[0]) ||
                         Integer.parseInt(timeOfDay2[timeOfDay2.length - 1]) + 1 == Integer.parseInt(timeOfDay1[0])) {
                     return 1;

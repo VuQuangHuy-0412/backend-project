@@ -14,25 +14,13 @@ import java.util.Map;
 @EnableAsync
 public class SpringAsyncConfig {
 
-    @Bean(name = "export-thread-pool")
+    @Bean(name = "async-thread-pool")
     public ThreadPoolTaskExecutor exportThreadPoolExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(3);
-        executor.setQueueCapacity(10);
-        executor.setThreadNamePrefix("EXPORT_THREAD_POOL_");
-        executor.setTaskDecorator(new LoggingTaskDecorator());
-
-        return executor;
-    }
-
-    @Bean(name = "report-thread-pool")
-    public ThreadPoolTaskExecutor reportThreadPoolExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(1);
-        executor.setQueueCapacity(10);
-        executor.setThreadNamePrefix("REPORT_THREAD_POOL_");
+        executor.setMaxPoolSize(100);
+        executor.setQueueCapacity(0);
+        executor.setThreadNamePrefix("ASYNC_THREAD_POOL_");
         executor.setTaskDecorator(new LoggingTaskDecorator());
 
         return executor;
