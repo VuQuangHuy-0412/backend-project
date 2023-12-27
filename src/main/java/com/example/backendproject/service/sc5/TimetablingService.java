@@ -8,6 +8,8 @@ import com.example.backendproject.model.geneticalgorithm.InputData;
 import com.example.backendproject.model.geneticalgorithm.Population;
 import com.example.backendproject.repository.sc5.*;
 import com.example.backendproject.service.AdminLogService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
@@ -33,9 +35,10 @@ public class TimetablingService {
     private final RequiredConstraintRepository requiredConstraintRepository;
     private final CustomConstraintRepository customConstraintRepository;
     private final AdminLogService adminLogService;
-    public static final Integer POPULATION_SIZE = 500;
-    public static final Integer NUM_OF_CROSS = 50;
-    public static final Integer NUM_LOOP = 100;
+    private final ObjectMapper objectMapper;
+    public static final Integer POPULATION_SIZE = 100;
+    public static final Integer NUM_OF_CROSS = 20;
+    public static final Integer NUM_LOOP = 200;
 
     public TimetablingService(TeacherRepository teacherRepository,
                               LanguageTeacherMappingRepository languageTeacherMappingRepository,
@@ -47,7 +50,7 @@ public class TimetablingService {
                               LanguageRepository languageRepository,
                               RequiredConstraintRepository requiredConstraintRepository,
                               CustomConstraintRepository customConstraintRepository,
-                              AdminLogService adminLogService) {
+                              AdminLogService adminLogService, ObjectMapper objectMapper) {
         this.teacherRepository = teacherRepository;
         this.languageTeacherMappingRepository = languageTeacherMappingRepository;
         this.groupTeacherMappingRepository = groupTeacherMappingRepository;
@@ -59,10 +62,11 @@ public class TimetablingService {
         this.requiredConstraintRepository = requiredConstraintRepository;
         this.customConstraintRepository = customConstraintRepository;
         this.adminLogService = adminLogService;
+        this.objectMapper = objectMapper;
     }
 
     @Async("async-thread-pool")
-    public void timetablingTeacher() {
+    public void timetablingTeacher() throws JsonProcessingException {
 //        adminLogService.log("timetablingTeacher", null);
 
         InputData inputData = getInputData();
@@ -71,6 +75,8 @@ public class TimetablingService {
         for (int i = 0; i < NUM_LOOP; i++) {
             evaluateConstraint(inputData, population);
             if (i == NUM_LOOP - 1) {
+                Population.Member bestSolution = getTheMostObjectiveResult(population);
+                log.info("Solution: {}", objectMapper.writeValueAsString(bestSolution));
                 break;
             }
             selection(population);
@@ -83,6 +89,7 @@ public class TimetablingService {
         if (bestSolution != null) {
             bestSolution.setObjective(objectiveFunction(inputData, bestSolution));
         }
+        log.info("Solution: {}", objectMapper.writeValueAsString(bestSolution));
     }
 
     private Population.Member getTheMostObjectiveResult(Population population) {

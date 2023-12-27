@@ -2,6 +2,7 @@ package com.example.backendproject.controller.sc5;
 
 import com.example.backendproject.service.sc5.TimetablingService;
 import com.example.backendproject.util.ApiDescription;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,7 +16,7 @@ public class TimetablingController {
 
     @PostMapping("/timetabling/teacher")
     @ApiDescription(value = "Phân công giảng dạy lớp học cho giảng viên", code = "timetabling_teacher")
-    public void timetablingTeacher() {
+    public void timetablingTeacher() throws JsonProcessingException {
         timetablingService.timetablingTeacher();
     }
 
