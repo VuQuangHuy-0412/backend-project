@@ -22,11 +22,11 @@ public class StudentProject {
 
     private Date updatedAt;
 
-    private String teacher1Id;
+    private Long teacher1Id;
 
-    private String teacher2Id;
+    private Long teacher2Id;
 
-    private String teacher3Id;
+    private Long teacher3Id;
 
-    private String teacherAssignedId;
+    private Long teacherAssignedId;
 }

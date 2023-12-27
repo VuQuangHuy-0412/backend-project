@@ -39,14 +39,14 @@ public class StudentProjectEntity implements Serializable {
     private Date updatedAt;
 
     @Column(name = "teacher_1_id")
-    private String teacher1Id;
+    private Long teacher1Id;
 
     @Column(name = "teacher_2_id")
-    private String teacher2Id;
+    private Long teacher2Id;
 
     @Column(name = "teacher_3_id")
-    private String teacher3Id;
+    private Long teacher3Id;
 
     @Column(name = "teacher_assigned_id")
-    private String teacherAssignedId;
+    private Long teacherAssignedId;
 }

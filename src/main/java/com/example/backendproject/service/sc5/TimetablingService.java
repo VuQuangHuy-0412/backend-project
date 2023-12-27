@@ -1,5 +1,6 @@
 package com.example.backendproject.service.sc5;
 
+import com.example.backendproject.config.constant.ClassConstant;
 import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.constant.TeacherConstant;
 import com.example.backendproject.config.exception.Sc5Exception;
@@ -16,10 +17,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -30,7 +28,6 @@ public class TimetablingService {
     private final SubjectRepository subjectRepository;
     private final ClassRepository classRepository;
     private final GroupTeacherRepository groupTeacherRepository;
-    private final StudentProjectRepository studentProjectRepository;
     private final LanguageRepository languageRepository;
     private final RequiredConstraintRepository requiredConstraintRepository;
     private final CustomConstraintRepository customConstraintRepository;
@@ -46,7 +43,6 @@ public class TimetablingService {
                               SubjectRepository subjectRepository,
                               ClassRepository classRepository,
                               GroupTeacherRepository groupTeacherRepository,
-                              StudentProjectRepository studentProjectRepository,
                               LanguageRepository languageRepository,
                               RequiredConstraintRepository requiredConstraintRepository,
                               CustomConstraintRepository customConstraintRepository,
@@ -57,7 +53,6 @@ public class TimetablingService {
         this.subjectRepository = subjectRepository;
         this.classRepository = classRepository;
         this.groupTeacherRepository = groupTeacherRepository;
-        this.studentProjectRepository = studentProjectRepository;
         this.languageRepository = languageRepository;
         this.requiredConstraintRepository = requiredConstraintRepository;
         this.customConstraintRepository = customConstraintRepository;
@@ -67,7 +62,7 @@ public class TimetablingService {
 
     @Async("async-thread-pool")
     public void timetablingTeacher() throws JsonProcessingException {
-//        adminLogService.log("timetablingTeacher", null);
+        adminLogService.log("timetablingTeacher", null);
 
         InputData inputData = getInputData();
         Population population = initPopulation(inputData);
@@ -90,6 +85,22 @@ public class TimetablingService {
             bestSolution.setObjective(objectiveFunction(inputData, bestSolution));
         }
         log.info("Solution: {}", objectMapper.writeValueAsString(bestSolution));
+
+        saveSolution(inputData.getClasses(), bestSolution);
+    }
+
+    private void saveSolution(List<ClassEntity> classEntities, Population.Member member) {
+        for (ClassEntity classEntity : classEntities) {
+            for (Population.Member.MemberDetail detail : member.getDetails()) {
+                if (classEntity.getId().equals(detail.getClassId())) {
+                    classEntity.setIsAssigned(ClassConstant.ASSIGNED);
+                    classEntity.setTeacherId(detail.getTeacherId());
+                    classEntity.setUpdatedAt(new Date());
+                }
+            }
+        }
+
+        classRepository.saveAll(classEntities);
     }
 
     private Population.Member getTheMostObjectiveResult(Population population) {
@@ -115,7 +126,6 @@ public class TimetablingService {
         List<SubjectEntity> subjects = subjectRepository.findAll();
         List<ClassEntity> classes = classRepository.findAll();
         List<GroupTeacherEntity> groupTeachers = groupTeacherRepository.findAll();
-        List<StudentProjectEntity> studentProjects = studentProjectRepository.findAll();
         List<LanguageEntity> languages = languageRepository.findAll();
         List<RequiredConstraintEntity> requiredConstraints = requiredConstraintRepository.findAll();
         List<CustomConstraintEntity> customConstraints = customConstraintRepository.findAll();
@@ -126,7 +136,6 @@ public class TimetablingService {
         inputData.setSubjects(subjects);
         inputData.setClasses(classes);
         inputData.setGroupTeachers(groupTeachers);
-        inputData.setStudentProjects(studentProjects);
         inputData.setLanguages(languages);
         inputData.setRequiredConstraints(requiredConstraints);
         inputData.setCustomConstraints(customConstraints);
@@ -136,21 +145,16 @@ public class TimetablingService {
         inputData.setNumOfGroups(groupTeachers.size());
         inputData.setNumOfSubjects(subjects.size());
         inputData.setNumOfLanguages(languages.size());
-        inputData.setNumOfStudents(studentProjects.size());
 
         int allTimeGdTeacher = teachers.stream().map(TeacherEntity::getGdTime).reduce(0, Integer::sum);
-        int allTimeHdTeacher = teachers.stream().map(TeacherEntity::getHdTime).reduce(0, Integer::sum);
         Integer allTimeClass = classes.stream().map(ClassEntity::getTimeOfClass).reduce(0, Integer::sum);
-        Integer allTimeHd = studentProjects.stream().map(StudentProjectEntity::getTimeHd).reduce(0, Integer::sum);
 
-        if (allTimeGdTeacher <= 0 || allTimeHdTeacher <= 0) {
+        if (allTimeGdTeacher <= 0) {
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
         }
 
         Double averageGD = (double) allTimeClass / allTimeGdTeacher;
-        Double averageHD = (double) allTimeHd / allTimeHdTeacher;
         inputData.setAverageGD(averageGD);
-        inputData.setAverageHD(averageHD);
 
         return inputData;
     }
@@ -442,9 +446,5 @@ public class TimetablingService {
     private TeacherEntity getRandomTeacherFromList(List<TeacherEntity> teachers) {
         Random rand = new Random();
         return teachers.get(rand.nextInt(teachers.size()));
-    }
-
-    public void timetablingStudent() {
-
     }
 }
