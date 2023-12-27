@@ -4,12 +4,12 @@ import com.example.backendproject.config.constant.ClassConstant;
 import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.constant.TeacherConstant;
 import com.example.backendproject.config.exception.Sc5Exception;
-import com.example.backendproject.entity.sc5.CustomConstraintEntity;
-import com.example.backendproject.entity.sc5.RequiredConstraintEntity;
-import com.example.backendproject.entity.sc5.StudentProjectEntity;
-import com.example.backendproject.entity.sc5.TeacherEntity;
+import com.example.backendproject.entity.sc5.*;
+import com.example.backendproject.mapper.StudentProjectMapper;
+import com.example.backendproject.mapper.TeacherMapper;
 import com.example.backendproject.model.geneticalgorithm.InputData;
 import com.example.backendproject.model.geneticalgorithm.PopulationStudent;
+import com.example.backendproject.model.sc5.TimetableStudent;
 import com.example.backendproject.repository.sc5.CustomConstraintRepository;
 import com.example.backendproject.repository.sc5.RequiredConstraintRepository;
 import com.example.backendproject.repository.sc5.StudentProjectRepository;
@@ -33,6 +33,8 @@ public class TimeTablingStudentService {
     private final CustomConstraintRepository customConstraintRepository;
     private final AdminLogService adminLogService;
     private final ObjectMapper objectMapper;
+    private final TeacherMapper teacherMapper;
+    private final StudentProjectMapper studentProjectMapper;
     public static final Integer POPULATION_SIZE = 100;
     public static final Integer NUM_OF_CROSS = 20;
     public static final Integer NUM_LOOP = 200;
@@ -42,13 +44,17 @@ public class TimeTablingStudentService {
                                      RequiredConstraintRepository requiredConstraintRepository,
                                      CustomConstraintRepository customConstraintRepository,
                                      AdminLogService adminLogService,
-                                     ObjectMapper objectMapper) {
+                                     ObjectMapper objectMapper,
+                                     TeacherMapper teacherMapper,
+                                     StudentProjectMapper studentProjectMapper) {
         this.teacherRepository = teacherRepository;
         this.studentProjectRepository = studentProjectRepository;
         this.requiredConstraintRepository = requiredConstraintRepository;
         this.customConstraintRepository = customConstraintRepository;
         this.adminLogService = adminLogService;
         this.objectMapper = objectMapper;
+        this.teacherMapper = teacherMapper;
+        this.studentProjectMapper = studentProjectMapper;
     }
 
     @Async("async-thread-pool")
@@ -331,5 +337,22 @@ public class TimeTablingStudentService {
             return studentProjectEntity.getTeacher2Id();
         }
         return studentProjectEntity.getTeacher3Id();
+    }
+
+    public TimetableStudent getTimeTableOfStudent(Long teacherId) {
+        if (teacherId == null || teacherId <= 0) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Mã giảng viên không hợp lệ");
+        }
+
+        Optional<TeacherEntity> teacherEntity = teacherRepository.findById(teacherId);
+        if (teacherEntity.isEmpty()) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Không tìm thấy thông tin giảng viên");
+        }
+
+        TimetableStudent timetableStudent = new TimetableStudent();
+        timetableStudent.setTeacher(teacherMapper.toDto(teacherEntity.get()));
+        List<StudentProjectEntity> studentProjectEntities = studentProjectRepository.findByTeacherAssignedId(teacherId);
+        timetableStudent.setStudentProjects(studentProjectMapper.toDtos(studentProjectEntities));
+        return timetableStudent;
     }
 }

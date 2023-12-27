@@ -10,6 +10,8 @@ import java.util.List;
 public interface ClassMapper {
     Class toDto(ClassEntity classEntity);
 
+    List<Class> toDtos(List<ClassEntity> classEntity);
+
     ClassEntity toEntity(Class classDto);
 
     List<ClassEntity> toEntities(List<Class> classDtos);

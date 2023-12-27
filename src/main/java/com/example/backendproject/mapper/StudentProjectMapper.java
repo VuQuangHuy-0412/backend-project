@@ -10,6 +10,8 @@ import java.util.List;
 public interface StudentProjectMapper {
     StudentProject toDto(StudentProjectEntity studentProjectEntity);
 
+    List<StudentProject> toDtos(List<StudentProjectEntity> studentProjectEntity);
+
     StudentProjectEntity toEntity(StudentProject studentProject);
 
     List<StudentProjectEntity> toEntities(List<StudentProject> studentProjects);

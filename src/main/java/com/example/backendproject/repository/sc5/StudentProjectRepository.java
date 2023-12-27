@@ -5,6 +5,9 @@ import com.example.backendproject.repository.sc5.custom.StudentProjectRepository
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface StudentProjectRepository extends JpaRepository<StudentProjectEntity, Long>, StudentProjectRepositoryCustom {
+    List<StudentProjectEntity> findByTeacherAssignedId(Long teacherId);
 }

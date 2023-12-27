@@ -5,8 +5,11 @@ import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.constant.TeacherConstant;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.sc5.*;
+import com.example.backendproject.mapper.ClassMapper;
+import com.example.backendproject.mapper.TeacherMapper;
 import com.example.backendproject.model.geneticalgorithm.InputData;
 import com.example.backendproject.model.geneticalgorithm.Population;
+import com.example.backendproject.model.sc5.TimetableTeacher;
 import com.example.backendproject.repository.sc5.*;
 import com.example.backendproject.service.AdminLogService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,6 +36,8 @@ public class TimetablingService {
     private final CustomConstraintRepository customConstraintRepository;
     private final AdminLogService adminLogService;
     private final ObjectMapper objectMapper;
+    private final TeacherMapper teacherMapper;
+    private final ClassMapper classMapper;
     public static final Integer POPULATION_SIZE = 100;
     public static final Integer NUM_OF_CROSS = 20;
     public static final Integer NUM_LOOP = 200;
@@ -46,7 +51,10 @@ public class TimetablingService {
                               LanguageRepository languageRepository,
                               RequiredConstraintRepository requiredConstraintRepository,
                               CustomConstraintRepository customConstraintRepository,
-                              AdminLogService adminLogService, ObjectMapper objectMapper) {
+                              AdminLogService adminLogService,
+                              ObjectMapper objectMapper,
+                              TeacherMapper teacherMapper,
+                              ClassMapper classMapper) {
         this.teacherRepository = teacherRepository;
         this.languageTeacherMappingRepository = languageTeacherMappingRepository;
         this.groupTeacherMappingRepository = groupTeacherMappingRepository;
@@ -58,6 +66,8 @@ public class TimetablingService {
         this.customConstraintRepository = customConstraintRepository;
         this.adminLogService = adminLogService;
         this.objectMapper = objectMapper;
+        this.teacherMapper = teacherMapper;
+        this.classMapper = classMapper;
     }
 
     @Async("async-thread-pool")
@@ -446,5 +456,22 @@ public class TimetablingService {
     private TeacherEntity getRandomTeacherFromList(List<TeacherEntity> teachers) {
         Random rand = new Random();
         return teachers.get(rand.nextInt(teachers.size()));
+    }
+
+    public TimetableTeacher getTimeTableOfTeacher(Long teacherId) {
+        if (teacherId == null || teacherId <= 0) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Mã giảng viên không hợp lệ");
+        }
+
+        Optional<TeacherEntity> teacherEntity = teacherRepository.findById(teacherId);
+        if (teacherEntity.isEmpty()) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Không tìm thấy thông tin giảng viên");
+        }
+
+        TimetableTeacher timetableTeacher = new TimetableTeacher();
+        timetableTeacher.setTeacher(teacherMapper.toDto(teacherEntity.get()));
+        List<ClassEntity> classEntities = classRepository.findByTeacherId(teacherId);
+        timetableTeacher.setClasses(classMapper.toDtos(classEntities));
+        return timetableTeacher;
     }
 }
