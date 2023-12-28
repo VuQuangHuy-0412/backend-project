@@ -1,5 +1,6 @@
 package com.example.backendproject.controller.sc5;
 
+import com.example.backendproject.model.geneticalgorithm.InputData;
 import com.example.backendproject.model.sc5.TimetableStudent;
 import com.example.backendproject.model.sc5.TimetableTeacher;
 import com.example.backendproject.service.sc5.TimeTablingStudentService;
@@ -44,5 +45,11 @@ public class TimetablingController {
     @ApiDescription(value = "Lịch HD của GV", code = "timetable_student_get")
     public TimetableStudent getTimeTableOfStudent(@RequestParam Long teacherId) {
         return timeTablingStudentService.getTimeTableOfStudent(teacherId);
+    }
+
+    @GetMapping("/timetabling-teacher/input-data")
+    @ApiDescription(value = "Input data phân công GD", code = "input_data_timetabling_teacher")
+    public InputData getTimetablingTeacherInputData() {
+        return timetablingService.getTimetablingTeacherInputData();
     }
 }

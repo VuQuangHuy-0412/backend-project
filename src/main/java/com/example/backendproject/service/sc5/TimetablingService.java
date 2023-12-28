@@ -474,4 +474,22 @@ public class TimetablingService {
         timetableTeacher.setClasses(classMapper.toDtos(classEntities));
         return timetableTeacher;
     }
+
+    public InputData getTimetablingTeacherInputData() {
+        InputData inputData = new InputData();
+        List<TeacherEntity> teachers = teacherRepository.findAllByStatus(TeacherConstant.Status.ACTIVE);
+        List<ClassEntity> classes = classRepository.findAll();
+        List<RequiredConstraintEntity> requiredConstraints = requiredConstraintRepository.findAll();
+        List<CustomConstraintEntity> customConstraints = customConstraintRepository.findAll();
+
+        inputData.setTeachers(teachers);
+        inputData.setClasses(classes);
+        inputData.setRequiredConstraints(requiredConstraints);
+        inputData.setCustomConstraints(customConstraints);
+
+        inputData.setNumOfTeachers(teachers.size());
+        inputData.setNumOfClasses(classes.size());
+
+        return inputData;
+    }
 }
