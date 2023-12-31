@@ -8,6 +8,6 @@ import java.util.List;
 @Getter
 @Setter
 public class TimetableTeacher {
-    private List<Class> classes;
+    private List<Class> data;
     private Teacher teacher;
 }
