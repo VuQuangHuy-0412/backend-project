@@ -62,9 +62,6 @@ public class ClassService {
     }
 
     private void validateCreateClassRequest(Class classDto) {
-        if (StringUtils.isBlank(classDto.getName()) || StringUtils.isBlank(classDto.getCode())) {
-            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Thiếu thông tin tên hoặc mã lớp học");
-        }
     }
 
     public void updateClass(Class classDto) {
