@@ -50,33 +50,40 @@ public class TimeTablingStudentServiceHelper {
         entity.setUpdatedAt(new Date());
         timetablingProcessRepository.save(entity);
 
-        InputData inputData = getInputData();
-        PopulationStudent population = initPopulation(inputData);
+        try {
+            InputData inputData = getInputData();
+            PopulationStudent population = initPopulation(inputData);
 
-        for (int i = 0; i < NUM_LOOP; i++) {
-            evaluateConstraint(inputData, population);
-            if (i == NUM_LOOP - 1) {
-                PopulationStudent.Member bestSolution = getTheMostObjectiveResult(population);
-                log.info("Solution: {}", objectMapper.writeValueAsString(bestSolution));
-                break;
+            for (int i = 0; i < NUM_LOOP; i++) {
+                evaluateConstraint(inputData, population);
+                if (i == NUM_LOOP - 1) {
+                    PopulationStudent.Member bestSolution = getTheMostObjectiveResult(population);
+                    log.info("Solution: {}", objectMapper.writeValueAsString(bestSolution));
+                    break;
+                }
+                selection(population);
+                crossover(inputData, population);
+                mutation(inputData, population);
+                log.info("End loop {}", i);
             }
-            selection(population);
-            crossover(inputData, population);
-            mutation(inputData, population);
-            log.info("End loop {}", i);
+
+            PopulationStudent.Member bestSolution = getTheMostObjectiveResult(population);
+            if (bestSolution != null) {
+                bestSolution.setObjective(objectiveFunction(inputData, bestSolution));
+            }
+            log.info("Solution: {}", objectMapper.writeValueAsString(bestSolution));
+
+            saveSolution(inputData.getStudentProjects(), bestSolution);
+
+            entity.setStatus("SUCCESS");
+            entity.setUpdatedAt(new Date());
+            timetablingProcessRepository.save(entity);
+        } catch (Exception ex) {
+            entity.setStatus("FAILED");
+            entity.setErrorMessage(ex.getMessage());
+            entity.setUpdatedAt(new Date());
+            timetablingProcessRepository.save(entity);
         }
-
-        PopulationStudent.Member bestSolution = getTheMostObjectiveResult(population);
-        if (bestSolution != null) {
-            bestSolution.setObjective(objectiveFunction(inputData, bestSolution));
-        }
-        log.info("Solution: {}", objectMapper.writeValueAsString(bestSolution));
-
-        saveSolution(inputData.getStudentProjects(), bestSolution);
-
-        entity.setStatus("SUCCESS");
-        entity.setUpdatedAt(new Date());
-        timetablingProcessRepository.save(entity);
     }
 
     private void saveSolution(List<StudentProjectEntity> studentProjectEntities, PopulationStudent.Member member) {

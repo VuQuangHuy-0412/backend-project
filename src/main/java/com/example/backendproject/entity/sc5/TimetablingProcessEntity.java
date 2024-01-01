@@ -26,6 +26,9 @@ public class TimetablingProcessEntity implements Serializable {
     @Column(name = "status")
     private String status;
 
+    @Column(name = "error_message")
+    private String errorMessage;
+
     @Column(name = "created_at")
     private Date createdAt;
 
