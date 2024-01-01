@@ -76,19 +76,21 @@ public class ClassService {
         }
 
         ClassEntity classEntity = classEntityOptional.get();
-        classEntity.setName(classDto.getName());
-        classEntity.setCode(classDto.getCode());
-        classEntity.setSemester(classDto.getSemester());
-        classEntity.setSubjectId(classDto.getSubjectId());
-        classEntity.setWeek(classDto.getWeek());
-        classEntity.setDayOfWeek(classDto.getDayOfWeek());
-        classEntity.setTimeOfDay(classDto.getTimeOfDay());
-        classEntity.setTimeOfClass(classDto.getTimeOfClass());
-        classEntity.setLanguageId(classDto.getLanguageId());
-        classEntity.setIsAssigned(classDto.getIsAssigned());
+        if (!StringUtils.isBlank(classDto.getName()) && !StringUtils.isBlank(classDto.getCode())) {
+            classEntity.setName(classDto.getName());
+            classEntity.setCode(classDto.getCode());
+            classEntity.setSemester(classDto.getSemester());
+            classEntity.setSubjectId(classDto.getSubjectId());
+            classEntity.setWeek(classDto.getWeek());
+            classEntity.setDayOfWeek(classDto.getDayOfWeek());
+            classEntity.setTimeOfDay(classDto.getTimeOfDay());
+            classEntity.setTimeOfClass(classDto.getTimeOfClass());
+            classEntity.setLanguageId(classDto.getLanguageId());
+            classEntity.setIsAssigned(classDto.getIsAssigned());
+            classEntity.setBuilding(classDto.getBuilding());
+            classEntity.setRoom(classDto.getRoom());
+        }
         classEntity.setTeacherId(classDto.getTeacherId());
-        classEntity.setBuilding(classDto.getBuilding());
-        classEntity.setRoom(classDto.getRoom());
         classEntity.setUpdatedAt(new Date());
 
         try {

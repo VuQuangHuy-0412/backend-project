@@ -12,6 +12,7 @@ import com.example.backendproject.repository.sc5.StudentProjectRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -76,13 +77,15 @@ public class StudentProjectService {
         }
 
         StudentProjectEntity studentProjectEntity = studentProjectEntityOptional.get();
-        studentProjectEntity.setName(studentProject.getName());
-        studentProjectEntity.setStudentCode(studentProject.getStudentCode());
-        studentProjectEntity.setTimeHd(studentProject.getTimeHd());
-        studentProjectEntity.setIsAssigned(studentProject.getIsAssigned());
-        studentProjectEntity.setTeacher1Id(studentProject.getTeacher1Id());
-        studentProjectEntity.setTeacher2Id(studentProject.getTeacher2Id());
-        studentProjectEntity.setTeacher3Id(studentProject.getTeacher3Id());
+        if (!StringUtils.isBlank(studentProject.getName()) && !StringUtils.isBlank(studentProject.getStudentCode())) {
+            studentProjectEntity.setName(studentProject.getName());
+            studentProjectEntity.setStudentCode(studentProject.getStudentCode());
+            studentProjectEntity.setTimeHd(studentProject.getTimeHd());
+            studentProjectEntity.setIsAssigned(studentProject.getIsAssigned());
+            studentProjectEntity.setTeacher1Id(studentProject.getTeacher1Id());
+            studentProjectEntity.setTeacher2Id(studentProject.getTeacher2Id());
+            studentProjectEntity.setTeacher3Id(studentProject.getTeacher3Id());
+        }
         studentProjectEntity.setTeacherAssignedId(studentProject.getTeacherAssignedId());
         studentProjectEntity.setUpdatedAt(new Date());
 
