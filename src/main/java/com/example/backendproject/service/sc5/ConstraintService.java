@@ -123,6 +123,7 @@ public class ConstraintService {
         requiredConstraintEntity.setCode(requiredConstraint.getCode());
         requiredConstraintEntity.setValue(requiredConstraintEntity.getValue());
         requiredConstraintEntity.setStatus(requiredConstraintEntity.getStatus());
+        requiredConstraintEntity.setType(requiredConstraintEntity.getType());
         requiredConstraintEntity.setUpdatedAt(new Date());
 
         try {

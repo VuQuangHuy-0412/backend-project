@@ -16,6 +16,8 @@ public class RequiredConstraint {
 
     private Integer status;
 
+    private String type;
+
     private Date createdAt;
 
     private Date updatedAt;

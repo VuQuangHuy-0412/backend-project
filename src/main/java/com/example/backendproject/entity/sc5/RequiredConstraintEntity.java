@@ -28,6 +28,9 @@ public class RequiredConstraintEntity implements Serializable {
     @Column(name = "status")
     private Integer status;
 
+    @Column(name = "type")
+    private String type;
+
     @Column(name = "created_at")
     private Date createdAt;
 
