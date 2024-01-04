@@ -68,7 +68,7 @@ public class FileExportService {
             styleLongContent.setAlignment(HorizontalAlignment.LEFT);
             styleLongContent.setVerticalAlignment(VerticalAlignment.CENTER);
 
-            Sheet listTimetablingTeacher = workbook.createSheet("Danh sách lớp sau phân công");
+            Sheet listTimetablingTeacher = workbook.createSheet("Danh sách lớp học");
             // title row
             int row = 0;
             Row rowTitle = listTimetablingTeacher.createRow(row);
@@ -88,62 +88,62 @@ public class FileExportService {
             Cell cellName = headerRow.createCell(1);
             cellName.setCellValue("Tên lớp học");
             cellName.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(1, ((int) (6 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(1, ((int) (24 * 1.14388)) * 256);
 
             Cell cellCode = headerRow.createCell(2);
             cellCode.setCellValue("Mã lớp học");
             cellCode.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(2, ((int) (24 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(2, ((int) (6 * 1.14388)) * 256);
 
             Cell cellSemester = headerRow.createCell(3);
             cellSemester.setCellValue("Học kỳ");
             cellSemester.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(3, ((int) (24 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(3, ((int) (6 * 1.14388)) * 256);
 
             Cell cellSubjectId = headerRow.createCell(4);
             cellSubjectId.setCellValue("ID học phần");
             cellSubjectId.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(4, ((int) (24 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(4, ((int) (6 * 1.14388)) * 256);
 
             Cell cellWeek = headerRow.createCell(5);
             cellWeek.setCellValue("Tuần học");
             cellWeek.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(5, ((int) (24 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(5, ((int) (6 * 1.14388)) * 256);
 
             Cell cellDayOfWeek = headerRow.createCell(6);
             cellDayOfWeek.setCellValue("Thứ trong tuần");
             cellDayOfWeek.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(6, ((int) (24 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(6, ((int) (6 * 1.14388)) * 256);
 
             Cell cellTimeOfDay = headerRow.createCell(7);
             cellTimeOfDay.setCellValue("Tiết học");
             cellTimeOfDay.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(7, ((int) (24 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(7, ((int) (12 * 1.14388)) * 256);
 
             Cell cellTimeOfClass = headerRow.createCell(8);
             cellTimeOfClass.setCellValue("Số giờ GD");
             cellTimeOfClass.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(8, ((int) (24 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(8, ((int) (6 * 1.14388)) * 256);
 
             Cell cellLanguageId = headerRow.createCell(9);
             cellLanguageId.setCellValue("ID ngôn ngữ");
             cellLanguageId.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(9, ((int) (24 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(9, ((int) (6 * 1.14388)) * 256);
 
             Cell cellBuilding = headerRow.createCell(10);
             cellBuilding.setCellValue("Toà nhà");
             cellBuilding.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(10, ((int) (24 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(10, ((int) (6 * 1.14388)) * 256);
 
             Cell cellRoom = headerRow.createCell(11);
             cellRoom.setCellValue("Phòng học");
             cellRoom.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(11, ((int) (24 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(11, ((int) (6 * 1.14388)) * 256);
 
             Cell cellTeacherId = headerRow.createCell(12);
             cellTeacherId.setCellValue("Giảng viên phụ trách");
             cellTeacherId.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(12, ((int) (24 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(12, ((int) (6 * 1.14388)) * 256);
 
             for (ClassEntity classEntity : entities) {
                 row += 1;
@@ -198,7 +198,7 @@ public class FileExportService {
                 room.setCellStyle(styleLeft);
 
                 Cell teacherId = rowClass.createCell(12);
-                teacherId.setCellValue(classEntity.getRoom());
+                teacherId.setCellValue(classEntity.getTeacherId());
                 teacherId.setCellStyle(styleLeft);
             }
 
@@ -246,7 +246,7 @@ public class FileExportService {
             styleLongContent.setAlignment(HorizontalAlignment.LEFT);
             styleLongContent.setVerticalAlignment(VerticalAlignment.CENTER);
 
-            Sheet listTimetablingTeacher = workbook.createSheet("Danh sách sinh viên sau phân công");
+            Sheet listTimetablingTeacher = workbook.createSheet("Danh sách sinh viên");
             // title row
             int row = 0;
             Row rowTitle = listTimetablingTeacher.createRow(row);
@@ -266,22 +266,22 @@ public class FileExportService {
             Cell cellName = headerRow.createCell(1);
             cellName.setCellValue("Tên sinh viên");
             cellName.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(1, ((int) (6 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(1, ((int) (24 * 1.14388)) * 256);
 
             Cell cellStudentCode = headerRow.createCell(2);
             cellStudentCode.setCellValue("Mã sinh viên");
             cellStudentCode.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(2, ((int) (24 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(2, ((int) (12 * 1.14388)) * 256);
 
             Cell cellTimeHd = headerRow.createCell(3);
             cellTimeHd.setCellValue("Số giờ HD");
             cellTimeHd.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(3, ((int) (24 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(3, ((int) (6 * 1.14388)) * 256);
 
             Cell cellTeacherAssignedId = headerRow.createCell(4);
             cellTeacherAssignedId.setCellValue("Giảng viên phụ trách");
             cellTeacherAssignedId.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(4, ((int) (24 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(4, ((int) (6 * 1.14388)) * 256);
 
             for (StudentProjectEntity studentProjectEntity : entities) {
                 row += 1;

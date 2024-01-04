@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +19,7 @@ public class FileExportController {
         this.fileExportService = fileExportService;
     }
 
-    @PostMapping(value = "/admin/timetabling-teacher/list/excel")
+    @GetMapping(value = "/admin/timetabling-teacher/list/excel")
     @ApiDescription(value = "Xuất file Excel danh sách lớp sau khi phân công", code = "timetabling_teacher_export_excel")
     public ResponseEntity<?> exportListTimetablingTeacher() {
         String fileName = "timetabling_teacher_" + System.currentTimeMillis() + ".xlsx";
@@ -29,7 +30,7 @@ public class FileExportController {
                 .body(resource);
     }
 
-    @PostMapping(value = "/admin/timetabling-student/list/excel")
+    @GetMapping(value = "/admin/timetabling-student/list/excel")
     @ApiDescription(value = "Xuất file Excel danh sách sinh viên sau khi phân công", code = "timetabling_student_export_excel")
     public ResponseEntity<?> exportListTimetablingStudent() {
         String fileName = "timetabling_student_" + System.currentTimeMillis() + ".xlsx";
