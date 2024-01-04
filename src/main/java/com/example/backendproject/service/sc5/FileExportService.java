@@ -35,7 +35,7 @@ public class FileExportService {
     }
 
     public InputStreamResource exportListTimetablingTeacher() {
-        adminLogService.log("exportListTametablingTeacher", null);
+        adminLogService.log("exportListTimetablingTeacher", null);
 
         List<ClassEntity> entities = classRepository.findAll();
 
