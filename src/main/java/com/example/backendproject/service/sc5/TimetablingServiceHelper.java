@@ -160,13 +160,13 @@ public class TimetablingServiceHelper {
         inputData.setNumOfLanguages(languages.size());
 
         int allTimeGdTeacher = teachers.stream().map(TeacherEntity::getGdTime).reduce(0, Integer::sum);
-        Integer allTimeClass = classes.stream().map(ClassEntity::getTimeOfClass).reduce(0, Integer::sum);
+        Double allTimeClass = classes.stream().map(ClassEntity::getTimeOfClass).reduce(0d, Double::sum);
 
         if (allTimeGdTeacher <= 0) {
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
         }
 
-        Double averageGD = (double) allTimeClass / allTimeGdTeacher;
+        Double averageGD = allTimeClass / allTimeGdTeacher;
         inputData.setAverageGD(averageGD);
 
         return inputData;

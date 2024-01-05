@@ -116,13 +116,13 @@ public class TimeTablingStudentServiceHelper {
         inputData.setNumOfStudents(studentProjects.size());
 
         int allTimeHdTeacher = teachers.stream().map(TeacherEntity::getHdTime).reduce(0, Integer::sum);
-        Integer allTimeHd = studentProjects.stream().map(StudentProjectEntity::getTimeHd).reduce(0, Integer::sum);
+        Double allTimeHd = studentProjects.stream().map(StudentProjectEntity::getTimeHd).reduce(0d, Double::sum);
 
         if (allTimeHdTeacher <= 0) {
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
         }
 
-        Double averageHD = (double) allTimeHd / allTimeHdTeacher;
+        Double averageHD = allTimeHd / allTimeHdTeacher;
         inputData.setAverageHD(averageHD);
 
         return inputData;

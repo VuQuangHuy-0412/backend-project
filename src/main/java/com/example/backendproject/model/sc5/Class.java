@@ -24,7 +24,7 @@ public class Class {
 
     private String timeOfDay;
 
-    private Integer timeOfClass;
+    private Double timeOfClass;
 
     private Long languageId;
 

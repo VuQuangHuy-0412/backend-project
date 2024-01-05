@@ -27,7 +27,7 @@ public class StudentProjectEntity implements Serializable {
     private String studentCode;
 
     @Column(name = "time_hd")
-    private Integer timeHd;
+    private Double timeHd;
 
     @Column(name = "is_assigned")
     private Integer isAssigned;

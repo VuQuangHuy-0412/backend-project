@@ -42,7 +42,7 @@ public class ClassEntity implements Serializable {
     private String timeOfDay;
 
     @Column(name = "time_of_class")
-    private Integer timeOfClass;
+    private Double timeOfClass;
 
     @Column(name = "language_id")
     private Long languageId;
