@@ -66,7 +66,7 @@ public class GroupTeacherServiceHelper {
             }
         }
 
-        List<GroupTeacherMappingEntity> entities = groupTeacherMappingMapper.toEntities(request.getGroupTeacherMappingCreateRequests());
+        List<GroupTeacherMappingEntity> entities = groupTeacherMappingMapper.toEntities(requests);
         groupTeacherMappingRepository.saveAll(entities);
     }
 }
