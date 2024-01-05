@@ -21,7 +21,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -174,8 +176,8 @@ public class GroupTeacherService {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vai trò không hợp lệ");
         }
 
-        GroupTeacherMappingEntity existed = groupTeacherMappingRepository.findByGroupIdAndTeacherId(request.getGroupId(), request.getTeacherId());
-        if (existed != null) {
+        List<GroupTeacherMappingEntity> existed = groupTeacherMappingRepository.findByGroupIdAndTeacherId(request.getGroupId(), request.getTeacherId());
+        if (!CollectionUtils.isEmpty(existed)) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Giảng viên đã nằm trong nhóm");
         }
 
@@ -196,14 +198,14 @@ public class GroupTeacherService {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vai trò không hợp lệ");
         }
 
-        GroupTeacherMappingEntity existed = groupTeacherMappingRepository.findByGroupIdAndTeacherId(request.getGroupId(), request.getTeacherId());
-        if (existed == null) {
+        List<GroupTeacherMappingEntity> existed = groupTeacherMappingRepository.findByGroupIdAndTeacherId(request.getGroupId(), request.getTeacherId());
+        if (CollectionUtils.isEmpty(existed)) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Giảng viên không nằm trong nhóm");
         }
+        GroupTeacherMappingEntity entity = existed.get(0);
+        entity.setRole(request.getRole());
 
-        existed.setRole(request.getRole());
-
-        groupTeacherMappingRepository.save(existed);
+        groupTeacherMappingRepository.save(entity);
     }
 
     public void uploadExcelGroupTeacherMapping(UploadGroupTeacherMappingRequest request) {

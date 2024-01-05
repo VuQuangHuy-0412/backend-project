@@ -4,7 +4,10 @@ import com.example.backendproject.entity.sc5.LanguageTeacherMappingEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface LanguageTeacherMappingRepository extends JpaRepository<LanguageTeacherMappingEntity, Long> {
-    LanguageTeacherMappingEntity findByTeacherIdAndLanguageId(Long teacherId, Long languageId);
+    List<LanguageTeacherMappingEntity> findByTeacherIdAndLanguageId(Long teacherId, Long languageId);
+
 }

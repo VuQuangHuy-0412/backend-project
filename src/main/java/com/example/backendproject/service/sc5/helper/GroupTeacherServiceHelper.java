@@ -12,6 +12,7 @@ import com.example.backendproject.repository.sc5.GroupTeacherRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,16 +58,12 @@ public class GroupTeacherServiceHelper {
 
     @Async("async-thread-pool")
     public void uploadExcelGroupTeacherMapping(UploadGroupTeacherMappingRequest request) {
-        List<GroupTeacherMapping> requests = request.getGroupTeacherMappingCreateRequests();
         for (GroupTeacherMapping groupTeacherMapping : request.getGroupTeacherMappingCreateRequests()) {
-            GroupTeacherMappingEntity entity = groupTeacherMappingRepository.findByGroupIdAndTeacherId(groupTeacherMapping.getGroupId(), groupTeacherMapping.getTeacherId());
-            if (entity != null) {
-                List<GroupTeacherMapping> filter = requests.stream().filter(x -> Objects.equals(x.getGroupId(), groupTeacherMapping.getGroupId()) && Objects.equals(x.getTeacherId(), groupTeacherMapping.getTeacherId())).toList();
-                requests.removeAll(filter);
+            List<GroupTeacherMappingEntity> entity = groupTeacherMappingRepository.findByGroupIdAndTeacherId(groupTeacherMapping.getGroupId(), groupTeacherMapping.getTeacherId());
+            if (CollectionUtils.isEmpty(entity)) {
+                GroupTeacherMappingEntity groupTeacherMappingEntity = groupTeacherMappingMapper.toEntity(groupTeacherMapping);
+                groupTeacherMappingRepository.save(groupTeacherMappingEntity);
             }
         }
-
-        List<GroupTeacherMappingEntity> entities = groupTeacherMappingMapper.toEntities(requests);
-        groupTeacherMappingRepository.saveAll(entities);
     }
 }

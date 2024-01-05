@@ -29,6 +29,8 @@ public class StudentProjectServiceHelper {
         entities.forEach(x -> x.setCreatedAt(new Date()));
         entities.forEach(x -> x.setUpdatedAt(new Date()));
 
-        studentProjectRepository.saveAll(entities);
+        for (StudentProjectEntity entity : entities) {
+            studentProjectRepository.save(entity);
+        }
     }
 }

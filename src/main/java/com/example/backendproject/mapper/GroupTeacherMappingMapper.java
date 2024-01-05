@@ -13,4 +13,5 @@ public interface GroupTeacherMappingMapper {
     GroupTeacherMapping toDto(GroupTeacherMappingEntity groupTeacherMappingEntity);
 
     List<GroupTeacherMappingEntity> toEntities(List<GroupTeacherMapping> groupTeacherMappings);
+    GroupTeacherMappingEntity toEntity(GroupTeacherMapping groupTeacherMapping);
 }

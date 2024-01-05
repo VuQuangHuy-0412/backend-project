@@ -12,6 +12,7 @@ import com.example.backendproject.repository.sc5.TeacherRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -41,24 +42,20 @@ public class TeacherServiceHelper {
         entities.forEach(x -> x.setCreatedAt(new Date()));
         entities.forEach(x -> x.setUpdatedAt(new Date()));
 
-        teacherRepository.saveAll(entities);
+        for (TeacherEntity entity : entities) {
+            teacherRepository.save(entity);
+        }
     }
 
     @Async("async-thread-pool")
     public void uploadFileLanguageTeacherMapping(UploadLanguageTeacherRequest request) {
-        List<LanguageTeacherMapping> requests = request.getLanguageTeacherCreateRequests();
         for (LanguageTeacherMapping languageTeacherMapping : request.getLanguageTeacherCreateRequests()) {
-            LanguageTeacherMappingEntity entity = languageTeacherMappingRepository.findByTeacherIdAndLanguageId(
+            List<LanguageTeacherMappingEntity> entity = languageTeacherMappingRepository.findByTeacherIdAndLanguageId(
                     languageTeacherMapping.getTeacherId(), languageTeacherMapping.getLanguageId());
-            if (entity != null) {
-                List<LanguageTeacherMapping> filter = requests.stream().filter(x ->
-                        Objects.equals(x.getLanguageId(), languageTeacherMapping.getLanguageId()) &&
-                                Objects.equals(x.getTeacherId(), languageTeacherMapping.getTeacherId())).toList();
-                requests.removeAll(filter);
+            if (CollectionUtils.isEmpty(entity)) {
+                LanguageTeacherMappingEntity languageTeacherMappingEntity = languageTeacherMappingMapper.toEntity(languageTeacherMapping);
+                languageTeacherMappingRepository.save(languageTeacherMappingEntity);
             }
         }
-
-        List<LanguageTeacherMappingEntity> entities = languageTeacherMappingMapper.toEntities(requests);
-        languageTeacherMappingRepository.saveAll(entities);
     }
 }

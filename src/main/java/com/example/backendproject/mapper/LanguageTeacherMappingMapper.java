@@ -11,4 +11,5 @@ public interface LanguageTeacherMappingMapper {
     LanguageTeacherMapping toDto(LanguageTeacherMappingEntity languageTeacherMappingEntity);
 
     List<LanguageTeacherMappingEntity> toEntities(List<LanguageTeacherMapping> dtos);
+    LanguageTeacherMappingEntity toEntity(LanguageTeacherMapping dto);
 }

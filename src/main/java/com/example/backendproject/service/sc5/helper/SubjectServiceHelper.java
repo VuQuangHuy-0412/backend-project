@@ -29,6 +29,8 @@ public class SubjectServiceHelper {
         entities.forEach(x -> x.setCreatedAt(new Date()));
         entities.forEach(x -> x.setUpdatedAt(new Date()));
 
-        subjectRepository.saveAll(entities);
+        for (SubjectEntity entity : entities) {
+            subjectRepository.save(entity);
+        }
     }
 }

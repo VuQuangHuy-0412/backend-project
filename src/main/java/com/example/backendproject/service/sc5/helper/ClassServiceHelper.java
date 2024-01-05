@@ -28,6 +28,8 @@ public class ClassServiceHelper {
         entities.forEach(x -> x.setCreatedAt(new Date()));
         entities.forEach(x -> x.setUpdatedAt(new Date()));
 
-        classRepository.saveAll(entities);
+        for (ClassEntity classEntity : entities) {
+            classRepository.save(classEntity);
+        }
     }
 }
