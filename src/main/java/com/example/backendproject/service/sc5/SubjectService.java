@@ -2,12 +2,13 @@ package com.example.backendproject.service.sc5;
 
 import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.exception.Sc5Exception;
+import com.example.backendproject.entity.sc5.GroupTeacherEntity;
 import com.example.backendproject.entity.sc5.SubjectEntity;
+import com.example.backendproject.entity.sc5.TeacherEntity;
+import com.example.backendproject.mapper.GroupTeacherMapper;
 import com.example.backendproject.mapper.SubjectMapper;
-import com.example.backendproject.model.sc5.Subject;
-import com.example.backendproject.model.sc5.SubjectSearchRequest;
-import com.example.backendproject.model.sc5.SubjectSearchResponse;
-import com.example.backendproject.model.sc5.UploadSubjectRequest;
+import com.example.backendproject.model.sc5.*;
+import com.example.backendproject.repository.sc5.GroupTeacherRepository;
 import com.example.backendproject.repository.sc5.SubjectRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.service.sc5.helper.SubjectServiceHelper;
@@ -28,15 +29,21 @@ public class SubjectService {
     private final AdminLogService adminLogService;
     private final SubjectMapper subjectMapper;
     private final SubjectServiceHelper subjectServiceHelper;
+    private final GroupTeacherRepository groupTeacherRepository;
+    private final GroupTeacherMapper groupTeacherMapper;
 
     public SubjectService(SubjectRepository subjectRepository,
                           AdminLogService adminLogService,
                           SubjectMapper subjectMapper,
-                          SubjectServiceHelper subjectServiceHelper) {
+                          SubjectServiceHelper subjectServiceHelper,
+                          GroupTeacherRepository groupTeacherRepository,
+                          GroupTeacherMapper groupTeacherMapper) {
         this.subjectRepository = subjectRepository;
         this.adminLogService = adminLogService;
         this.subjectMapper = subjectMapper;
         this.subjectServiceHelper = subjectServiceHelper;
+        this.groupTeacherRepository = groupTeacherRepository;
+        this.groupTeacherMapper = groupTeacherMapper;
     }
 
     public SubjectSearchResponse searchSubject(SubjectSearchRequest request) {
@@ -45,6 +52,12 @@ public class SubjectService {
         response.setPageSize(request.getPageSize());
 
         List<Subject> data = subjectRepository.searchSubjectByFilter(request);
+        for (Subject subject : data) {
+            if (subject.getGroupId() != null) {
+                Optional<GroupTeacherEntity> groupTeacherEntity = groupTeacherRepository.findById(subject.getGroupId());
+                groupTeacherEntity.ifPresent(entity -> subject.setGroupTeacher(groupTeacherMapper.toDto(entity)));
+            }
+        }
         response.setData(data);
         return response;
     }

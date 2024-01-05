@@ -29,4 +29,12 @@ public class StudentProject {
     private Long teacher3Id;
 
     private Long teacherAssignedId;
+
+    private Teacher teacher1;
+
+    private Teacher teacher2;
+
+    private Teacher teacher3;
+
+    private Teacher teacherAssigned;
 }

@@ -39,4 +39,8 @@ public class Class {
     private Date createdAt;
 
     private Date updatedAt;
+
+    private Subject subject;
+
+    private Teacher teacher;
 }

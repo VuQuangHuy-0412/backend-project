@@ -3,12 +3,17 @@ package com.example.backendproject.service.sc5;
 import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.sc5.StudentProjectEntity;
+import com.example.backendproject.entity.sc5.SubjectEntity;
+import com.example.backendproject.entity.sc5.TeacherEntity;
 import com.example.backendproject.mapper.StudentProjectMapper;
+import com.example.backendproject.mapper.TeacherMapper;
+import com.example.backendproject.model.sc5.Class;
 import com.example.backendproject.model.sc5.StudentProject;
 import com.example.backendproject.model.sc5.StudentProjectSearchRequest;
 import com.example.backendproject.model.sc5.StudentProjectSearchResponse;
 import com.example.backendproject.model.sc5.UploadStudentProjectRequest;
 import com.example.backendproject.repository.sc5.StudentProjectRepository;
+import com.example.backendproject.repository.sc5.TeacherRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.service.sc5.helper.StudentProjectServiceHelper;
 import com.example.backendproject.util.CommonUtil;
@@ -28,15 +33,21 @@ public class StudentProjectService {
     private final AdminLogService adminLogService;
     private final StudentProjectMapper studentProjectMapper;
     private final StudentProjectServiceHelper studentProjectServiceHelper;
+    private final TeacherRepository teacherRepository;
+    private final TeacherMapper teacherMapper;
 
     public StudentProjectService(StudentProjectRepository studentProjectRepository,
                                  AdminLogService adminLogService,
                                  StudentProjectMapper studentProjectMapper,
-                                 StudentProjectServiceHelper studentProjectServiceHelper) {
+                                 StudentProjectServiceHelper studentProjectServiceHelper,
+                                 TeacherRepository teacherRepository,
+                                 TeacherMapper teacherMapper) {
         this.studentProjectRepository = studentProjectRepository;
         this.adminLogService = adminLogService;
         this.studentProjectMapper = studentProjectMapper;
         this.studentProjectServiceHelper = studentProjectServiceHelper;
+        this.teacherRepository = teacherRepository;
+        this.teacherMapper = teacherMapper;
     }
 
     public StudentProjectSearchResponse searchStudentProject(StudentProjectSearchRequest request) {
@@ -45,6 +56,24 @@ public class StudentProjectService {
         response.setPageSize(request.getPageSize());
 
         List<StudentProject> data = studentProjectRepository.searchStudentProjectByFilter(request);
+        for (StudentProject studentProject : data) {
+            if (studentProject.getTeacher1Id() != null) {
+                Optional<TeacherEntity> teacher1Entity = teacherRepository.findById(studentProject.getTeacher1Id());
+                teacher1Entity.ifPresent(entity -> studentProject.setTeacher1(teacherMapper.toDto(entity)));
+            }
+            if (studentProject.getTeacher2Id() != null) {
+                Optional<TeacherEntity> teacher2Entity = teacherRepository.findById(studentProject.getTeacher2Id());
+                teacher2Entity.ifPresent(entity -> studentProject.setTeacher2(teacherMapper.toDto(entity)));
+            }
+            if (studentProject.getTeacher3Id() != null) {
+                Optional<TeacherEntity> teacher3Entity = teacherRepository.findById(studentProject.getTeacher3Id());
+                teacher3Entity.ifPresent(entity -> studentProject.setTeacher3(teacherMapper.toDto(entity)));
+            }
+            if (studentProject.getTeacherAssignedId() != null) {
+                Optional<TeacherEntity> teacherAssignedEntity = teacherRepository.findById(studentProject.getTeacherAssignedId());
+                teacherAssignedEntity.ifPresent(entity -> studentProject.setTeacherAssigned(teacherMapper.toDto(entity)));
+            }
+        }
         response.setData(data);
         return response;
     }

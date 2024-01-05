@@ -3,12 +3,16 @@ package com.example.backendproject.service.sc5;
 import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.sc5.ClassEntity;
+import com.example.backendproject.entity.sc5.SubjectEntity;
+import com.example.backendproject.entity.sc5.TeacherEntity;
 import com.example.backendproject.mapper.ClassMapper;
+import com.example.backendproject.mapper.SubjectMapper;
+import com.example.backendproject.mapper.TeacherMapper;
+import com.example.backendproject.model.sc5.*;
 import com.example.backendproject.model.sc5.Class;
-import com.example.backendproject.model.sc5.ClassSearchRequest;
-import com.example.backendproject.model.sc5.ClassSearchResponse;
-import com.example.backendproject.model.sc5.UploadClassRequest;
 import com.example.backendproject.repository.sc5.ClassRepository;
+import com.example.backendproject.repository.sc5.SubjectRepository;
+import com.example.backendproject.repository.sc5.TeacherRepository;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.service.sc5.helper.ClassServiceHelper;
 import com.example.backendproject.util.CommonUtil;
@@ -28,15 +32,27 @@ public class ClassService {
     private final AdminLogService adminLogService;
     private final ClassMapper classMapper;
     private final ClassServiceHelper classServiceHelper;
+    private final SubjectRepository subjectRepository;
+    private final SubjectMapper subjectMapper;
+    private final TeacherRepository teacherRepository;
+    private final TeacherMapper teacherMapper;
 
     public ClassService(ClassRepository classRepository,
                         AdminLogService adminLogService,
                         ClassMapper classMapper,
-                        ClassServiceHelper classServiceHelper) {
+                        ClassServiceHelper classServiceHelper,
+                        SubjectRepository subjectRepository,
+                        SubjectMapper subjectMapper,
+                        TeacherRepository teacherRepository,
+                        TeacherMapper teacherMapper) {
         this.classRepository = classRepository;
         this.adminLogService = adminLogService;
         this.classMapper = classMapper;
         this.classServiceHelper = classServiceHelper;
+        this.subjectRepository = subjectRepository;
+        this.subjectMapper = subjectMapper;
+        this.teacherRepository = teacherRepository;
+        this.teacherMapper = teacherMapper;
     }
 
     public ClassSearchResponse searchClass(ClassSearchRequest request) {
@@ -45,6 +61,16 @@ public class ClassService {
         response.setPageSize(request.getPageSize());
 
         List<Class> data = classRepository.searchClassByFilter(request);
+        for (Class classDto : data) {
+            if (classDto.getSubjectId() != null) {
+                Optional<SubjectEntity> subjectEntity = subjectRepository.findById(classDto.getSubjectId());
+                subjectEntity.ifPresent(entity -> classDto.setSubject(subjectMapper.toDto(entity)));
+            }
+            if (classDto.getTeacherId() != null) {
+                Optional<TeacherEntity> teacherEntity = teacherRepository.findById(classDto.getTeacherId());
+                teacherEntity.ifPresent(entity -> classDto.setTeacher(teacherMapper.toDto(entity)));
+            }
+        }
         response.setData(data);
         return response;
     }
