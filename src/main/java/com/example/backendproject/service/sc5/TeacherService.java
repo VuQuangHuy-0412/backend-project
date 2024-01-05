@@ -17,6 +17,7 @@ import com.example.backendproject.repository.sc5.GroupTeacherRepository;
 import com.example.backendproject.repository.sc5.LanguageTeacherMappingRepository;
 import com.example.backendproject.repository.sc5.TeacherRepository;
 import com.example.backendproject.service.AdminLogService;
+import com.example.backendproject.service.sc5.helper.TeacherServiceHelper;
 import com.example.backendproject.util.CommonUtil;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class TeacherService {
     private final LanguageTeacherMappingMapper languageTeacherMappingMapper;
     private final GroupTeacherRepository groupTeacherRepository;
     private final GroupTeacherMapper groupTeacherMapper;
+    private final TeacherServiceHelper teacherServiceHelper;
 
     public TeacherService(TeacherRepository teacherRepository,
                           AdminLogService adminLogService,
@@ -45,7 +47,8 @@ public class TeacherService {
                           LanguageTeacherMappingRepository languageTeacherMappingRepository,
                           LanguageTeacherMappingMapper languageTeacherMappingMapper,
                           GroupTeacherRepository groupTeacherRepository,
-                          GroupTeacherMapper groupTeacherMapper) {
+                          GroupTeacherMapper groupTeacherMapper,
+                          TeacherServiceHelper teacherServiceHelper) {
         this.teacherRepository = teacherRepository;
         this.adminLogService = adminLogService;
         this.teacherMapper = teacherMapper;
@@ -54,6 +57,7 @@ public class TeacherService {
         this.languageTeacherMappingMapper = languageTeacherMappingMapper;
         this.groupTeacherRepository = groupTeacherRepository;
         this.groupTeacherMapper = groupTeacherMapper;
+        this.teacherServiceHelper = teacherServiceHelper;
     }
 
     public TeacherSearchResponse searchTeacher(TeacherSearchRequest request) {
@@ -177,11 +181,7 @@ public class TeacherService {
             validateCreateTeacherRequest(teacher);
         }
 
-        List<TeacherEntity> entities = teacherMapper.toEntities(request.getTeacherCreateRequests());
-        entities.forEach(x -> x.setCreatedAt(new Date()));
-        entities.forEach(x -> x.setUpdatedAt(new Date()));
-
-        teacherRepository.saveAll(entities);
+        teacherServiceHelper.uploadFileTeacher(request);
     }
 
     public TeacherSearchResponse getAllTeacherByGroup(Long groupId) {
@@ -227,19 +227,6 @@ public class TeacherService {
             }
         }
 
-        List<LanguageTeacherMapping> requests = request.getLanguageTeacherCreateRequests();
-        for (LanguageTeacherMapping languageTeacherMapping : request.getLanguageTeacherCreateRequests()) {
-            LanguageTeacherMappingEntity entity = languageTeacherMappingRepository.findByTeacherIdAndLanguageId(
-                    languageTeacherMapping.getTeacherId(), languageTeacherMapping.getLanguageId());
-            if (entity != null) {
-                List<LanguageTeacherMapping> filter = requests.stream().filter(x ->
-                        Objects.equals(x.getLanguageId(), languageTeacherMapping.getLanguageId()) &&
-                                Objects.equals(x.getTeacherId(), languageTeacherMapping.getTeacherId())).toList();
-                requests.removeAll(filter);
-            }
-        }
-
-        List<LanguageTeacherMappingEntity> entities = languageTeacherMappingMapper.toEntities(request.getLanguageTeacherCreateRequests());
-        languageTeacherMappingRepository.saveAll(entities);
+        teacherServiceHelper.uploadFileLanguageTeacherMapping(request);
     }
 }

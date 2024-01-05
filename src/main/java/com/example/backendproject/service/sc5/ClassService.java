@@ -10,6 +10,7 @@ import com.example.backendproject.model.sc5.ClassSearchResponse;
 import com.example.backendproject.model.sc5.UploadClassRequest;
 import com.example.backendproject.repository.sc5.ClassRepository;
 import com.example.backendproject.service.AdminLogService;
+import com.example.backendproject.service.sc5.helper.ClassServiceHelper;
 import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,13 +27,16 @@ public class ClassService {
     private final ClassRepository classRepository;
     private final AdminLogService adminLogService;
     private final ClassMapper classMapper;
+    private final ClassServiceHelper classServiceHelper;
 
     public ClassService(ClassRepository classRepository,
                         AdminLogService adminLogService,
-                        ClassMapper classMapper) {
+                        ClassMapper classMapper,
+                        ClassServiceHelper classServiceHelper) {
         this.classRepository = classRepository;
         this.adminLogService = adminLogService;
         this.classMapper = classMapper;
+        this.classServiceHelper = classServiceHelper;
     }
 
     public ClassSearchResponse searchClass(ClassSearchRequest request) {
@@ -110,10 +114,6 @@ public class ClassService {
             validateCreateClassRequest(classDto);
         }
 
-        List<ClassEntity> entities = classMapper.toEntities(request.getClassCreateRequests());
-        entities.forEach(x -> x.setCreatedAt(new Date()));
-        entities.forEach(x -> x.setUpdatedAt(new Date()));
-
-        classRepository.saveAll(entities);
+        classServiceHelper.uploadFileClass(request);
     }
 }

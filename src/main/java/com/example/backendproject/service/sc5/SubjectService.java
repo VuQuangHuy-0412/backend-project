@@ -10,6 +10,7 @@ import com.example.backendproject.model.sc5.SubjectSearchResponse;
 import com.example.backendproject.model.sc5.UploadSubjectRequest;
 import com.example.backendproject.repository.sc5.SubjectRepository;
 import com.example.backendproject.service.AdminLogService;
+import com.example.backendproject.service.sc5.helper.SubjectServiceHelper;
 import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,13 +27,16 @@ public class SubjectService {
     private final SubjectRepository subjectRepository;
     private final AdminLogService adminLogService;
     private final SubjectMapper subjectMapper;
+    private final SubjectServiceHelper subjectServiceHelper;
 
     public SubjectService(SubjectRepository subjectRepository,
                           AdminLogService adminLogService,
-                          SubjectMapper subjectMapper) {
+                          SubjectMapper subjectMapper,
+                          SubjectServiceHelper subjectServiceHelper) {
         this.subjectRepository = subjectRepository;
         this.adminLogService = adminLogService;
         this.subjectMapper = subjectMapper;
+        this.subjectServiceHelper = subjectServiceHelper;
     }
 
     public SubjectSearchResponse searchSubject(SubjectSearchRequest request) {
@@ -109,10 +113,6 @@ public class SubjectService {
             validateCreateSubjectRequest(subject);
         }
 
-        List<SubjectEntity> entities = subjectMapper.toEntities(request.getSubjectCreateRequests());
-        entities.forEach(x -> x.setCreatedAt(new Date()));
-        entities.forEach(x -> x.setUpdatedAt(new Date()));
-
-        subjectRepository.saveAll(entities);
+        subjectServiceHelper.uploadFileSubject(request);
     }
 }

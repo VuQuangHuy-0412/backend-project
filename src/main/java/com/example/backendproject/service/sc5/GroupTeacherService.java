@@ -14,6 +14,7 @@ import com.example.backendproject.repository.sc5.GroupTeacherMappingRepository;
 import com.example.backendproject.repository.sc5.GroupTeacherRepository;
 import com.example.backendproject.repository.sc5.TeacherRepository;
 import com.example.backendproject.service.AdminLogService;
+import com.example.backendproject.service.sc5.helper.GroupTeacherServiceHelper;
 import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +33,7 @@ public class GroupTeacherService {
     private final TeacherMapper teacherMapper;
     private final GroupTeacherMappingRepository groupTeacherMappingRepository;
     private final GroupTeacherMappingMapper groupTeacherMappingMapper;
+    private final GroupTeacherServiceHelper groupTeacherServiceHelper;
 
     public GroupTeacherService(GroupTeacherRepository groupTeacherRepository,
                                AdminLogService adminLogService,
@@ -39,7 +41,8 @@ public class GroupTeacherService {
                                TeacherRepository teacherRepository,
                                TeacherMapper teacherMapper,
                                GroupTeacherMappingRepository groupTeacherMappingRepository,
-                               GroupTeacherMappingMapper groupTeacherMappingMapper) {
+                               GroupTeacherMappingMapper groupTeacherMappingMapper,
+                               GroupTeacherServiceHelper groupTeacherServiceHelper) {
         this.groupTeacherRepository = groupTeacherRepository;
         this.groupTeacherMapper = groupTeacherMapper;
         this.adminLogService = adminLogService;
@@ -47,6 +50,7 @@ public class GroupTeacherService {
         this.teacherMapper = teacherMapper;
         this.groupTeacherMappingRepository = groupTeacherMappingRepository;
         this.groupTeacherMappingMapper = groupTeacherMappingMapper;
+        this.groupTeacherServiceHelper = groupTeacherServiceHelper;
     }
 
     public GroupTeacherSearchResponse searchGroupTeacher(GroupTeacherSearchRequest request) {
@@ -121,21 +125,7 @@ public class GroupTeacherService {
             validateCreateGroupTeacherRequest(teacher);
         }
 
-        List<GroupTeacherEntity> entities = groupTeacherMapper.toEntities(request.getGroupTeacherCreateRequests());
-        entities.forEach(x -> x.setCreatedAt(new Date()));
-        entities.forEach(x -> x.setUpdatedAt(new Date()));
-
-        entities = groupTeacherRepository.saveAll(entities);
-
-        List<GroupTeacherMappingEntity> mappingEntities = new ArrayList<>();
-        for (GroupTeacherEntity teacher : entities) {
-            GroupTeacherMappingEntity newLeader = new GroupTeacherMappingEntity();
-            newLeader.setTeacherId(teacher.getLeader());
-            newLeader.setGroupId(teacher.getId());
-            newLeader.setRole("leader");
-            mappingEntities.add(newLeader);
-        }
-        groupTeacherMappingRepository.saveAll(mappingEntities);
+        groupTeacherServiceHelper.uploadFileGroupTeacher(request);
     }
 
     public GroupTeacherSearchResponse getAllGroupTeacher() {
@@ -231,16 +221,6 @@ public class GroupTeacherService {
             }
         }
 
-        List<GroupTeacherMapping> requests = request.getGroupTeacherMappingCreateRequests();
-        for (GroupTeacherMapping groupTeacherMapping : request.getGroupTeacherMappingCreateRequests()) {
-            GroupTeacherMappingEntity entity = groupTeacherMappingRepository.findByGroupIdAndTeacherId(groupTeacherMapping.getGroupId(), groupTeacherMapping.getTeacherId());
-            if (entity != null) {
-                List<GroupTeacherMapping> filter = requests.stream().filter(x -> Objects.equals(x.getGroupId(), groupTeacherMapping.getGroupId()) && Objects.equals(x.getTeacherId(), groupTeacherMapping.getTeacherId())).toList();
-                requests.removeAll(filter);
-            }
-        }
-
-        List<GroupTeacherMappingEntity> entities = groupTeacherMappingMapper.toEntities(request.getGroupTeacherMappingCreateRequests());
-        groupTeacherMappingRepository.saveAll(entities);
+        groupTeacherServiceHelper.uploadExcelGroupTeacherMapping(request);
     }
 }

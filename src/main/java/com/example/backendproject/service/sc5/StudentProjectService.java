@@ -10,6 +10,7 @@ import com.example.backendproject.model.sc5.StudentProjectSearchResponse;
 import com.example.backendproject.model.sc5.UploadStudentProjectRequest;
 import com.example.backendproject.repository.sc5.StudentProjectRepository;
 import com.example.backendproject.service.AdminLogService;
+import com.example.backendproject.service.sc5.helper.StudentProjectServiceHelper;
 import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,13 +27,16 @@ public class StudentProjectService {
     private final StudentProjectRepository studentProjectRepository;
     private final AdminLogService adminLogService;
     private final StudentProjectMapper studentProjectMapper;
+    private final StudentProjectServiceHelper studentProjectServiceHelper;
 
     public StudentProjectService(StudentProjectRepository studentProjectRepository,
                                  AdminLogService adminLogService,
-                                 StudentProjectMapper studentProjectMapper) {
+                                 StudentProjectMapper studentProjectMapper,
+                                 StudentProjectServiceHelper studentProjectServiceHelper) {
         this.studentProjectRepository = studentProjectRepository;
         this.adminLogService = adminLogService;
         this.studentProjectMapper = studentProjectMapper;
+        this.studentProjectServiceHelper = studentProjectServiceHelper;
     }
 
     public StudentProjectSearchResponse searchStudentProject(StudentProjectSearchRequest request) {
@@ -106,10 +110,6 @@ public class StudentProjectService {
             validateCreateStudentProjectRequest(studentProject);
         }
 
-        List<StudentProjectEntity> entities = studentProjectMapper.toEntities(request.getStudentProjectCreateRequests());
-        entities.forEach(x -> x.setCreatedAt(new Date()));
-        entities.forEach(x -> x.setUpdatedAt(new Date()));
-
-        studentProjectRepository.saveAll(entities);
+        studentProjectServiceHelper.uploadFileStudentProject(request);
     }
 }
