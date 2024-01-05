@@ -58,7 +58,7 @@ public class TeacherServiceHelper {
             }
         }
 
-        List<LanguageTeacherMappingEntity> entities = languageTeacherMappingMapper.toEntities(request.getLanguageTeacherCreateRequests());
+        List<LanguageTeacherMappingEntity> entities = languageTeacherMappingMapper.toEntities(requests);
         languageTeacherMappingRepository.saveAll(entities);
     }
 }
