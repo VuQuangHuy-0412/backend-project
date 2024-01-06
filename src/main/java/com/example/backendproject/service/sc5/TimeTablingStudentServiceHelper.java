@@ -59,6 +59,8 @@ public class TimeTablingStudentServiceHelper {
                 if (i == NUM_LOOP - 1) {
                     PopulationStudent.Member bestSolution = getTheMostObjectiveResult(population);
                     log.info("Solution: {}", objectMapper.writeValueAsString(bestSolution));
+                    entity.setErrorMessage(String.valueOf(i));
+                    timetablingProcessRepository.save(entity);
                     break;
                 }
                 selection(population);

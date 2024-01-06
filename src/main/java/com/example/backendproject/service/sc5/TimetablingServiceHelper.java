@@ -34,7 +34,7 @@ public class TimetablingServiceHelper {
     private final TimetablingProcessRepository timetablingProcessRepository;
     public static final Integer POPULATION_SIZE = 100;
     public static final Integer NUM_OF_CROSS = 20;
-    public static final Integer NUM_LOOP = 200;
+    public static final Integer NUM_LOOP = 100;
 
     public TimetablingServiceHelper(TeacherRepository teacherRepository,
                                     LanguageTeacherMappingRepository languageTeacherMappingRepository,
@@ -74,6 +74,8 @@ public class TimetablingServiceHelper {
                 evaluateConstraint(inputData, population);
                 if (i == NUM_LOOP - 1) {
                     Population.Member bestSolution = getTheMostObjectiveResult(population);
+                    entity.setErrorMessage(String.valueOf(i));
+                    timetablingProcessRepository.save(entity);
                     log.info("Solution: {}", objectMapper.writeValueAsString(bestSolution));
                     break;
                 }
