@@ -66,6 +66,7 @@ public class TimeTablingStudentServiceHelper {
                 mutation(inputData, population);
                 log.info("End loop {}", i);
                 entity.setErrorMessage(String.valueOf(i));
+                entity.setUpdatedAt(new Date());
                 timetablingProcessRepository.save(entity);
             }
 
@@ -160,7 +161,6 @@ public class TimeTablingStudentServiceHelper {
             log.info("Start member {}", member);
             member.setObjective(objectiveFunction(inputData, member));
 
-            // CT7: 1 student is only assigned by 1 teacher
             if (!CollectionUtils.isEmpty(CT7)) {
                 for (StudentProjectEntity studentProjectEntity : inputData.getStudentProjects()) {
                     int ct7 = 0;
@@ -175,30 +175,28 @@ public class TimeTablingStudentServiceHelper {
                 }
             }
 
-            // CT8: Each teacher has at least 1 student
-            if (!CollectionUtils.isEmpty(CT8)) {
-                for (TeacherEntity teacherEntity : inputData.getTeachers()) {
-                    int ct8 = 0;
-                    for (StudentProjectEntity studentProjectEntity : inputData.getStudentProjects()) {
-                        if (isTeacherOfStudent(member, teacherEntity, studentProjectEntity) == 1) {
+            for (TeacherEntity teacherEntity : inputData.getTeachers()) {
+                int ct8 = 0;
+                int ct9 = 0;
+                for (StudentProjectEntity studentProjectEntity : inputData.getStudentProjects()) {
+                    if (isTeacherOfStudent(member, teacherEntity, studentProjectEntity) == 1) {
+
+                        if (!CollectionUtils.isEmpty(CT8)) {
                             ct8 += 1;
                         }
+                        if (!CollectionUtils.isEmpty(CT9)) {
+                            ct9 += studentProjectEntity.getTimeHd();
+                        }
                     }
+                }
+
+                if (!CollectionUtils.isEmpty(CT8)) {
                     if (ct8 < 1) {
                         member.setObjective(member.getObjective() + 100000);
                     }
                 }
-            }
 
-            // CT9: Số giờ được phân công cho 1 GV không được vượt quá 120% * hdTime của GV * averageHD
-            if (!CollectionUtils.isEmpty(CT9)) {
-                for (TeacherEntity teacherEntity : inputData.getTeachers()) {
-                    int ct9 = 0;
-                    for (StudentProjectEntity studentProjectEntity : inputData.getStudentProjects()) {
-                        if (isTeacherOfStudent(member, teacherEntity, studentProjectEntity) == 1) {
-                            ct9 += studentProjectEntity.getTimeHd();
-                        }
-                    }
+                if (!CollectionUtils.isEmpty(CT9)) {
                     double maxTime = 1.2 * teacherEntity.getHdTime() * inputData.getAverageHD();
                     if (ct9 > maxTime) {
                         member.setObjective(member.getObjective() + 100000);

@@ -82,6 +82,7 @@ public class TimetablingServiceHelper {
                 mutation(inputData, population);
                 log.info("End loop {}", i);
                 entity.setErrorMessage(String.valueOf(i));
+                entity.setUpdatedAt(new Date());
                 timetablingProcessRepository.save(entity);
             }
 
@@ -222,29 +223,21 @@ public class TimetablingServiceHelper {
             log.info("Start member {}", member);
             member.setObjective(objectiveFunction(inputData, member));
 
-            // CT1: Language - Teacher - Class
-            if (!CollectionUtils.isEmpty(CT1)) {
-                for (ClassEntity classEntity : inputData.getClasses()) {
-                    int ct1 = 0;
-                    for (TeacherEntity teacherEntity : inputData.getTeachers()) {
-                        if (isTeacherOfClass(member, teacherEntity, classEntity) == 1) {
+            for (ClassEntity classEntity : inputData.getClasses()) {
+                int ct1 = 0;
+                int ct2 = 0;
+                int ct3 = 0;
+                for (TeacherEntity teacherEntity : inputData.getTeachers()) {
+                    if (isTeacherOfClass(member, teacherEntity, classEntity) == 1) {
+
+                        if (!CollectionUtils.isEmpty(CT1)) {
                             for (LanguageEntity languageEntity : inputData.getLanguages()) {
                                 ct1 += classHasLanguage(languageEntity, classEntity) * teacherHasLanguage(languageEntity, teacherEntity, inputData.getLanguageTeacherMappings());
                             }
                         }
-                    }
-                    if (ct1 != 1) {
-                        member.setObjective(member.getObjective() + 100000);
-                    }
-                }
-            }
 
-            // CT2: Class - Teacher - Subject - GroupTeacher
-            if (!CollectionUtils.isEmpty(CT2)) {
-                for (ClassEntity classEntity : inputData.getClasses()) {
-                    int ct2 = 0;
-                    for (TeacherEntity teacherEntity : inputData.getTeachers()) {
-                        if (isTeacherOfClass(member, teacherEntity, classEntity) == 1) {
+
+                        if (!CollectionUtils.isEmpty(CT2)) {
                             for (GroupTeacherEntity groupTeacherEntity : inputData.getGroupTeachers()) {
                                 for (SubjectEntity subjectEntity : inputData.getSubjects()) {
                                     ct2 += teacherOfGroup(groupTeacherEntity, teacherEntity, inputData.getGroupTeacherMappings()) *
@@ -252,70 +245,69 @@ public class TimetablingServiceHelper {
                                 }
                             }
                         }
+
+                        if (!CollectionUtils.isEmpty(CT3)) {
+                            ct3 += 1;
+                        }
                     }
+                }
+
+                if (!CollectionUtils.isEmpty(CT1)) {
+                    if (ct1 != 1) {
+                        member.setObjective(member.getObjective() + 100000);
+                    }
+                }
+
+                if (!CollectionUtils.isEmpty(CT2)) {
                     if (ct2 != 1) {
                         member.setObjective(member.getObjective() + 100000);
                     }
                 }
-            }
 
-            // CT3: 1 class is only assigned by 1 teacher
-            if (!CollectionUtils.isEmpty(CT3)) {
-                for (ClassEntity classEntity : inputData.getClasses()) {
-                    int ct3 = 0;
-                    for (TeacherEntity teacherEntity : inputData.getTeachers()) {
-                        if (isTeacherOfClass(member, teacherEntity, classEntity) == 1) {
-                            ct3 += 1;
-                        }
-                    }
+                if (!CollectionUtils.isEmpty(CT3)) {
                     if (ct3 != 1) {
                         member.setObjective(member.getObjective() + 100000);
                     }
                 }
             }
 
-            // CT4: Each teacher has at least 1 class
-            if (!CollectionUtils.isEmpty(CT4)) {
-                for (TeacherEntity teacherEntity : inputData.getTeachers()) {
-                    int ct4 = 0;
-                    for (ClassEntity classEntity : inputData.getClasses()) {
-                        if (isTeacherOfClass(member, teacherEntity, classEntity) == 1) {
+            for (TeacherEntity teacherEntity : inputData.getTeachers()) {
+                int ct4 = 0;
+                int ct5 = 0;
+                for (ClassEntity classEntity : inputData.getClasses()) {
+                    if (isTeacherOfClass(member, teacherEntity, classEntity) == 1) {
+
+                        if (!CollectionUtils.isEmpty(CT4)) {
                             ct4 += 1;
                         }
+
+                        if (!CollectionUtils.isEmpty(CT5)) {
+                            ct5 += classEntity.getTimeOfClass();
+                        }
                     }
+
+
+                    if (!CollectionUtils.isEmpty(CT6)) {
+                        for (ClassEntity classEntity2 : inputData.getClasses()) {
+                            if (classEntity.getId() < classEntity2.getId() && isTeacherOfClass(member, teacherEntity, classEntity) == 1 &&
+                                    isTeacherOfClass(member, teacherEntity, classEntity2) == 1 &&
+                                    isConflictClass(classEntity, classEntity2) == 1) {
+                                member.setObjective(member.getObjective() + 100000);
+                            }
+                        }
+                    }
+                }
+
+                if (!CollectionUtils.isEmpty(CT4)) {
                     if (ct4 < 1) {
                         member.setObjective(member.getObjective() + 100000);
                     }
                 }
-            }
 
-            // CT5: Số giờ được phân công cho 1 GV không được vượt quá 120% * gdTime của GV * averageGD
-            if (!CollectionUtils.isEmpty(CT5)) {
-                for (TeacherEntity teacherEntity : inputData.getTeachers()) {
-                    int ct5 = 0;
-                    for (ClassEntity classEntity : inputData.getClasses()) {
-                        if (isTeacherOfClass(member, teacherEntity, classEntity) == 1) {
-                            ct5 += classEntity.getTimeOfClass();
-                        }
-                    }
+                if (!CollectionUtils.isEmpty(CT5)) {
                     double maxTime = 1.2 * teacherEntity.getGdTime() * inputData.getAverageGD();
                     if (ct5 > maxTime) {
                         member.setObjective(member.getObjective() + 100000);
-                    }
-                }
-            }
-
-            // CT6: 2 lớp bị conflict lịch học hoặc phòng học không được xếp cùng 1 GV
-            if (!CollectionUtils.isEmpty(CT6)) {
-                for (TeacherEntity teacherEntity : inputData.getTeachers()) {
-                    for (ClassEntity classEntity1 : inputData.getClasses()) {
-                        for (ClassEntity classEntity2 : inputData.getClasses()) {
-                            if (classEntity1.getId() < classEntity2.getId() && isTeacherOfClass(member, teacherEntity, classEntity1) == 1 &&
-                                    isTeacherOfClass(member, teacherEntity, classEntity2) == 1 &&
-                                    isConflictClass(classEntity1, classEntity2) == 1) {
-                                member.setObjective(member.getObjective() + 100000);
-                            }
-                        }
                     }
                 }
             }
@@ -392,7 +384,7 @@ public class TimetablingServiceHelper {
             if (class1.equals(class2)) {
                 return 0;
             }
-            if (StringUtils.isBlank(class1.getTimeOfDay()) && StringUtils.isBlank(class2.getTimeOfDay())) {
+            if (!StringUtils.isBlank(class1.getTimeOfDay()) && !StringUtils.isBlank(class2.getTimeOfDay())) {
                 String[] timeOfDay1 = class1.getTimeOfDay().split(",");
                 String[] timeOfDay2 = class1.getTimeOfDay().split(",");
                 if (!StringUtils.isBlank(class1.getDayOfWeek()) && !StringUtils.isBlank(class2.getDayOfWeek()) && class1.getDayOfWeek().equals(class2.getDayOfWeek())) {
@@ -432,7 +424,7 @@ public class TimetablingServiceHelper {
                 return 0;
             }
             return 0;
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             log.error("Check class conflict failed", ex);
             return 0;
         }
