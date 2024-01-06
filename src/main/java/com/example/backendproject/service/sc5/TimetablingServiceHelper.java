@@ -32,9 +32,9 @@ public class TimetablingServiceHelper {
     private final CustomConstraintRepository customConstraintRepository;
     private final ObjectMapper objectMapper;
     private final TimetablingProcessRepository timetablingProcessRepository;
-    public static final Integer POPULATION_SIZE = 50;
-    public static final Integer NUM_OF_CROSS = 10;
-    public static final Integer NUM_LOOP = 100;
+    public static final Integer POPULATION_SIZE = 5;
+    public static final Integer NUM_OF_CROSS = 1;
+    public static final Integer NUM_LOOP = 10;
 
     public TimetablingServiceHelper(TeacherRepository teacherRepository,
                                     LanguageTeacherMappingRepository languageTeacherMappingRepository,
@@ -77,12 +77,12 @@ public class TimetablingServiceHelper {
                     log.info("Solution: {}", objectMapper.writeValueAsString(bestSolution));
                     break;
                 }
-                entity.setErrorMessage(String.valueOf(i));
-                timetablingProcessRepository.save(entity);
                 selection(population);
                 crossover(inputData, population);
                 mutation(inputData, population);
                 log.info("End loop {}", i);
+                entity.setErrorMessage(String.valueOf(i));
+                timetablingProcessRepository.save(entity);
             }
 
             Population.Member bestSolution = getTheMostObjectiveResult(population);
