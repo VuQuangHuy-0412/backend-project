@@ -43,4 +43,8 @@ public class Class {
     private Subject subject;
 
     private Teacher teacher;
+
+    private Integer startTime;
+
+    private Integer endTime;
 }

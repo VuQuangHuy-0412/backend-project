@@ -64,4 +64,10 @@ public class ClassEntity implements Serializable {
 
     @Column(name = "updated_at")
     private Date updatedAt;
+
+    @Column(name = "start_time")
+    private Integer startTime;
+
+    @Column(name = "end_time")
+    private Integer endTime;
 }

@@ -119,6 +119,8 @@ public class ClassService {
             classEntity.setIsAssigned(classDto.getIsAssigned());
             classEntity.setBuilding(classDto.getBuilding());
             classEntity.setRoom(classDto.getRoom());
+            classEntity.setStartTime(classDto.getStartTime());
+            classEntity.setEndTime(classDto.getEndTime());
         }
         classEntity.setTeacherId(classDto.getTeacherId());
         classEntity.setUpdatedAt(new Date());

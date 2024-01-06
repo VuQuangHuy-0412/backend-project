@@ -390,23 +390,44 @@ public class TimetablingServiceHelper {
             if (class1.equals(class2)) {
                 return 0;
             }
-            String[] timeOfDay1 = class1.getTimeOfDay().split(",");
-            String[] timeOfDay2 = class1.getTimeOfDay().split(",");
-            if (!StringUtils.isBlank(class1.getDayOfWeek()) && !StringUtils.isBlank(class2.getDayOfWeek()) && class1.getDayOfWeek().equals(class2.getDayOfWeek())) {
-                for (String t1 : timeOfDay1) {
-                    for (String t2 : timeOfDay2) {
-                        if (t1.equals(t2)) {
-                            return 1;
+            if (StringUtils.isBlank(class1.getTimeOfDay()) && StringUtils.isBlank(class2.getTimeOfDay())) {
+                String[] timeOfDay1 = class1.getTimeOfDay().split(",");
+                String[] timeOfDay2 = class1.getTimeOfDay().split(",");
+                if (!StringUtils.isBlank(class1.getDayOfWeek()) && !StringUtils.isBlank(class2.getDayOfWeek()) && class1.getDayOfWeek().equals(class2.getDayOfWeek())) {
+                    for (String t1 : timeOfDay1) {
+                        for (String t2 : timeOfDay2) {
+                            if (t1.equals(t2)) {
+                                return 1;
+                            }
                         }
                     }
                 }
+
+                if (!StringUtils.isBlank(class1.getBuilding()) && !StringUtils.isBlank(class2.getBuilding()) && !class1.getBuilding().equals(class2.getBuilding())) {
+                    if (Integer.parseInt(timeOfDay1[timeOfDay1.length - 1]) + 1 == Integer.parseInt(timeOfDay2[0]) ||
+                            Integer.parseInt(timeOfDay2[timeOfDay2.length - 1]) + 1 == Integer.parseInt(timeOfDay1[0])) {
+                        return 1;
+                    }
+                }
+                return 0;
             }
 
-            if (!StringUtils.isBlank(class1.getBuilding()) && !StringUtils.isBlank(class2.getBuilding()) && !class1.getBuilding().equals(class2.getBuilding())) {
-                if (Integer.parseInt(timeOfDay1[timeOfDay1.length - 1]) + 1 == Integer.parseInt(timeOfDay2[0]) ||
-                        Integer.parseInt(timeOfDay2[timeOfDay2.length - 1]) + 1 == Integer.parseInt(timeOfDay1[0])) {
-                    return 1;
+            if (class1.getStartTime() != null && class1.getEndTime() != null && class2.getStartTime() != null && class2.getEndTime() != null) {
+                if (!StringUtils.isBlank(class1.getDayOfWeek()) && !StringUtils.isBlank(class2.getDayOfWeek()) && class1.getDayOfWeek().equals(class2.getDayOfWeek())) {
+                    if (class1.getStartTime() < class2.getEndTime() || class1.getEndTime() > class2.getStartTime()) {
+                        return 1;
+                    }
                 }
+
+                if (!StringUtils.isBlank(class1.getBuilding()) && !StringUtils.isBlank(class2.getBuilding()) && !class1.getBuilding().equals(class2.getBuilding())) {
+                    if (class1.getStartTime() - class2.getEndTime() > 0 && class1.getStartTime() - class2.getEndTime() < 15) {
+                        return 1;
+                    }
+                    if (class2.getStartTime() - class1.getEndTime() > 0 && class2.getStartTime() - class1.getEndTime() < 15) {
+                        return 1;
+                    }
+                }
+                return 0;
             }
             return 0;
         } catch(Exception ex) {
