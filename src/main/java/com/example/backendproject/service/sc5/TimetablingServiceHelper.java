@@ -74,11 +74,11 @@ public class TimetablingServiceHelper {
                 evaluateConstraint(inputData, population);
                 if (i == NUM_LOOP - 1) {
                     Population.Member bestSolution = getTheMostObjectiveResult(population);
-                    entity.setErrorMessage(String.valueOf(i));
-                    timetablingProcessRepository.save(entity);
                     log.info("Solution: {}", objectMapper.writeValueAsString(bestSolution));
                     break;
                 }
+                entity.setErrorMessage(String.valueOf(i));
+                timetablingProcessRepository.save(entity);
                 selection(population);
                 crossover(inputData, population);
                 mutation(inputData, population);
