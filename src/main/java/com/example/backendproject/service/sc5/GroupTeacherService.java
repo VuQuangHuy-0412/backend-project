@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +61,11 @@ public class GroupTeacherService {
         response.setPage(request.getPage() + 1);
         response.setPageSize(request.getPageSize());
 
+        if (request.getDataset() == null) {
+            response.setData(new ArrayList<>());
+            return response;
+        }
+
         List<GroupTeacher> data = groupTeacherRepository.searchGroupTeacherByFilter(request);
         for (GroupTeacher groupTeacher : data) {
             if (groupTeacher.getLeader() != null) {
@@ -88,8 +94,8 @@ public class GroupTeacherService {
     }
 
     private void validateCreateGroupTeacherRequest(GroupTeacher groupTeacher) {
-        if (StringUtils.isBlank(groupTeacher.getName())) {
-            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Thiếu thông tin tên nhóm chuyên môn.");
+        if (StringUtils.isBlank(groupTeacher.getName()) || groupTeacher.getDataset() == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Thiếu thông tin nhóm chuyên môn.");
         }
     }
 
@@ -126,7 +132,7 @@ public class GroupTeacherService {
     }
 
     public void uploadFileGroupTeacher(UploadGroupTeacherRequest request) {
-        if (request == null || CollectionUtils.isEmpty(request.getGroupTeacherCreateRequests())) {
+        if (request == null || CollectionUtils.isEmpty(request.getGroupTeacherCreateRequests()) || request.getDataset() == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
 
@@ -137,9 +143,12 @@ public class GroupTeacherService {
         groupTeacherServiceHelper.uploadFileGroupTeacher(request);
     }
 
-    public GroupTeacherSearchResponse getAllGroupTeacher() {
+    public GroupTeacherSearchResponse getAllGroupTeacher(Long dataset) {
+        if (dataset == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
         GroupTeacherSearchResponse response = new GroupTeacherSearchResponse();
-        List<GroupTeacherEntity> allGroup = groupTeacherRepository.findAll();
+        List<GroupTeacherEntity> allGroup = groupTeacherRepository.findByDataset(dataset);
 
         response.setData(groupTeacherMapper.toDtos(allGroup));
         return response;
@@ -176,7 +185,7 @@ public class GroupTeacherService {
     }
 
     public void addTeacherToGroup(AddTeacherToGroupRequest request) {
-        if (request.getTeacherId() == null || request.getGroupId() == null || StringUtils.isBlank(request.getRole())) {
+        if (request.getTeacherId() == null || request.getGroupId() == null || StringUtils.isBlank(request.getRole()) || request.getDataset() == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
 
@@ -218,7 +227,7 @@ public class GroupTeacherService {
     }
 
     public void uploadExcelGroupTeacherMapping(UploadGroupTeacherMappingRequest request) {
-        if (request == null || CollectionUtils.isEmpty(request.getGroupTeacherMappingCreateRequests())) {
+        if (request == null || CollectionUtils.isEmpty(request.getGroupTeacherMappingCreateRequests()) || request.getDataset() == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
 

@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +61,11 @@ public class ClassService {
         response.setPage(request.getPage() + 1);
         response.setPageSize(request.getPageSize());
 
+        if (request.getDataset() == null) {
+            response.setData(new ArrayList<>());
+            return response;
+        }
+
         List<Class> data = classRepository.searchClassByFilter(request);
         for (Class classDto : data) {
             if (classDto.getSubjectId() != null) {
@@ -92,6 +98,9 @@ public class ClassService {
     }
 
     private void validateCreateClassRequest(Class classDto) {
+        if (classDto.getDataset() == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
     }
 
     public void updateClass(Class classDto) {
@@ -139,7 +148,7 @@ public class ClassService {
     }
 
     public void uploadFileClass(UploadClassRequest request) {
-        if (request == null || CollectionUtils.isEmpty(request.getClassCreateRequests())) {
+        if (request == null || CollectionUtils.isEmpty(request.getClassCreateRequests()) || request.getDataset() == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
 

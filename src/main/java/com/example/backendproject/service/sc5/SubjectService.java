@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +51,11 @@ public class SubjectService {
         SubjectSearchResponse response = new SubjectSearchResponse();
         response.setPage(request.getPage() + 1);
         response.setPageSize(request.getPageSize());
+
+        if (request.getDataset() == null) {
+            response.setData(new ArrayList<>());
+            return response;
+        }
 
         List<Subject> data = subjectRepository.searchSubjectByFilter(request);
         for (Subject subject : data) {
@@ -119,7 +125,7 @@ public class SubjectService {
     }
 
     public void uploadFileSubject(UploadSubjectRequest request) {
-        if (request == null || CollectionUtils.isEmpty(request.getSubjectCreateRequests())) {
+        if (request == null || CollectionUtils.isEmpty(request.getSubjectCreateRequests()) || request.getDataset() == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
 

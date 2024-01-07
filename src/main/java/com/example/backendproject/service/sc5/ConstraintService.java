@@ -14,6 +14,7 @@ import com.example.backendproject.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +42,12 @@ public class ConstraintService {
 
     public ConstraintSearchResponse searchConstraint(ConstraintSearchRequest request) {
         ConstraintSearchResponse response = new ConstraintSearchResponse();
+
+        if (request.getDataset() == null) {
+            response.setRequiredConstraints(new ArrayList<>());
+            response.setCustomConstraints(new ArrayList<>());
+            return response;
+        }
 
         List<CustomConstraint> customConstraints = customConstraintRepository.searchCustomConstraintByFilter(request);
         response.setCustomConstraints(customConstraints);

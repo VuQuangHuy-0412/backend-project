@@ -65,6 +65,11 @@ public class TeacherService {
         response.setPage(request.getPage() + 1);
         response.setPageSize(request.getPageSize());
 
+        if (request.getDataset() == null) {
+            response.setData(new ArrayList<>());
+            return response;
+        }
+
         if (request.getGroupTeacher() != null) {
             List<GroupTeacherMappingEntity> groupTeacherMappingEntities = groupTeacherMappingRepository.findAllByGroupIdAndDataset(request.getGroupTeacher(), request.getDataset());
             if (CollectionUtils.isEmpty(groupTeacherMappingEntities)) {
@@ -156,7 +161,7 @@ public class TeacherService {
     }
 
     public void uploadFileTeacher(UploadTeacherRequest request) {
-        if (request == null || CollectionUtils.isEmpty(request.getTeacherCreateRequests())) {
+        if (request == null || CollectionUtils.isEmpty(request.getTeacherCreateRequests()) || request.getDataset() == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
 
@@ -210,7 +215,7 @@ public class TeacherService {
     }
 
     public void uploadFileLanguageTeacherMapping(UploadLanguageTeacherRequest request) {
-        if (request == null || CollectionUtils.isEmpty(request.getLanguageTeacherCreateRequests())) {
+        if (request == null || CollectionUtils.isEmpty(request.getLanguageTeacherCreateRequests()) || request.getDataset() == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
 

@@ -37,6 +37,9 @@ public class FileExportService {
 
     public InputStreamResource exportListTimetablingTeacher(Long dataset) {
         adminLogService.log("exportListTimetablingTeacher", String.valueOf(dataset));
+        if (dataset == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
 
         List<ClassEntity> entities = classRepository.findByDataset(dataset);
 
@@ -233,7 +236,9 @@ public class FileExportService {
 
     public InputStreamResource exportListTimetablingStudent(Long dataset) {
         adminLogService.log("exportListTimetablingTeacher", String.valueOf(dataset));
-
+        if (dataset == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
         List<StudentProjectEntity> entities = studentProjectRepository.findByDataset(dataset);
 
         return createFileExcelListTimeTablingStudent(entities);
