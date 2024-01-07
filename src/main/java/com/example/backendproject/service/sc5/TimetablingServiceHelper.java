@@ -184,7 +184,7 @@ public class TimetablingServiceHelper {
             for (ClassEntity classEntity : inputData.getClasses()) {
                 Population.Member.MemberDetail detail = new Population.Member.MemberDetail();
                 detail.setClassId(classEntity.getId());
-                detail.setTeacherId(getRandomTeacherFromList(inputData.getTeachers()).getId());
+                detail.setTeacherId(getRandomTeacherFromList(inputData.getTeachers(), inputData, classEntity).getId());
                 details.add(detail);
             }
             member.setDetails(details);
@@ -471,9 +471,23 @@ public class TimetablingServiceHelper {
         return classEntity.getSubjectId().equals(subjectEntity.getId()) ? 1 : 0;
     }
 
-    private TeacherEntity getRandomTeacherFromList(List<TeacherEntity> teachers) {
+    private TeacherEntity getRandomTeacherFromList(List<TeacherEntity> teachers, InputData inputData, ClassEntity classEntity) {
         Random rand = new Random();
-        return teachers.get(rand.nextInt(teachers.size()));
+        Long subjectId = classEntity.getSubjectId();
+        List<SubjectEntity> subjectEntities = inputData.getSubjects().stream().filter(x -> x.getId().equals(subjectId)).toList();
+        if (CollectionUtils.isEmpty(subjectEntities)) {
+            return teachers.get(rand.nextInt(teachers.size()));
+        }
+        SubjectEntity subjectEntity = subjectEntities.get(0);
+        Long groupId = subjectEntity.getGroupId();
+        List<Long> teacherIds = inputData.getGroupTeacherMappings().stream().filter(x -> x.getGroupId().equals(groupId)).
+                map(GroupTeacherMappingEntity::getTeacherId).toList();
+        if (CollectionUtils.isEmpty(teacherIds)) {
+            return teachers.get(rand.nextInt(teachers.size()));
+        }
+
+        List<TeacherEntity> availableTeachers = teachers.stream().filter(x -> teacherIds.contains(x.getId())).toList();
+        return availableTeachers.get(rand.nextInt(availableTeachers.size()));
     }
 
 }
