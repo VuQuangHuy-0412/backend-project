@@ -7,42 +7,24 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class Class {
-    private Long id;
-
+public class ClassUpload {
     private String name;
 
     private String code;
 
     private String semester;
 
-    private Long subjectId;
+    private String subjectCode;
 
     private String week;
 
     private String dayOfWeek;
 
-    private String timeOfDay;
-
-    private Double timeOfClass;
-
-    private Long languageId;
-
-    private Integer isAssigned;
-
-    private Long teacherId;
+    private String languageName;
 
     private String building;
 
     private String room;
-
-    private Date createdAt;
-
-    private Date updatedAt;
-
-    private Subject subject;
-
-    private Teacher teacher;
 
     private Integer startTime;
 

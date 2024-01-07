@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface GroupTeacherRepository extends JpaRepository<GroupTeacherEntity, Long>, GroupTeacherRepositoryCustom {
     List<GroupTeacherEntity> findAllByIdIn(List<Long> ids);
+
+    List<GroupTeacherEntity> findByName(String name);
 }

@@ -57,4 +57,10 @@ public class TeacherController {
     public void uploadFileLanguageTeacherMapping(@RequestBody UploadLanguageTeacherRequest request) {
         teacherService.uploadFileLanguageTeacherMapping(request);
     }
+
+    @PostMapping(value = "/teacher/calculate-time")
+    @ApiDescription(value = "Tính toán thời gian giảng dạy và hướng dẫn dựa trên danh sách lớp học và danh sách sinh viên đã upload", code = "teacher_calculate_time")
+    public void calculateTimeTeacher() {
+        teacherService.calculateTimeTeacher();
+    }
 }

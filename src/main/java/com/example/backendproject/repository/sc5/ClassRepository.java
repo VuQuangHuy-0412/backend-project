@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface ClassRepository extends JpaRepository<ClassEntity, Long>, ClassRepositoryCustom {
     List<ClassEntity> findByTeacherId(Long teacherId);
+
+    List<ClassEntity> findByCode(String code);
 }

@@ -118,7 +118,7 @@ public class TimeTablingStudentServiceHelper {
         inputData.setNumOfTeachers(teachers.size());
         inputData.setNumOfStudents(studentProjects.size());
 
-        int allTimeHdTeacher = teachers.stream().map(TeacherEntity::getHdTime).reduce(0, Integer::sum);
+        Double allTimeHdTeacher = teachers.stream().map(TeacherEntity::getHdTime).reduce(0d, Double::sum);
         Double allTimeHd = studentProjects.stream().map(StudentProjectEntity::getTimeHd).reduce(0d, Double::sum);
 
         if (allTimeHdTeacher <= 0) {

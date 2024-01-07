@@ -7,11 +7,8 @@ import com.example.backendproject.entity.sc5.SubjectEntity;
 import com.example.backendproject.entity.sc5.TeacherEntity;
 import com.example.backendproject.mapper.StudentProjectMapper;
 import com.example.backendproject.mapper.TeacherMapper;
+import com.example.backendproject.model.sc5.*;
 import com.example.backendproject.model.sc5.Class;
-import com.example.backendproject.model.sc5.StudentProject;
-import com.example.backendproject.model.sc5.StudentProjectSearchRequest;
-import com.example.backendproject.model.sc5.StudentProjectSearchResponse;
-import com.example.backendproject.model.sc5.UploadStudentProjectRequest;
 import com.example.backendproject.repository.sc5.StudentProjectRepository;
 import com.example.backendproject.repository.sc5.TeacherRepository;
 import com.example.backendproject.service.AdminLogService;
@@ -118,6 +115,9 @@ public class StudentProjectService {
             studentProjectEntity.setTeacher1Id(studentProject.getTeacher1Id());
             studentProjectEntity.setTeacher2Id(studentProject.getTeacher2Id());
             studentProjectEntity.setTeacher3Id(studentProject.getTeacher3Id());
+            studentProjectEntity.setProjectType(studentProject.getProjectType());
+            studentProjectEntity.setProjectName(studentProject.getProjectName());
+            studentProjectEntity.setClassId(studentProject.getClassId());
         }
         studentProjectEntity.setTeacherAssignedId(studentProject.getTeacherAssignedId());
         studentProjectEntity.setUpdatedAt(new Date());
@@ -135,10 +135,14 @@ public class StudentProjectService {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
 
-        for (StudentProject studentProject : request.getStudentProjectCreateRequests()) {
-            validateCreateStudentProjectRequest(studentProject);
+        for (StudentProjectUpload studentProject : request.getStudentProjectCreateRequests()) {
+            validateCreateStudentProjectRequestUpload(studentProject);
         }
 
         studentProjectServiceHelper.uploadFileStudentProject(request);
+    }
+
+    private void validateCreateStudentProjectRequestUpload(StudentProjectUpload studentProject) {
+
     }
 }

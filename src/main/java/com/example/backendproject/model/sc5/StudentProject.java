@@ -37,4 +37,10 @@ public class StudentProject {
     private Teacher teacher3;
 
     private Teacher teacherAssigned;
+
+    private String projectType;
+
+    private String classId;
+
+    private String projectName;
 }

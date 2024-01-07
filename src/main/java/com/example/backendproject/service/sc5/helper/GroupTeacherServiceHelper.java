@@ -2,13 +2,13 @@ package com.example.backendproject.service.sc5.helper;
 
 import com.example.backendproject.entity.sc5.GroupTeacherEntity;
 import com.example.backendproject.entity.sc5.GroupTeacherMappingEntity;
+import com.example.backendproject.entity.sc5.TeacherEntity;
 import com.example.backendproject.mapper.GroupTeacherMapper;
 import com.example.backendproject.mapper.GroupTeacherMappingMapper;
-import com.example.backendproject.model.sc5.GroupTeacherMapping;
-import com.example.backendproject.model.sc5.UploadGroupTeacherMappingRequest;
-import com.example.backendproject.model.sc5.UploadGroupTeacherRequest;
+import com.example.backendproject.model.sc5.*;
 import com.example.backendproject.repository.sc5.GroupTeacherMappingRepository;
 import com.example.backendproject.repository.sc5.GroupTeacherRepository;
+import com.example.backendproject.repository.sc5.TeacherRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -26,30 +26,42 @@ public class GroupTeacherServiceHelper {
     private final GroupTeacherRepository groupTeacherRepository;
     private final GroupTeacherMappingRepository groupTeacherMappingRepository;
     private final GroupTeacherMappingMapper groupTeacherMappingMapper;
+    private final TeacherRepository teacherRepository;
 
     public GroupTeacherServiceHelper(GroupTeacherMapper groupTeacherMapper,
                                      GroupTeacherRepository groupTeacherRepository,
                                      GroupTeacherMappingRepository groupTeacherMappingRepository,
-                                     GroupTeacherMappingMapper groupTeacherMappingMapper) {
+                                     GroupTeacherMappingMapper groupTeacherMappingMapper,
+                                     TeacherRepository teacherRepository) {
         this.groupTeacherMapper = groupTeacherMapper;
         this.groupTeacherRepository = groupTeacherRepository;
         this.groupTeacherMappingRepository = groupTeacherMappingRepository;
         this.groupTeacherMappingMapper = groupTeacherMappingMapper;
+        this.teacherRepository = teacherRepository;
     }
 
     @Async("async-thread-pool")
     public void uploadFileGroupTeacher(UploadGroupTeacherRequest request) {
-        List<GroupTeacherEntity> entities = groupTeacherMapper.toEntities(request.getGroupTeacherCreateRequests());
-        entities.forEach(x -> x.setCreatedAt(new Date()));
-        entities.forEach(x -> x.setUpdatedAt(new Date()));
+        List<GroupTeacherEntity> entities = new ArrayList<>();
+
+        for (GroupTeacherUpload groupTeacherUpload : request.getGroupTeacherCreateRequests()) {
+            GroupTeacherEntity entity = new GroupTeacherEntity();
+            entity.setName(groupTeacherUpload.getName());
+            entity.setDescription(groupTeacherUpload.getDescription());
+            List<TeacherEntity> teacherEntity = teacherRepository.findByFullName(groupTeacherUpload.getLeaderName());
+            entity.setLeader(CollectionUtils.isEmpty(teacherEntity) ? 1L : teacherEntity.get(0).getId());
+            entity.setCreatedAt(new Date());
+            entity.setUpdatedAt(new Date());
+            entities.add(entity);
+        }
 
         entities = groupTeacherRepository.saveAll(entities);
 
         List<GroupTeacherMappingEntity> mappingEntities = new ArrayList<>();
-        for (GroupTeacherEntity teacher : entities) {
+        for (GroupTeacherEntity groupTeacherEntity : entities) {
             GroupTeacherMappingEntity newLeader = new GroupTeacherMappingEntity();
-            newLeader.setTeacherId(teacher.getLeader());
-            newLeader.setGroupId(teacher.getId());
+            newLeader.setTeacherId(groupTeacherEntity.getLeader());
+            newLeader.setGroupId(groupTeacherEntity.getId());
             newLeader.setRole("leader");
             mappingEntities.add(newLeader);
         }
@@ -58,10 +70,18 @@ public class GroupTeacherServiceHelper {
 
     @Async("async-thread-pool")
     public void uploadExcelGroupTeacherMapping(UploadGroupTeacherMappingRequest request) {
-        for (GroupTeacherMapping groupTeacherMapping : request.getGroupTeacherMappingCreateRequests()) {
-            List<GroupTeacherMappingEntity> entity = groupTeacherMappingRepository.findByGroupIdAndTeacherId(groupTeacherMapping.getGroupId(), groupTeacherMapping.getTeacherId());
+        for (GroupTeacherMappingUpload groupTeacherMapping : request.getGroupTeacherMappingCreateRequests()) {
+            List<GroupTeacherEntity> groupTeacherEntities = groupTeacherRepository.findByName(groupTeacherMapping.getGroupName());
+            Long groupId = CollectionUtils.isEmpty(groupTeacherEntities) ? 1L : groupTeacherEntities.get(0).getId();
+            List<TeacherEntity> teacherEntities = teacherRepository.findByFullName(groupTeacherMapping.getTeacherName());
+            Long teacherId = CollectionUtils.isEmpty(teacherEntities) ? 1L : teacherEntities.get(0).getId();
+
+            List<GroupTeacherMappingEntity> entity = groupTeacherMappingRepository.findByGroupIdAndTeacherId(groupId, teacherId);
             if (CollectionUtils.isEmpty(entity)) {
-                GroupTeacherMappingEntity groupTeacherMappingEntity = groupTeacherMappingMapper.toEntity(groupTeacherMapping);
+                GroupTeacherMappingEntity groupTeacherMappingEntity = new GroupTeacherMappingEntity();
+                groupTeacherMappingEntity.setGroupId(groupId);
+                groupTeacherMappingEntity.setTeacherId(teacherId);
+                groupTeacherMappingEntity.setRole(groupTeacherMapping.getRole());
                 groupTeacherMappingRepository.save(groupTeacherMappingEntity);
             }
         }

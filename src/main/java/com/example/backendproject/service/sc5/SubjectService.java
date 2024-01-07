@@ -122,10 +122,24 @@ public class SubjectService {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
 
-        for (Subject subject : request.getSubjectCreateRequests()) {
-            validateCreateSubjectRequest(subject);
+        for (SubjectUpload subject : request.getSubjectCreateRequests()) {
+            validateCreateSubjectRequestUpload(subject);
         }
 
         subjectServiceHelper.uploadFileSubject(request);
+    }
+
+    private void validateCreateSubjectRequestUpload(SubjectUpload subject) {
+        if (StringUtils.isBlank(subject.getName())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Thiếu thông tin tên học phần.");
+        }
+
+        if (StringUtils.isBlank(subject.getCode())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Thiếu thông tin mã học phần.");
+        }
+
+        if (subject.getGroupName() == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Thiếu thông tin nhóm chuyên môn.");
+        }
     }
 }

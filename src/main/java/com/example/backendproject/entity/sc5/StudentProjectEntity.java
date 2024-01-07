@@ -49,4 +49,13 @@ public class StudentProjectEntity implements Serializable {
 
     @Column(name = "teacher_assigned_id")
     private Long teacherAssignedId;
+
+    @Column(name = "project_type")
+    private String projectType;
+
+    @Column(name = "class_id")
+    private String classId;
+
+    @Column(name = "project_name")
+    private String projectName;
 }

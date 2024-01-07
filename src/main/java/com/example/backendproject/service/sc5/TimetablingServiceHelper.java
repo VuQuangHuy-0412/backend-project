@@ -162,7 +162,7 @@ public class TimetablingServiceHelper {
         inputData.setNumOfSubjects(subjects.size());
         inputData.setNumOfLanguages(languages.size());
 
-        int allTimeGdTeacher = teachers.stream().map(TeacherEntity::getGdTime).reduce(0, Integer::sum);
+        Double allTimeGdTeacher = teachers.stream().map(TeacherEntity::getGdTime).reduce(0d, Double::sum);
         Double allTimeClass = classes.stream().map(ClassEntity::getTimeOfClass).reduce(0d, Double::sum);
 
         if (allTimeGdTeacher <= 0) {

@@ -5,6 +5,7 @@ import com.example.backendproject.entity.sc5.TeacherEntity;
 import com.example.backendproject.mapper.LanguageTeacherMappingMapper;
 import com.example.backendproject.mapper.TeacherMapper;
 import com.example.backendproject.model.sc5.LanguageTeacherMapping;
+import com.example.backendproject.model.sc5.TeacherUpload;
 import com.example.backendproject.model.sc5.UploadLanguageTeacherRequest;
 import com.example.backendproject.model.sc5.UploadTeacherRequest;
 import com.example.backendproject.repository.sc5.LanguageTeacherMappingRepository;
@@ -38,11 +39,17 @@ public class TeacherServiceHelper {
 
     @Async("async-thread-pool")
     public void uploadFileTeacher(UploadTeacherRequest request) {
-        List<TeacherEntity> entities = teacherMapper.toEntities(request.getTeacherCreateRequests());
-        entities.forEach(x -> x.setCreatedAt(new Date()));
-        entities.forEach(x -> x.setUpdatedAt(new Date()));
-
-        for (TeacherEntity entity : entities) {
+        for (TeacherUpload teacher : request.getTeacherCreateRequests()) {
+            TeacherEntity entity = new TeacherEntity();
+            entity.setFullName(teacher.getFullName());
+            entity.setRankAndDegree(teacher.getRankAndDegree());
+            entity.setStartTime(teacher.getStartTime());
+            entity.setBirthday(teacher.getBirthday());
+            entity.setRating(teacher.getRating());
+            entity.setStatus(teacher.getStatus());
+            entity.setTotalTime(teacher.getTotalTime());
+            entity.setCreatedAt(new Date());
+            entity.setUpdatedAt(new Date());
             teacherRepository.save(entity);
         }
     }

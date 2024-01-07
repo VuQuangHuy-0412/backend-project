@@ -121,6 +121,10 @@ public class ClassService {
             classEntity.setRoom(classDto.getRoom());
             classEntity.setStartTime(classDto.getStartTime());
             classEntity.setEndTime(classDto.getEndTime());
+            classEntity.setClassType(classDto.getClassType());
+            classEntity.setNumberOfStudent(classDto.getNumberOfStudent());
+            classEntity.setNumberOfCredits(classDto.getNumberOfCredits());
+            classEntity.setProgram(classDto.getProgram());
         }
         classEntity.setTeacherId(classDto.getTeacherId());
         classEntity.setUpdatedAt(new Date());
@@ -138,10 +142,13 @@ public class ClassService {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
 
-        for (Class classDto : request.getClassCreateRequests()) {
-            validateCreateClassRequest(classDto);
+        for (ClassUpload classUpload : request.getClassCreateRequests()) {
+            validateCreateClassRequestUpload(classUpload);
         }
 
         classServiceHelper.uploadFileClass(request);
+    }
+
+    private void validateCreateClassRequestUpload(ClassUpload classUpload) {
     }
 }

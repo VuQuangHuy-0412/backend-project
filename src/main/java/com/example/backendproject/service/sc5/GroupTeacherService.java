@@ -93,6 +93,12 @@ public class GroupTeacherService {
         }
     }
 
+    private void validateCreateGroupTeacherRequestUpload(GroupTeacherUpload groupTeacher) {
+        if (StringUtils.isBlank(groupTeacher.getName())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Thiếu thông tin tên nhóm chuyên môn.");
+        }
+    }
+
     public void updateGroupTeacher(GroupTeacher groupTeacher) {
         if (groupTeacher.getId() == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Không tìm thấy nhóm chuyên môn.");
@@ -123,8 +129,8 @@ public class GroupTeacherService {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
 
-        for (GroupTeacher teacher : request.getGroupTeacherCreateRequests()) {
-            validateCreateGroupTeacherRequest(teacher);
+        for (GroupTeacherUpload groupTeacherUpload : request.getGroupTeacherCreateRequests()) {
+            validateCreateGroupTeacherRequestUpload(groupTeacherUpload);
         }
 
         groupTeacherServiceHelper.uploadFileGroupTeacher(request);
@@ -213,8 +219,8 @@ public class GroupTeacherService {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
 
-        for (GroupTeacherMapping groupTeacherMapping : request.getGroupTeacherMappingCreateRequests()) {
-            if (groupTeacherMapping.getTeacherId() == null || groupTeacherMapping.getGroupId() == null || StringUtils.isBlank(groupTeacherMapping.getRole())) {
+        for (GroupTeacherMappingUpload groupTeacherMapping : request.getGroupTeacherMappingCreateRequests()) {
+            if (StringUtils.isBlank(groupTeacherMapping.getTeacherName()) || StringUtils.isBlank(groupTeacherMapping.getGroupName()) || StringUtils.isBlank(groupTeacherMapping.getRole())) {
                 throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
             }
 

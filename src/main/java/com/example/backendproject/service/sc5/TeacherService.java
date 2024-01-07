@@ -4,18 +4,12 @@ import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.constant.GroupTeacherMappingConstant;
 import com.example.backendproject.config.constant.TeacherConstant;
 import com.example.backendproject.config.exception.Sc5Exception;
-import com.example.backendproject.entity.sc5.GroupTeacherEntity;
-import com.example.backendproject.entity.sc5.GroupTeacherMappingEntity;
-import com.example.backendproject.entity.sc5.LanguageTeacherMappingEntity;
-import com.example.backendproject.entity.sc5.TeacherEntity;
+import com.example.backendproject.entity.sc5.*;
 import com.example.backendproject.mapper.GroupTeacherMapper;
 import com.example.backendproject.mapper.LanguageTeacherMappingMapper;
 import com.example.backendproject.mapper.TeacherMapper;
 import com.example.backendproject.model.sc5.*;
-import com.example.backendproject.repository.sc5.GroupTeacherMappingRepository;
-import com.example.backendproject.repository.sc5.GroupTeacherRepository;
-import com.example.backendproject.repository.sc5.LanguageTeacherMappingRepository;
-import com.example.backendproject.repository.sc5.TeacherRepository;
+import com.example.backendproject.repository.sc5.*;
 import com.example.backendproject.service.AdminLogService;
 import com.example.backendproject.service.sc5.helper.TeacherServiceHelper;
 import com.example.backendproject.util.CommonUtil;
@@ -39,6 +33,8 @@ public class TeacherService {
     private final GroupTeacherRepository groupTeacherRepository;
     private final GroupTeacherMapper groupTeacherMapper;
     private final TeacherServiceHelper teacherServiceHelper;
+    private final ClassRepository classRepository;
+    private final StudentProjectRepository studentProjectRepository;
 
     public TeacherService(TeacherRepository teacherRepository,
                           AdminLogService adminLogService,
@@ -48,7 +44,9 @@ public class TeacherService {
                           LanguageTeacherMappingMapper languageTeacherMappingMapper,
                           GroupTeacherRepository groupTeacherRepository,
                           GroupTeacherMapper groupTeacherMapper,
-                          TeacherServiceHelper teacherServiceHelper) {
+                          TeacherServiceHelper teacherServiceHelper,
+                          ClassRepository classRepository,
+                          StudentProjectRepository studentProjectRepository) {
         this.teacherRepository = teacherRepository;
         this.adminLogService = adminLogService;
         this.teacherMapper = teacherMapper;
@@ -58,6 +56,8 @@ public class TeacherService {
         this.groupTeacherRepository = groupTeacherRepository;
         this.groupTeacherMapper = groupTeacherMapper;
         this.teacherServiceHelper = teacherServiceHelper;
+        this.classRepository = classRepository;
+        this.studentProjectRepository = studentProjectRepository;
     }
 
     public TeacherSearchResponse searchTeacher(TeacherSearchRequest request) {
@@ -162,6 +162,7 @@ public class TeacherService {
         teacherEntity.setHdTime(teacher.getHdTime());
         teacherEntity.setRating(teacher.getRating());
         teacherEntity.setStatus(teacher.getStatus());
+        teacherEntity.setTotalTime(teacher.getTotalTime());
         teacherEntity.setUpdatedAt(new Date());
 
         try {
@@ -177,11 +178,21 @@ public class TeacherService {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
 
-        for (Teacher teacher : request.getTeacherCreateRequests()) {
-            validateCreateTeacherRequest(teacher);
+        for (TeacherUpload teacher : request.getTeacherCreateRequests()) {
+            validateCreateTeacherRequestUpload(teacher);
         }
 
         teacherServiceHelper.uploadFileTeacher(request);
+    }
+
+    private void validateCreateTeacherRequestUpload(TeacherUpload teacher) {
+        if (StringUtils.isBlank(teacher.getFullName())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Thiếu thông tin tên giảng viên.");
+        }
+
+        if (teacher.getStatus() == null || !TeacherConstant.Status.LIST_STATUS_VALID.contains(teacher.getStatus())) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Trạng thái không hợp lệ.");
+        }
     }
 
     public TeacherSearchResponse getAllTeacherByGroup(Long groupId) {
@@ -228,5 +239,25 @@ public class TeacherService {
         }
 
         teacherServiceHelper.uploadFileLanguageTeacherMapping(request);
+    }
+
+    public void calculateTimeTeacher() {
+        List<ClassEntity> classEntities = classRepository.findAll();
+        List<StudentProjectEntity> studentProjectEntities = studentProjectRepository.findAll();
+        List<TeacherEntity> teacherEntities = teacherRepository.findAll();
+
+        if (CollectionUtils.isEmpty(classEntities) || CollectionUtils.isEmpty(studentProjectEntities) || CollectionUtils.isEmpty(teacherEntities)) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Bộ dữ liệu không hợp lệ");
+        }
+
+        double allTimeGd = classEntities.stream().map(ClassEntity::getTimeOfClass).reduce(0d, Double::sum);
+        double allTimeHd = studentProjectEntities.stream().map(StudentProjectEntity::getTimeHd).reduce(0d, Double::sum);
+
+        double rateGd = allTimeGd/(allTimeHd + allTimeGd);
+        double rateHd = allTimeHd/(allTimeHd + allTimeGd);
+        for (TeacherEntity teacherEntity : teacherEntities) {
+            teacherEntity.setGdTime(rateGd * teacherEntity.getTotalTime());
+            teacherEntity.setHdTime(rateHd * teacherEntity.getTotalTime());
+        }
     }
 }

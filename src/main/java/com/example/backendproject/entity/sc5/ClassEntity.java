@@ -70,4 +70,16 @@ public class ClassEntity implements Serializable {
 
     @Column(name = "end_time")
     private Integer endTime;
+
+    @Column(name = "number_of_student")
+    private Integer numberOfStudent;
+
+    @Column(name = "number_of_credits")
+    private Integer numberOfCredits;
+
+    @Column(name = "class_type")
+    private String classType;
+
+    @Column(name = "program")
+    private String program;
 }

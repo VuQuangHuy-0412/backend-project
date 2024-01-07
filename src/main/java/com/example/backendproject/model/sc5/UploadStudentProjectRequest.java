@@ -8,5 +8,5 @@ import java.util.List;
 @Getter
 @Setter
 public class UploadStudentProjectRequest {
-    private List<StudentProject> studentProjectCreateRequests;
+    private List<StudentProjectUpload> studentProjectCreateRequests;
 }

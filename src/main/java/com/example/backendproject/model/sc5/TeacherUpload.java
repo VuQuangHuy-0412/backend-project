@@ -8,8 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class Teacher {
-    private Long id;
+public class TeacherUpload {
 
     private String fullName;
 
@@ -19,21 +18,9 @@ public class Teacher {
 
     private Date birthday;
 
-    private Date createdAt;
-
-    private Date updatedAt;
-
-    private Double gdTime;
-
-    private Double hdTime;
-
     private Float rating;
 
     private Integer status;
-
-    private List<GroupTeacher> groupTeacher;
-
-    private String role;
 
     private Integer totalTime;
 }

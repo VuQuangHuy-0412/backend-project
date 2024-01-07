@@ -33,10 +33,10 @@ public class TeacherEntity implements Serializable {
     private Date birthday;
 
     @Column(name = "gd_time")
-    private Integer gdTime;
+    private Double gdTime;
 
     @Column(name = "hd_time")
-    private Integer hdTime;
+    private Double hdTime;
 
     @Column(name = "rating")
     private Float rating;
@@ -49,4 +49,7 @@ public class TeacherEntity implements Serializable {
 
     @Column(name = "status")
     private Integer status;
+
+    @Column(name = "total_time")
+    private Integer totalTime;
 }
