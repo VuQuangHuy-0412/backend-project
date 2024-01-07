@@ -82,17 +82,24 @@ public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
             params.addValue("status", request.getStatus());
         }
 
+        if (request.getDataset() != null) {
+            where += " and t.dataset = :dataset ";
+            params.addValue("dataset", request.getDataset());
+        }
+
         return where;
     }
 
     @Override
-    public List<Teacher> getAllTeacherOfAGroup(Long groupId) {
+    public List<Teacher> getAllTeacherOfAGroupAndDataset(Long groupId, Long dataset) {
         String sql = "select t.*, gtm.role from group_teacher_mapping gtm " +
                 " join teacher t on gtm.teacher_id = t.id " +
                 " where 1=1 " +
-                " and gtm.group_id = :groupId ";
+                " and gtm.group_id = :groupId " +
+                " and qtm.dataset = :dataset ";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("groupId", groupId);
+        params.addValue("dataset", dataset);
 
         List<Teacher> result;
         try {

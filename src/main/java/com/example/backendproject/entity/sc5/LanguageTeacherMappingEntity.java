@@ -24,4 +24,7 @@ public class LanguageTeacherMappingEntity implements Serializable {
 
     @Column(name = "language_id")
     private Long languageId;
+
+    @Column(name = "dataset")
+    private Long dataset;
 }

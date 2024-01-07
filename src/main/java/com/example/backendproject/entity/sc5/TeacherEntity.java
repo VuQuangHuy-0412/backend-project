@@ -52,4 +52,7 @@ public class TeacherEntity implements Serializable {
 
     @Column(name = "total_time")
     private Integer totalTime;
+
+    @Column(name = "dataset")
+    private Long dataset;
 }

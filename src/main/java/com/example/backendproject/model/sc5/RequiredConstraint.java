@@ -21,4 +21,6 @@ public class RequiredConstraint {
     private Date createdAt;
 
     private Date updatedAt;
+
+    private Long dataset;
 }

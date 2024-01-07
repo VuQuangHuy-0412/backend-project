@@ -114,6 +114,7 @@ public class GroupTeacherService {
         groupTeacherEntity.setName(groupTeacher.getName());
         groupTeacherEntity.setDescription(groupTeacher.getDescription());
         groupTeacherEntity.setLeader(groupTeacher.getLeader());
+        groupTeacherEntity.setDataset(groupTeacher.getDataset());
         groupTeacherEntity.setUpdatedAt(new Date());
 
         try {
@@ -162,13 +163,14 @@ public class GroupTeacherService {
         groupTeacherDetail.setCreatedAt(entity.getCreatedAt());
         groupTeacherDetail.setUpdatedAt(entity.getUpdatedAt());
         groupTeacherDetail.setLeader(entity.getLeader());
+        groupTeacherDetail.setDataset(entity.getDataset());
 
         if (groupTeacherDetail.getLeader() != null) {
             Optional<TeacherEntity> teacherEntity = teacherRepository.findById(groupTeacherDetail.getLeader());
             teacherEntity.ifPresent(e -> groupTeacherDetail.setLeaderInfo(teacherMapper.toDto(e)));
         }
 
-        List<Teacher> members = teacherRepository.getAllTeacherOfAGroup(groupTeacherDetail.getId());
+        List<Teacher> members = teacherRepository.getAllTeacherOfAGroupAndDataset(groupTeacherDetail.getId(), groupTeacherDetail.getDataset());
         groupTeacherDetail.setMembers(members);
         return groupTeacherDetail;
     }
@@ -182,7 +184,7 @@ public class GroupTeacherService {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vai trò không hợp lệ");
         }
 
-        List<GroupTeacherMappingEntity> existed = groupTeacherMappingRepository.findByGroupIdAndTeacherId(request.getGroupId(), request.getTeacherId());
+        List<GroupTeacherMappingEntity> existed = groupTeacherMappingRepository.findByGroupIdAndTeacherIdAndDataset(request.getGroupId(), request.getTeacherId(), request.getDataset());
         if (!CollectionUtils.isEmpty(existed)) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Giảng viên đã nằm trong nhóm");
         }
@@ -191,6 +193,7 @@ public class GroupTeacherService {
         entity.setGroupId(request.getGroupId());
         entity.setTeacherId(request.getTeacherId());
         entity.setRole(request.getRole());
+        entity.setDataset(request.getDataset());
 
         groupTeacherMappingRepository.save(entity);
     }
@@ -204,7 +207,7 @@ public class GroupTeacherService {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vai trò không hợp lệ");
         }
 
-        List<GroupTeacherMappingEntity> existed = groupTeacherMappingRepository.findByGroupIdAndTeacherId(request.getGroupId(), request.getTeacherId());
+        List<GroupTeacherMappingEntity> existed = groupTeacherMappingRepository.findByGroupIdAndTeacherIdAndDataset(request.getGroupId(), request.getTeacherId(), request.getDataset());
         if (CollectionUtils.isEmpty(existed)) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Giảng viên không nằm trong nhóm");
         }

@@ -9,5 +9,6 @@ import java.util.List;
 
 @Repository
 public interface StudentProjectRepository extends JpaRepository<StudentProjectEntity, Long>, StudentProjectRepositoryCustom {
-    List<StudentProjectEntity> findByTeacherAssignedId(Long teacherId);
+    List<StudentProjectEntity> findByTeacherAssignedIdAndDataset(Long teacherId, Long dataset);
+    List<StudentProjectEntity> findByDataset(Long dataset);
 }

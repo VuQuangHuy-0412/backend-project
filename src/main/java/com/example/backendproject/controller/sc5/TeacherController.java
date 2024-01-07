@@ -42,14 +42,14 @@ public class TeacherController {
 
     @GetMapping(value = "/teacher/all-by-group")
     @ApiDescription(value = "Lấy toàn bộ danh sách GV thuộc nhóm chuyên môn", code = "all_teacher_by_group")
-    public TeacherSearchResponse getAllTeacherByGroup(Long groupId) {
-        return teacherService.getAllTeacherByGroup(groupId);
+    public TeacherSearchResponse getAllTeacherByGroup(Long groupId, Long dataset) {
+        return teacherService.getAllTeacherByGroup(groupId, dataset);
     }
 
     @GetMapping(value = "/teacher/all")
     @ApiDescription(value = "Lấy toàn bộ danh sách GV", code = "all_teacher")
-    public TeacherSearchResponse getAllTeacher() {
-        return teacherService.getAllTeacher();
+    public TeacherSearchResponse getAllTeacher(Long dataset) {
+        return teacherService.getAllTeacher(dataset);
     }
 
     @PostMapping(value = "/language-teacher/upload-excel")
@@ -60,7 +60,7 @@ public class TeacherController {
 
     @PostMapping(value = "/teacher/calculate-time")
     @ApiDescription(value = "Tính toán thời gian giảng dạy và hướng dẫn dựa trên danh sách lớp học và danh sách sinh viên đã upload", code = "teacher_calculate_time")
-    public void calculateTimeTeacher() {
-        teacherService.calculateTimeTeacher();
+    public void calculateTimeTeacher(Long dataset) {
+        teacherService.calculateTimeTeacher(dataset);
     }
 }

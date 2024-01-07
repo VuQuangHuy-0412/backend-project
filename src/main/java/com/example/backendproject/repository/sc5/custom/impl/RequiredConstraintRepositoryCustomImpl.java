@@ -31,6 +31,11 @@ public class RequiredConstraintRepositoryCustomImpl implements RequiredConstrain
             params.addValue("status", request.getStatus());
         }
 
+        if (request.getDataset() != null) {
+            sql += " and rc.dataset = :dataset ";
+            params.addValue("dataset", request.getDataset());
+        }
+
         sql += " order by rc.created_at desc ";
 
         List<RequiredConstraint> result;

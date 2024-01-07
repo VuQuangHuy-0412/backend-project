@@ -125,6 +125,7 @@ public class ClassService {
             classEntity.setNumberOfStudent(classDto.getNumberOfStudent());
             classEntity.setNumberOfCredits(classDto.getNumberOfCredits());
             classEntity.setProgram(classDto.getProgram());
+            classEntity.setDataset(classDto.getDataset());
         }
         classEntity.setTeacherId(classDto.getTeacherId());
         classEntity.setUpdatedAt(new Date());

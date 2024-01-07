@@ -61,6 +61,11 @@ public class SubjectRepositoryCustomImpl implements SubjectRepositoryCustom {
             params.addValue("code", "%" + request.getCode() + "%");
         }
 
+        if (request.getDataset() != null) {
+            where += " and t.dataset = :dataset ";
+            params.addValue("dataset", request.getDataset());
+        }
+
         return where;
     }
 }

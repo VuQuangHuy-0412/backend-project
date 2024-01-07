@@ -10,9 +10,8 @@ import java.util.Date;
 @Getter
 @Setter
 @Entity
-@Table(name = "timetabling_process")
-public class TimetablingProcessEntity implements Serializable {
-
+@Table(name = "dataset")
+public class DatasetEntity  implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -20,21 +19,15 @@ public class TimetablingProcessEntity implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "type")
-    private String type;
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "error_message")
-    private String errorMessage;
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "created_at")
     private Date createdAt;
 
     @Column(name = "updated_at")
     private Date updatedAt;
-
-    @Column(name = "dataset")
-    private Long dataset;
 }

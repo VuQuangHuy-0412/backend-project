@@ -51,9 +51,9 @@ public class TimeTablingStudentService {
         this.timeTablingStudentServiceHelper = timeTablingStudentServiceHelper;
     }
 
-    public void timetablingStudent() throws JsonProcessingException {
+    public void timetablingStudent(Long dataset) throws JsonProcessingException {
         adminLogService.log("timetablingStudent", null);
-        TimetablingProcessEntity entity = timetablingProcessRepository.findByType("student");
+        TimetablingProcessEntity entity = timetablingProcessRepository.findByTypeAndDataset("student", dataset);
         if (entity != null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Đang trong quá trình thực hiện phân công HD");
         }
@@ -61,6 +61,7 @@ public class TimeTablingStudentService {
         entity = new TimetablingProcessEntity();
         entity.setType("student");
         entity.setStatus("INIT");
+        entity.setDataset(dataset);
         entity.setCreatedAt(new Date());
         entity.setUpdatedAt(new Date());
         entity = timetablingProcessRepository.save(entity);
@@ -68,7 +69,7 @@ public class TimeTablingStudentService {
         timeTablingStudentServiceHelper.timetablingStudentAsync(entity);
     }
 
-    public TimetableStudent getTimeTableOfStudent(Long teacherId) {
+    public TimetableStudent getTimeTableOfStudent(Long teacherId, Long dataset) {
         if (teacherId == null || teacherId <= 0) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Mã giảng viên không hợp lệ");
         }
@@ -80,17 +81,17 @@ public class TimeTablingStudentService {
 
         TimetableStudent timetableStudent = new TimetableStudent();
         timetableStudent.setTeacher(teacherMapper.toDto(teacherEntity.get()));
-        List<StudentProjectEntity> studentProjectEntities = studentProjectRepository.findByTeacherAssignedId(teacherId);
+        List<StudentProjectEntity> studentProjectEntities = studentProjectRepository.findByTeacherAssignedIdAndDataset(teacherId, dataset);
         timetableStudent.setData(studentProjectMapper.toDtos(studentProjectEntities));
         return timetableStudent;
     }
 
-    public InputData getTimetablingStudentInputData() {
+    public InputData getTimetablingStudentInputData(Long dataset) {
         InputData inputData = new InputData();
-        List<TeacherEntity> teachers = teacherRepository.findAllByStatus(TeacherConstant.Status.ACTIVE);
-        List<StudentProjectEntity> studentProjectEntities = studentProjectRepository.findAll();
-        List<RequiredConstraintEntity> requiredConstraints = requiredConstraintRepository.findAll();
-        List<CustomConstraintEntity> customConstraints = customConstraintRepository.findAll();
+        List<TeacherEntity> teachers = teacherRepository.findAllByStatusAndDataset(TeacherConstant.Status.ACTIVE, dataset);
+        List<StudentProjectEntity> studentProjectEntities = studentProjectRepository.findByDataset(dataset);
+        List<RequiredConstraintEntity> requiredConstraints = requiredConstraintRepository.findByStatusAndDataset(1, dataset);
+        List<CustomConstraintEntity> customConstraints = customConstraintRepository.findByStatusAndDataset(1, dataset);
 
         inputData.setTeachers(teachers);
         inputData.setStudentProjects(studentProjectEntities);

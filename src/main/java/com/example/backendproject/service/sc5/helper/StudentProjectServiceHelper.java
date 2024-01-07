@@ -45,26 +45,27 @@ public class StudentProjectServiceHelper {
             entity.setProjectName(studentProject.getProjectName());
             entity.setClassId(studentProject.getClassId());
 
-            Double timeHd = getTimeHd(studentProject);
+            Double timeHd = getTimeHd(studentProject, request.getDataset());
             entity.setTimeHd(timeHd);
 
-            List<TeacherEntity> teacher1Entity = teacherRepository.findByFullName(studentProject.getTeacher1Name());
+            List<TeacherEntity> teacher1Entity = teacherRepository.findByFullNameAndDataset(studentProject.getTeacher1Name(), request.getDataset());
             entity.setTeacher1Id(CollectionUtils.isEmpty(teacher1Entity) ? 1L : teacher1Entity.get(0).getId());
-            List<TeacherEntity> teacher2Entity = teacherRepository.findByFullName(studentProject.getTeacher2Name());
+            List<TeacherEntity> teacher2Entity = teacherRepository.findByFullNameAndDataset(studentProject.getTeacher2Name(), request.getDataset());
             entity.setTeacher2Id(CollectionUtils.isEmpty(teacher2Entity) ? 1L : teacher2Entity.get(0).getId());
-            List<TeacherEntity> teacher3Entity = teacherRepository.findByFullName(studentProject.getTeacher3Name());
+            List<TeacherEntity> teacher3Entity = teacherRepository.findByFullNameAndDataset(studentProject.getTeacher3Name(), request.getDataset());
             entity.setTeacher3Id(CollectionUtils.isEmpty(teacher3Entity) ? 1L : teacher3Entity.get(0).getId());
+            entity.setDataset(request.getDataset());
             entity.setCreatedAt(new Date());
             entity.setUpdatedAt(new Date());
             studentProjectRepository.save(entity);
         }
     }
 
-    private Double getTimeHd(StudentProjectUpload studentProjectUpload) {
+    private Double getTimeHd(StudentProjectUpload studentProjectUpload, Long dataset) {
         String classCode = studentProjectUpload.getClassId();
         String projectType = studentProjectUpload.getProjectType();
         String projectName = studentProjectUpload.getProjectName();
-        List<ClassEntity> classEntity = classRepository.findByCode(classCode);
+        List<ClassEntity> classEntity = classRepository.findByCodeAndDataset(classCode, dataset);
         if (CollectionUtils.isEmpty(classEntity)) {
             return 0d;
         }

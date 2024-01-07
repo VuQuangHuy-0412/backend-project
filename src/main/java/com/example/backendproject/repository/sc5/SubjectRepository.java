@@ -9,5 +9,6 @@ import java.util.List;
 
 @Repository
 public interface SubjectRepository extends JpaRepository<SubjectEntity, Long>, SubjectRepositoryCustom {
-    List<SubjectEntity> findByCode(String code);
+    List<SubjectEntity> findByCodeAndDataset(String code, Long dataset);
+    List<SubjectEntity> findByDataset(Long dataset);
 }

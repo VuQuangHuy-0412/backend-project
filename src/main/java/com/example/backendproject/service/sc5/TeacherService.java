@@ -66,7 +66,7 @@ public class TeacherService {
         response.setPageSize(request.getPageSize());
 
         if (request.getGroupTeacher() != null) {
-            List<GroupTeacherMappingEntity> groupTeacherMappingEntities = groupTeacherMappingRepository.findAllByGroupId(request.getGroupTeacher());
+            List<GroupTeacherMappingEntity> groupTeacherMappingEntities = groupTeacherMappingRepository.findAllByGroupIdAndDataset(request.getGroupTeacher(), request.getDataset());
             if (CollectionUtils.isEmpty(groupTeacherMappingEntities)) {
                 response.setData(new ArrayList<>());
                 return response;
@@ -77,9 +77,9 @@ public class TeacherService {
 
         List<Teacher> data = teacherRepository.searchTeacherByFilter(request);
         for (Teacher teacher : data) {
-            List<GroupTeacherMappingEntity> mappingEntities = groupTeacherMappingRepository.findAllByTeacherId(teacher.getId());
+            List<GroupTeacherMappingEntity> mappingEntities = groupTeacherMappingRepository.findAllByTeacherIdAndDataset(teacher.getId(), request.getDataset());
             List<Long> groupIds = mappingEntities.stream().map(GroupTeacherMappingEntity::getGroupId).toList();
-            List<GroupTeacherEntity> groupTeacherEntities = groupTeacherRepository.findAllByIdIn(groupIds);
+            List<GroupTeacherEntity> groupTeacherEntities = groupTeacherRepository.findAllByIdInAndDataset(groupIds, request.getDataset());
 
             teacher.setGroupTeacher(groupTeacherMapper.toDtos(groupTeacherEntities));
         }
@@ -98,30 +98,11 @@ public class TeacherService {
         teacherEntity.setUpdatedAt(new Date());
 
         try {
-            teacherEntity = teacherRepository.save(teacherEntity);
-            if (!CollectionUtils.isEmpty(teacher.getGroupTeacher())) {
-                List<GroupTeacherMappingEntity> mappingEntities = getGroupTeacherMappingEntities(teacher, teacherEntity);
-                if (!CollectionUtils.isEmpty(mappingEntities)) {
-                    groupTeacherMappingRepository.saveAll(mappingEntities);
-                }
-            }
-
+            teacherRepository.save(teacherEntity);
         } catch (Exception exception) {
             log.error("Save teacher error!", exception);
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    private static List<GroupTeacherMappingEntity> getGroupTeacherMappingEntities(Teacher teacher, TeacherEntity teacherEntity) {
-        List<GroupTeacherMappingEntity> mappingEntities = new ArrayList<>();
-        for (GroupTeacher groupTeacher : teacher.getGroupTeacher()) {
-            GroupTeacherMappingEntity entity = new GroupTeacherMappingEntity();
-            entity.setTeacherId(teacherEntity.getId());
-            entity.setGroupId(groupTeacher.getId());
-            entity.setRole(GroupTeacherMappingConstant.Role.TEACHER);
-            mappingEntities.add(entity);
-        }
-        return mappingEntities;
     }
 
     private void validateCreateTeacherRequest(Teacher teacher) {
@@ -163,6 +144,7 @@ public class TeacherService {
         teacherEntity.setRating(teacher.getRating());
         teacherEntity.setStatus(teacher.getStatus());
         teacherEntity.setTotalTime(teacher.getTotalTime());
+        teacherEntity.setDataset(teacher.getDataset());
         teacherEntity.setUpdatedAt(new Date());
 
         try {
@@ -195,7 +177,7 @@ public class TeacherService {
         }
     }
 
-    public TeacherSearchResponse getAllTeacherByGroup(Long groupId) {
+    public TeacherSearchResponse getAllTeacherByGroup(Long groupId, Long dataset) {
         if (groupId == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
@@ -206,7 +188,7 @@ public class TeacherService {
         }
 
         TeacherSearchResponse response = new TeacherSearchResponse();
-        List<GroupTeacherMappingEntity> mappingEntities = groupTeacherMappingRepository.findAllByGroupId(groupId);
+        List<GroupTeacherMappingEntity> mappingEntities = groupTeacherMappingRepository.findAllByGroupIdAndDataset(groupId, dataset);
         if (CollectionUtils.isEmpty(mappingEntities)) {
             response.setData(new ArrayList<>());
             return response;
@@ -219,9 +201,9 @@ public class TeacherService {
         return response;
     }
 
-    public TeacherSearchResponse getAllTeacher() {
+    public TeacherSearchResponse getAllTeacher(Long dataset) {
         TeacherSearchResponse response = new TeacherSearchResponse();
-        List<TeacherEntity> entities = teacherRepository.findAll();
+        List<TeacherEntity> entities = teacherRepository.findByDataset(dataset);
 
         response.setData(teacherMapper.toDtos(entities));
         return response;
@@ -232,8 +214,8 @@ public class TeacherService {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
         }
 
-        for (LanguageTeacherMapping languageTeacherMapping : request.getLanguageTeacherCreateRequests()) {
-            if (languageTeacherMapping.getTeacherId() == null || languageTeacherMapping.getLanguageId() == null) {
+        for (LanguageTeacherMappingUpload languageTeacherMapping : request.getLanguageTeacherCreateRequests()) {
+            if (languageTeacherMapping.getTeacherName() == null || languageTeacherMapping.getLanguageName() == null) {
                 throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
             }
         }
@@ -241,10 +223,10 @@ public class TeacherService {
         teacherServiceHelper.uploadFileLanguageTeacherMapping(request);
     }
 
-    public void calculateTimeTeacher() {
-        List<ClassEntity> classEntities = classRepository.findAll();
-        List<StudentProjectEntity> studentProjectEntities = studentProjectRepository.findAll();
-        List<TeacherEntity> teacherEntities = teacherRepository.findAll();
+    public void calculateTimeTeacher(Long dataset) {
+        List<ClassEntity> classEntities = classRepository.findByDataset(dataset);
+        List<StudentProjectEntity> studentProjectEntities = studentProjectRepository.findByDataset(dataset);
+        List<TeacherEntity> teacherEntities = teacherRepository.findByDataset(dataset);
 
         if (CollectionUtils.isEmpty(classEntities) || CollectionUtils.isEmpty(studentProjectEntities) || CollectionUtils.isEmpty(teacherEntities)) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Bộ dữ liệu không hợp lệ");

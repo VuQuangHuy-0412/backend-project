@@ -26,49 +26,49 @@ public class TimetablingController {
 
     @PostMapping("/timetabling/teacher")
     @ApiDescription(value = "Phân công giảng dạy lớp học cho giảng viên", code = "timetabling_teacher")
-    public void timetablingTeacher() throws JsonProcessingException {
-        timetablingService.timetablingTeacher();
+    public void timetablingTeacher(Long dataset) throws JsonProcessingException {
+        timetablingService.timetablingTeacher(dataset);
     }
 
     @PostMapping("/timetabling/student")
     @ApiDescription(value = "Phân công hướng dẫn sinh viên cho giảng viên", code = "timetabling_student")
-    public void timetablingStudent() throws JsonProcessingException {
-        timeTablingStudentService.timetablingStudent();
+    public void timetablingStudent(Long dataset) throws JsonProcessingException {
+        timeTablingStudentService.timetablingStudent(dataset);
     }
 
     @GetMapping("/timetable/teacher")
     @ApiDescription(value = "Thời khóa biểu GD của GV", code = "timetable_teacher_get")
-    public TimetableTeacher getTimeTableOfTeacher(@RequestParam Long teacherId) {
-        return timetablingService.getTimeTableOfTeacher(teacherId);
+    public TimetableTeacher getTimeTableOfTeacher(@RequestParam(name = "teacherId") Long teacherId, @RequestParam(name = "dataset") Long dataset) {
+        return timetablingService.getTimeTableOfTeacher(teacherId, dataset);
     }
 
     @GetMapping("/timetable/student")
     @ApiDescription(value = "Lịch HD của GV", code = "timetable_student_get")
-    public TimetableStudent getTimeTableOfStudent(@RequestParam Long teacherId) {
-        return timeTablingStudentService.getTimeTableOfStudent(teacherId);
+    public TimetableStudent getTimeTableOfStudent(@RequestParam(name = "teacherId") Long teacherId, @RequestParam(name = "dataset") Long dataset) {
+        return timeTablingStudentService.getTimeTableOfStudent(teacherId, dataset);
     }
 
     @GetMapping("/timetabling-teacher/input-data")
     @ApiDescription(value = "Input data phân công GD", code = "input_data_timetabling_teacher")
-    public InputData getTimetablingTeacherInputData() {
-        return timetablingService.getTimetablingTeacherInputData();
+    public InputData getTimetablingTeacherInputData(Long dataset) {
+        return timetablingService.getTimetablingTeacherInputData(dataset);
     }
 
     @GetMapping("/timetabling-student/input-data")
     @ApiDescription(value = "Input data phân công HD", code = "input_data_timetabling_student")
-    public InputData getTimetablingStudentInputData() {
-        return timeTablingStudentService.getTimetablingStudentInputData();
+    public InputData getTimetablingStudentInputData(Long dataset) {
+        return timeTablingStudentService.getTimetablingStudentInputData(dataset);
     }
 
     @GetMapping("/timetabling/teacher/status")
     @ApiDescription(value = "Lấy trạng thái phân công GD hiện tại", code = "timetabling_teacher_status")
-    public TimetablingProcessEntity getTimetablingTeacherStatus() {
-        return timetablingService.getTimetablingTeacherStatus();
+    public TimetablingProcessEntity getTimetablingTeacherStatus(Long dataset) {
+        return timetablingService.getTimetablingTeacherStatus(dataset);
     }
 
     @GetMapping("/timetabling/student/status")
     @ApiDescription(value = "Lấy trạng thái phân công HD hiện tại", code = "timetabling_student_status")
-    public TimetablingProcessEntity getTimetablingStudentStatus() {
-        return timetablingService.getTimetablingStudentStatus();
+    public TimetablingProcessEntity getTimetablingStudentStatus(Long dataset) {
+        return timetablingService.getTimetablingStudentStatus(dataset);
     }
 }

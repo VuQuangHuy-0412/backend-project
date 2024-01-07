@@ -107,6 +107,7 @@ public class SubjectService {
         subjectEntity.setName(subject.getName());
         subjectEntity.setCode(subject.getCode());
         subjectEntity.setGroupId(subject.getGroupId());
+        subjectEntity.setDataset(subject.getDataset());
         subjectEntity.setUpdatedAt(new Date());
 
         try {

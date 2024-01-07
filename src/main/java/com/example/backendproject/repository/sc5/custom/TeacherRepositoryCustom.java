@@ -8,5 +8,5 @@ import java.util.List;
 public interface TeacherRepositoryCustom {
     List<Teacher> searchTeacherByFilter(TeacherSearchRequest request);
 
-    List<Teacher> getAllTeacherOfAGroup(Long groupId);
+    List<Teacher> getAllTeacherOfAGroupAndDataset(Long groupId, Long dataset);
 }

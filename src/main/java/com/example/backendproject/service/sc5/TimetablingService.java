@@ -51,9 +51,9 @@ public class TimetablingService {
         this.timetablingServiceHelper = timetablingServiceHelper;
     }
 
-    public void timetablingTeacher() throws JsonProcessingException {
+    public void timetablingTeacher(Long dataset) throws JsonProcessingException {
         adminLogService.log("timetablingTeacher", null);
-        TimetablingProcessEntity entity = timetablingProcessRepository.findByType("teacher");
+        TimetablingProcessEntity entity = timetablingProcessRepository.findByTypeAndDataset("teacher", dataset);
         if (entity != null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Đang trong quá trình thực hiện phân công GD");
         }
@@ -61,6 +61,7 @@ public class TimetablingService {
         entity = new TimetablingProcessEntity();
         entity.setType("teacher");
         entity.setStatus("INIT");
+        entity.setDataset(dataset);
         entity.setCreatedAt(new Date());
         entity.setUpdatedAt(new Date());
         entity = timetablingProcessRepository.save(entity);
@@ -68,7 +69,7 @@ public class TimetablingService {
         timetablingServiceHelper.timetablingTeacherAsync(entity);
     }
 
-    public TimetableTeacher getTimeTableOfTeacher(Long teacherId) {
+    public TimetableTeacher getTimeTableOfTeacher(Long teacherId, Long dataset) {
         if (teacherId == null || teacherId <= 0) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Mã giảng viên không hợp lệ");
         }
@@ -80,17 +81,17 @@ public class TimetablingService {
 
         TimetableTeacher timetableTeacher = new TimetableTeacher();
         timetableTeacher.setTeacher(teacherMapper.toDto(teacherEntity.get()));
-        List<ClassEntity> classEntities = classRepository.findByTeacherId(teacherId);
+        List<ClassEntity> classEntities = classRepository.findByTeacherIdAndDataset(teacherId, dataset);
         timetableTeacher.setData(classMapper.toDtos(classEntities));
         return timetableTeacher;
     }
 
-    public InputData getTimetablingTeacherInputData() {
+    public InputData getTimetablingTeacherInputData(Long dataset) {
         InputData inputData = new InputData();
-        List<TeacherEntity> teachers = teacherRepository.findAllByStatus(TeacherConstant.Status.ACTIVE);
-        List<ClassEntity> classes = classRepository.findAll();
-        List<RequiredConstraintEntity> requiredConstraints = requiredConstraintRepository.findAll();
-        List<CustomConstraintEntity> customConstraints = customConstraintRepository.findAll();
+        List<TeacherEntity> teachers = teacherRepository.findAllByStatusAndDataset(TeacherConstant.Status.ACTIVE, dataset);
+        List<ClassEntity> classes = classRepository.findByDataset(dataset);
+        List<RequiredConstraintEntity> requiredConstraints = requiredConstraintRepository.findByStatusAndDataset(1, dataset);
+        List<CustomConstraintEntity> customConstraints = customConstraintRepository.findByStatusAndDataset(1, dataset);
 
         inputData.setTeachers(teachers);
         inputData.setClasses(classes);
@@ -103,12 +104,12 @@ public class TimetablingService {
         return inputData;
     }
 
-    public TimetablingProcessEntity getTimetablingTeacherStatus() {
-        return timetablingProcessRepository.findByType("teacher");
+    public TimetablingProcessEntity getTimetablingTeacherStatus(Long dataset) {
+        return timetablingProcessRepository.findByTypeAndDataset("teacher", dataset);
     }
 
-    public TimetablingProcessEntity getTimetablingStudentStatus() {
-        return timetablingProcessRepository.findByType("student");
+    public TimetablingProcessEntity getTimetablingStudentStatus(Long dataset) {
+        return timetablingProcessRepository.findByTypeAndDataset("student", dataset);
     }
 
 }

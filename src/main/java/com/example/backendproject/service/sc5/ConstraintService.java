@@ -84,6 +84,7 @@ public class ConstraintService {
         customConstraintEntity.setClassValueCompare(customConstraint.getClassValueCompare());
         customConstraintEntity.setClassColumnCompare(customConstraint.getClassColumnCompare());
         customConstraintEntity.setStatus(customConstraint.getStatus());
+        customConstraintEntity.setDataset(customConstraint.getDataset());
         customConstraintEntity.setUpdatedAt(new Date());
 
         try {
@@ -121,9 +122,10 @@ public class ConstraintService {
 
         RequiredConstraintEntity requiredConstraintEntity = requiredConstraintEntityOptional.get();
         requiredConstraintEntity.setCode(requiredConstraint.getCode());
-        requiredConstraintEntity.setValue(requiredConstraintEntity.getValue());
-        requiredConstraintEntity.setStatus(requiredConstraintEntity.getStatus());
-        requiredConstraintEntity.setType(requiredConstraintEntity.getType());
+        requiredConstraintEntity.setValue(requiredConstraint.getValue());
+        requiredConstraintEntity.setStatus(requiredConstraint.getStatus());
+        requiredConstraintEntity.setType(requiredConstraint.getType());
+        requiredConstraintEntity.setDataset(requiredConstraint.getDataset());
         requiredConstraintEntity.setUpdatedAt(new Date());
 
         try {

@@ -21,4 +21,6 @@ public class GroupTeacher {
     private Date updatedAt;
 
     private Teacher leaderInfo;
+
+    private Long dataset;
 }

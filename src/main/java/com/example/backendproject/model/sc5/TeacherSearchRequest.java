@@ -18,4 +18,5 @@ public class TeacherSearchRequest extends BaseFilterRequest {
     private Integer status;
     private Long groupTeacher;
     private List<Long> ids;
+    private Long dataset;
 }

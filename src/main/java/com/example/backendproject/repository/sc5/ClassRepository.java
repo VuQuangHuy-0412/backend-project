@@ -9,7 +9,8 @@ import java.util.List;
 
 @Repository
 public interface ClassRepository extends JpaRepository<ClassEntity, Long>, ClassRepositoryCustom {
-    List<ClassEntity> findByTeacherId(Long teacherId);
+    List<ClassEntity> findByTeacherIdAndDataset(Long teacherId, Long dataset);
 
-    List<ClassEntity> findByCode(String code);
+    List<ClassEntity> findByCodeAndDataset(String code, Long dataset);
+    List<ClassEntity> findByDataset(Long dataset);
 }

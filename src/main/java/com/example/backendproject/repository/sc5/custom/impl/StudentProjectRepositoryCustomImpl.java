@@ -51,6 +51,11 @@ public class StudentProjectRepositoryCustomImpl implements StudentProjectReposit
             params.addValue("id", request.getId());
         }
 
+        if (request.getDataset() != null) {
+            where += " and sp.dataset = :dataset ";
+            params.addValue("dataset", request.getDataset());
+        }
+
         return where;
     }
 }

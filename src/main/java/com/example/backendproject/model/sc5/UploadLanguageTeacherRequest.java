@@ -8,5 +8,6 @@ import java.util.List;
 @Getter
 @Setter
 public class UploadLanguageTeacherRequest {
-    private List<LanguageTeacherMapping> languageTeacherCreateRequests;
+    private List<LanguageTeacherMappingUpload> languageTeacherCreateRequests;
+    private Long dataset;
 }

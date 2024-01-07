@@ -24,4 +24,6 @@ public class GroupTeacherDetail {
     private Teacher leaderInfo;
 
     private List<Teacher> members;
+
+    private Long dataset;
 }

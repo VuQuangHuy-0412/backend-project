@@ -55,4 +55,6 @@ public class Class {
     private String classType;
 
     private String program;
+
+    private Long dataset;
 }

@@ -1,14 +1,16 @@
 package com.example.backendproject.model.sc5;
 
-import com.example.backendproject.model.BaseFilterRequest;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
-public class GroupTeacherSearchRequest extends BaseFilterRequest {
+public class Dataset {
     private Long id;
     private String name;
-
-    private Long dataset;
+    private String description;
+    private Date createdAt;
+    private Date updatedAt;
 }

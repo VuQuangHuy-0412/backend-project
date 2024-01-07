@@ -21,4 +21,6 @@ public class Subject {
     private Date updatedAt;
 
     private GroupTeacher groupTeacher;
+
+    private Long dataset;
 }

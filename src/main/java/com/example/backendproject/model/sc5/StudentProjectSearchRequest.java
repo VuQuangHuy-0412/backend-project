@@ -8,4 +8,6 @@ import lombok.Setter;
 @Setter
 public class StudentProjectSearchRequest extends BaseFilterRequest {
     private Long id;
+
+    private Long dataset;
 }

@@ -10,4 +10,5 @@ import java.util.List;
 public class TimetableStudent {
     private List<StudentProject> data;
     private Teacher teacher;
+    private Long dataset;
 }

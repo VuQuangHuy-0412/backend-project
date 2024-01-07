@@ -56,6 +56,11 @@ public class GroupTeacherRepositoryCustomImpl implements GroupTeacherRepositoryC
             params.addValue("name", "%" + request.getName() + "%");
         }
 
+        if (request.getDataset() != null) {
+            where += " and gt.dataset = :dataset ";
+            params.addValue("dataset", request.getDataset());
+        }
+
         return where;
     }
 }

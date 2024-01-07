@@ -43,4 +43,6 @@ public class StudentProject {
     private String classId;
 
     private String projectName;
+
+    private Long dataset;
 }

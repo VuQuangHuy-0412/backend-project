@@ -51,6 +51,11 @@ public class ClassRepositoryCustomImpl implements ClassRepositoryCustom {
             params.addValue("id", request.getId());
         }
 
+        if (request.getDataset() != null) {
+            where += " and c.dataset = :dataset ";
+            params.addValue("dataset", request.getDataset());
+        }
+
         return where;
     }
 }

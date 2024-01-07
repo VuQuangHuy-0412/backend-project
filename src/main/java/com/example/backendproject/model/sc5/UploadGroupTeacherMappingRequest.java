@@ -9,4 +9,5 @@ import java.util.List;
 @Setter
 public class UploadGroupTeacherMappingRequest {
     private List<GroupTeacherMappingUpload> groupTeacherMappingCreateRequests;
+    private Long dataset;
 }

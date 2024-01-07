@@ -34,4 +34,7 @@ public class SubjectEntity implements Serializable {
 
     @Column(name = "updated_at")
     private Date updatedAt;
+
+    @Column(name = "dataset")
+    private Long dataset;
 }

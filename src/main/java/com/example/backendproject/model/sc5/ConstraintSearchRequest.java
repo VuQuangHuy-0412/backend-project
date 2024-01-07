@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class ConstraintSearchRequest {
     private Integer status;
+    private Long dataset;
 }

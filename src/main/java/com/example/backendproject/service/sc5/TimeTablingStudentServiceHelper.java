@@ -51,7 +51,7 @@ public class TimeTablingStudentServiceHelper {
         timetablingProcessRepository.save(entity);
 
         try {
-            InputData inputData = getInputData();
+            InputData inputData = getInputData(entity.getDataset());
             PopulationStudent population = initPopulation(inputData);
 
             for (int i = 0; i < NUM_LOOP; i++) {
@@ -103,12 +103,12 @@ public class TimeTablingStudentServiceHelper {
         studentProjectRepository.saveAll(studentProjectEntities);
     }
 
-    private InputData getInputData() {
+    private InputData getInputData(Long dataset) {
         InputData inputData = new InputData();
-        List<TeacherEntity> teachers = teacherRepository.findAllByStatus(TeacherConstant.Status.ACTIVE);
-        List<StudentProjectEntity> studentProjects = studentProjectRepository.findAll();
-        List<RequiredConstraintEntity> requiredConstraints = requiredConstraintRepository.findAll();
-        List<CustomConstraintEntity> customConstraints = customConstraintRepository.findAll();
+        List<TeacherEntity> teachers = teacherRepository.findAllByStatusAndDataset(TeacherConstant.Status.ACTIVE, dataset);
+        List<StudentProjectEntity> studentProjects = studentProjectRepository.findByDataset(dataset);
+        List<RequiredConstraintEntity> requiredConstraints = requiredConstraintRepository.findByStatusAndDataset(1, dataset);
+        List<CustomConstraintEntity> customConstraints = customConstraintRepository.findByStatusAndDataset(1, dataset);
 
         inputData.setTeachers(teachers);
         inputData.setStudentProjects(studentProjects);

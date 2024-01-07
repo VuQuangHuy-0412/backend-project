@@ -10,4 +10,5 @@ public class SubjectSearchRequest extends BaseFilterRequest {
     private Long id;
     private String name;
     private String code;
+    private Long dataset;
 }

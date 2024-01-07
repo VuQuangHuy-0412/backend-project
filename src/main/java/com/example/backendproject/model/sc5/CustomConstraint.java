@@ -31,4 +31,6 @@ public class CustomConstraint {
     private Date createdAt;
 
     private Date updatedAt;
+
+    private Long dataset;
 }

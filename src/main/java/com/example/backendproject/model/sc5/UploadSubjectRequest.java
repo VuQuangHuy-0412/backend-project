@@ -9,4 +9,5 @@ import java.util.List;
 @Setter
 public class UploadSubjectRequest {
     private List<SubjectUpload> subjectCreateRequests;
+    private Long dataset;
 }

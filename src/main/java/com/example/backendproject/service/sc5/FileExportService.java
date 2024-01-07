@@ -35,10 +35,10 @@ public class FileExportService {
         this.studentProjectRepository = studentProjectRepository;
     }
 
-    public InputStreamResource exportListTimetablingTeacher() {
-        adminLogService.log("exportListTimetablingTeacher", null);
+    public InputStreamResource exportListTimetablingTeacher(Long dataset) {
+        adminLogService.log("exportListTimetablingTeacher", String.valueOf(dataset));
 
-        List<ClassEntity> entities = classRepository.findAll();
+        List<ClassEntity> entities = classRepository.findByDataset(dataset);
 
         return createFileExcelListTimeTablingTeacher(entities);
     }
@@ -231,10 +231,10 @@ public class FileExportService {
         }
     }
 
-    public InputStreamResource exportListTimetablingStudent() {
-        adminLogService.log("exportListTimetablingTeacher", null);
+    public InputStreamResource exportListTimetablingStudent(Long dataset) {
+        adminLogService.log("exportListTimetablingTeacher", String.valueOf(dataset));
 
-        List<StudentProjectEntity> entities = studentProjectRepository.findAll();
+        List<StudentProjectEntity> entities = studentProjectRepository.findByDataset(dataset);
 
         return createFileExcelListTimeTablingStudent(entities);
     }

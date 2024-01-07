@@ -9,4 +9,5 @@ public class AddTeacherToGroupRequest {
     private Long groupId;
     private Long teacherId;
     private String role;
+    private Long dataset;
 }

@@ -8,9 +8,10 @@ import java.util.List;
 
 @Repository
 public interface GroupTeacherMappingRepository extends JpaRepository<GroupTeacherMappingEntity, Long> {
-    List<GroupTeacherMappingEntity> findAllByTeacherId(Long teacherId);
+    List<GroupTeacherMappingEntity> findAllByTeacherIdAndDataset(Long teacherId, Long dataset);
 
-    List<GroupTeacherMappingEntity> findAllByGroupId(Long groupId);
+    List<GroupTeacherMappingEntity> findAllByGroupIdAndDataset(Long groupId, Long dataset);
 
-    List<GroupTeacherMappingEntity> findByGroupIdAndTeacherId(Long groupId, Long teacherId);
+    List<GroupTeacherMappingEntity> findByGroupIdAndTeacherIdAndDataset(Long groupId, Long teacherId, Long dataset);
+    List<GroupTeacherMappingEntity> findByDataset(Long dataset);
 }

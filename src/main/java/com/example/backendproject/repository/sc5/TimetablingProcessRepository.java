@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TimetablingProcessRepository extends JpaRepository<TimetablingProcessEntity, Long> {
-    TimetablingProcessEntity findByType(String type);
+    TimetablingProcessEntity findByTypeAndDataset(String type, Long dataset);
 }

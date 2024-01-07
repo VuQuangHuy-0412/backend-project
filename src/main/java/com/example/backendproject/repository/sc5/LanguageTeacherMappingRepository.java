@@ -8,6 +8,7 @@ import java.util.List;
 
 @Repository
 public interface LanguageTeacherMappingRepository extends JpaRepository<LanguageTeacherMappingEntity, Long> {
-    List<LanguageTeacherMappingEntity> findByTeacherIdAndLanguageId(Long teacherId, Long languageId);
+    List<LanguageTeacherMappingEntity> findByTeacherIdAndLanguageIdAndDataset(Long teacherId, Long languageId, Long dataset);
+    List<LanguageTeacherMappingEntity> findByDataset(Long dataset);
 
 }

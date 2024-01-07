@@ -11,4 +11,6 @@ public class LanguageTeacherMapping {
     private Long teacherId;
 
     private Long languageId;
+
+    private Long dataset;
 }

@@ -67,7 +67,7 @@ public class TimetablingServiceHelper {
         timetablingProcessRepository.save(entity);
 
         try {
-            InputData inputData = getInputData();
+            InputData inputData = getInputData(entity.getDataset());
             Population population = initPopulation(inputData);
 
             for (int i = 0; i < NUM_LOOP; i++) {
@@ -134,17 +134,17 @@ public class TimetablingServiceHelper {
         return null;
     }
 
-    private InputData getInputData() {
+    private InputData getInputData(Long dataset) {
         InputData inputData = new InputData();
-        List<TeacherEntity> teachers = teacherRepository.findAllByStatus(TeacherConstant.Status.ACTIVE);
-        List<LanguageTeacherMappingEntity> languageTeacherMappings = languageTeacherMappingRepository.findAll();
-        List<GroupTeacherMappingEntity> groupTeacherMappings = groupTeacherMappingRepository.findAll();
-        List<SubjectEntity> subjects = subjectRepository.findAll();
-        List<ClassEntity> classes = classRepository.findAll();
-        List<GroupTeacherEntity> groupTeachers = groupTeacherRepository.findAll();
+        List<TeacherEntity> teachers = teacherRepository.findAllByStatusAndDataset(TeacherConstant.Status.ACTIVE, dataset);
+        List<LanguageTeacherMappingEntity> languageTeacherMappings = languageTeacherMappingRepository.findByDataset(dataset);
+        List<GroupTeacherMappingEntity> groupTeacherMappings = groupTeacherMappingRepository.findByDataset(dataset);
+        List<SubjectEntity> subjects = subjectRepository.findByDataset(dataset);
+        List<ClassEntity> classes = classRepository.findByDataset(dataset);
+        List<GroupTeacherEntity> groupTeachers = groupTeacherRepository.findByDataset(dataset);
         List<LanguageEntity> languages = languageRepository.findAll();
-        List<RequiredConstraintEntity> requiredConstraints = requiredConstraintRepository.findAll();
-        List<CustomConstraintEntity> customConstraints = customConstraintRepository.findAll();
+        List<RequiredConstraintEntity> requiredConstraints = requiredConstraintRepository.findByStatusAndDataset(1, dataset);
+        List<CustomConstraintEntity> customConstraints = customConstraintRepository.findByStatusAndDataset(1, dataset);
 
         inputData.setTeachers(teachers);
         inputData.setLanguageTeacherMappings(languageTeacherMappings);

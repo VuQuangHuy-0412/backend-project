@@ -31,6 +31,11 @@ public class CustomConstraintRepositoryCustomImpl implements CustomConstraintRep
             params.addValue("status", request.getStatus());
         }
 
+        if (request.getDataset() != null) {
+            sql += " and cc.dataset = :dataset ";
+            params.addValue("dataset", request.getDataset());
+        }
+
         sql += " order by cc.created_at desc ";
 
         List<CustomConstraint> result;

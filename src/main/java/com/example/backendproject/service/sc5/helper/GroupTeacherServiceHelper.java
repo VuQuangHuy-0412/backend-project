@@ -48,8 +48,9 @@ public class GroupTeacherServiceHelper {
             GroupTeacherEntity entity = new GroupTeacherEntity();
             entity.setName(groupTeacherUpload.getName());
             entity.setDescription(groupTeacherUpload.getDescription());
-            List<TeacherEntity> teacherEntity = teacherRepository.findByFullName(groupTeacherUpload.getLeaderName());
+            List<TeacherEntity> teacherEntity = teacherRepository.findByFullNameAndDataset(groupTeacherUpload.getLeaderName(), request.getDataset());
             entity.setLeader(CollectionUtils.isEmpty(teacherEntity) ? 1L : teacherEntity.get(0).getId());
+            entity.setDataset(request.getDataset());
             entity.setCreatedAt(new Date());
             entity.setUpdatedAt(new Date());
             entities.add(entity);
@@ -63,6 +64,7 @@ public class GroupTeacherServiceHelper {
             newLeader.setTeacherId(groupTeacherEntity.getLeader());
             newLeader.setGroupId(groupTeacherEntity.getId());
             newLeader.setRole("leader");
+            newLeader.setDataset(request.getDataset());
             mappingEntities.add(newLeader);
         }
         groupTeacherMappingRepository.saveAll(mappingEntities);
@@ -71,17 +73,18 @@ public class GroupTeacherServiceHelper {
     @Async("async-thread-pool")
     public void uploadExcelGroupTeacherMapping(UploadGroupTeacherMappingRequest request) {
         for (GroupTeacherMappingUpload groupTeacherMapping : request.getGroupTeacherMappingCreateRequests()) {
-            List<GroupTeacherEntity> groupTeacherEntities = groupTeacherRepository.findByName(groupTeacherMapping.getGroupName());
+            List<GroupTeacherEntity> groupTeacherEntities = groupTeacherRepository.findByNameAndDataset(groupTeacherMapping.getGroupName(), request.getDataset());
             Long groupId = CollectionUtils.isEmpty(groupTeacherEntities) ? 1L : groupTeacherEntities.get(0).getId();
-            List<TeacherEntity> teacherEntities = teacherRepository.findByFullName(groupTeacherMapping.getTeacherName());
+            List<TeacherEntity> teacherEntities = teacherRepository.findByFullNameAndDataset(groupTeacherMapping.getTeacherName(), request.getDataset());
             Long teacherId = CollectionUtils.isEmpty(teacherEntities) ? 1L : teacherEntities.get(0).getId();
 
-            List<GroupTeacherMappingEntity> entity = groupTeacherMappingRepository.findByGroupIdAndTeacherId(groupId, teacherId);
+            List<GroupTeacherMappingEntity> entity = groupTeacherMappingRepository.findByGroupIdAndTeacherIdAndDataset(groupId, teacherId, request.getDataset());
             if (CollectionUtils.isEmpty(entity)) {
                 GroupTeacherMappingEntity groupTeacherMappingEntity = new GroupTeacherMappingEntity();
                 groupTeacherMappingEntity.setGroupId(groupId);
                 groupTeacherMappingEntity.setTeacherId(teacherId);
                 groupTeacherMappingEntity.setRole(groupTeacherMapping.getRole());
+                groupTeacherMappingEntity.setDataset(request.getDataset());
                 groupTeacherMappingRepository.save(groupTeacherMappingEntity);
             }
         }

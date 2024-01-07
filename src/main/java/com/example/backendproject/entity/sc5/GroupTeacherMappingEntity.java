@@ -27,4 +27,7 @@ public class GroupTeacherMappingEntity implements Serializable {
 
     @Column(name = "role")
     private String role;
+
+    @Column(name = "dataset")
+    private Long dataset;
 }

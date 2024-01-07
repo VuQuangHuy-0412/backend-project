@@ -82,4 +82,7 @@ public class ClassEntity implements Serializable {
 
     @Column(name = "program")
     private String program;
+
+    @Column(name = "dataset")
+    private Long dataset;
 }

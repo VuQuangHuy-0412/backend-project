@@ -13,4 +13,6 @@ public class GroupTeacherMapping {
     private Long groupId;
 
     private String role;
+
+    private Long dataset;
 }

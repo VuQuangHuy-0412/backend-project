@@ -118,6 +118,7 @@ public class StudentProjectService {
             studentProjectEntity.setProjectType(studentProject.getProjectType());
             studentProjectEntity.setProjectName(studentProject.getProjectName());
             studentProjectEntity.setClassId(studentProject.getClassId());
+            studentProjectEntity.setDataset(studentProject.getDataset());
         }
         studentProjectEntity.setTeacherAssignedId(studentProject.getTeacherAssignedId());
         studentProjectEntity.setUpdatedAt(new Date());

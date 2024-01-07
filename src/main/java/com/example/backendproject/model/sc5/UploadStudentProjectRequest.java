@@ -9,4 +9,5 @@ import java.util.List;
 @Setter
 public class UploadStudentProjectRequest {
     private List<StudentProjectUpload> studentProjectCreateRequests;
+    private Long dataset;
 }

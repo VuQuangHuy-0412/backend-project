@@ -5,6 +5,9 @@ import com.example.backendproject.repository.sc5.custom.RequiredConstraintReposi
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface RequiredConstraintRepository extends JpaRepository<RequiredConstraintEntity, Long>, RequiredConstraintRepositoryCustom {
+    List<RequiredConstraintEntity> findByStatusAndDataset(Integer status, Long dataset);
 }

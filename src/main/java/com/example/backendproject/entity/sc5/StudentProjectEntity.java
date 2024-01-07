@@ -58,4 +58,7 @@ public class StudentProjectEntity implements Serializable {
 
     @Column(name = "project_name")
     private String projectName;
+
+    @Column(name = "dataset")
+    private Long dataset;
 }
