@@ -7,6 +7,7 @@ import com.example.backendproject.entity.sc5.StudentProjectEntity;
 import com.example.backendproject.repository.sc5.ClassRepository;
 import com.example.backendproject.repository.sc5.StudentProjectRepository;
 import com.example.backendproject.service.AdminLogService;
+import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -75,7 +76,7 @@ public class FileExportService {
             Cell cellTitle = rowTitle.createCell(0);
             cellTitle.setCellValue("DANH SÁCH LỚP HỌC SAU PHÂN CÔNG");
             cellTitle.setCellStyle(styleHeader);
-            listTimetablingTeacher.addMergedRegion(new CellRangeAddress(0, 0, 0, 12));
+            listTimetablingTeacher.addMergedRegion(new CellRangeAddress(0, 0, 0, 14));
             // header row
             row += 1;
             Row headerRow = listTimetablingTeacher.createRow(row);
@@ -120,30 +121,40 @@ public class FileExportService {
             cellTimeOfDay.setCellStyle(styleHeader);
             listTimetablingTeacher.setColumnWidth(7, ((int) (12 * 1.14388)) * 256);
 
-            Cell cellTimeOfClass = headerRow.createCell(8);
+            Cell cellStartTime = headerRow.createCell(8);
+            cellStartTime.setCellValue("Thời gian bắt đầu");
+            cellStartTime.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(8, ((int) (12 * 1.14388)) * 256);
+
+            Cell cellEndTime = headerRow.createCell(9);
+            cellEndTime.setCellValue("Thời gian kết thúc");
+            cellEndTime.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(9, ((int) (12 * 1.14388)) * 256);
+
+            Cell cellTimeOfClass = headerRow.createCell(10);
             cellTimeOfClass.setCellValue("Số giờ GD");
             cellTimeOfClass.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(8, ((int) (6 * 1.14388)) * 256);
-
-            Cell cellLanguageId = headerRow.createCell(9);
-            cellLanguageId.setCellValue("ID ngôn ngữ");
-            cellLanguageId.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(9, ((int) (6 * 1.14388)) * 256);
-
-            Cell cellBuilding = headerRow.createCell(10);
-            cellBuilding.setCellValue("Toà nhà");
-            cellBuilding.setCellStyle(styleHeader);
             listTimetablingTeacher.setColumnWidth(10, ((int) (6 * 1.14388)) * 256);
 
-            Cell cellRoom = headerRow.createCell(11);
-            cellRoom.setCellValue("Phòng học");
-            cellRoom.setCellStyle(styleHeader);
+            Cell cellLanguageId = headerRow.createCell(11);
+            cellLanguageId.setCellValue("ID ngôn ngữ");
+            cellLanguageId.setCellStyle(styleHeader);
             listTimetablingTeacher.setColumnWidth(11, ((int) (6 * 1.14388)) * 256);
 
-            Cell cellTeacherId = headerRow.createCell(12);
+            Cell cellBuilding = headerRow.createCell(12);
+            cellBuilding.setCellValue("Toà nhà");
+            cellBuilding.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(12, ((int) (6 * 1.14388)) * 256);
+
+            Cell cellRoom = headerRow.createCell(13);
+            cellRoom.setCellValue("Phòng học");
+            cellRoom.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(13, ((int) (6 * 1.14388)) * 256);
+
+            Cell cellTeacherId = headerRow.createCell(14);
             cellTeacherId.setCellValue("Giảng viên phụ trách");
             cellTeacherId.setCellStyle(styleHeader);
-            listTimetablingTeacher.setColumnWidth(12, ((int) (6 * 1.14388)) * 256);
+            listTimetablingTeacher.setColumnWidth(14, ((int) (6 * 1.14388)) * 256);
 
             for (ClassEntity classEntity : entities) {
                 row += 1;
@@ -178,26 +189,34 @@ public class FileExportService {
                 dayOfWeek.setCellStyle(styleLeft);
 
                 Cell timeOfDay = rowClass.createCell(7);
-                timeOfDay.setCellValue(classEntity.getTimeOfDay());
+                timeOfDay.setCellValue(StringUtils.isBlank(classEntity.getTimeOfDay()) ? "" : classEntity.getTimeOfDay());
                 timeOfDay.setCellStyle(styleLeft);
 
-                Cell timeOfClass = rowClass.createCell(8);
+                Cell startTime = rowClass.createCell(8);
+                startTime.setCellValue(classEntity.getStartTime() == null ? "" : String.valueOf(classEntity.getStartTime()));
+                startTime.setCellStyle(styleLeft);
+
+                Cell endTime = rowClass.createCell(9);
+                endTime.setCellValue(classEntity.getEndTime() == null ? "" : String.valueOf(classEntity.getEndTime()));
+                endTime.setCellStyle(styleLeft);
+
+                Cell timeOfClass = rowClass.createCell(10);
                 timeOfClass.setCellValue(classEntity.getTimeOfClass());
                 timeOfClass.setCellStyle(styleLeft);
 
-                Cell languageId = rowClass.createCell(9);
+                Cell languageId = rowClass.createCell(11);
                 languageId.setCellValue(classEntity.getLanguageId());
                 languageId.setCellStyle(styleLeft);
 
-                Cell building = rowClass.createCell(10);
+                Cell building = rowClass.createCell(12);
                 building.setCellValue(classEntity.getBuilding());
                 building.setCellStyle(styleLeft);
 
-                Cell room = rowClass.createCell(11);
+                Cell room = rowClass.createCell(13);
                 room.setCellValue(classEntity.getRoom());
                 room.setCellStyle(styleLeft);
 
-                Cell teacherId = rowClass.createCell(12);
+                Cell teacherId = rowClass.createCell(14);
                 teacherId.setCellValue(classEntity.getTeacherId());
                 teacherId.setCellStyle(styleLeft);
             }
