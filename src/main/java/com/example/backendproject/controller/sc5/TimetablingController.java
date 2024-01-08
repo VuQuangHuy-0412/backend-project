@@ -38,13 +38,13 @@ public class TimetablingController {
 
     @GetMapping("/timetable/teacher")
     @ApiDescription(value = "Thời khóa biểu GD của GV", code = "timetable_teacher_get")
-    public TimetableTeacher getTimeTableOfTeacher(@RequestParam(name = "teacherId") Long teacherId, @RequestParam(name = "dataset") Long dataset) {
+    public TimetableTeacher getTimeTableOfTeacher(Long teacherId, Long dataset) {
         return timetablingService.getTimeTableOfTeacher(teacherId, dataset);
     }
 
     @GetMapping("/timetable/student")
     @ApiDescription(value = "Lịch HD của GV", code = "timetable_student_get")
-    public TimetableStudent getTimeTableOfStudent(@RequestParam(name = "teacherId") Long teacherId, @RequestParam(name = "dataset") Long dataset) {
+    public TimetableStudent getTimeTableOfStudent(Long teacherId, Long dataset) {
         return timeTablingStudentService.getTimeTableOfStudent(teacherId, dataset);
     }
 
