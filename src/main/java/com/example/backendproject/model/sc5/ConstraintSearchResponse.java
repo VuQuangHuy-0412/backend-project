@@ -10,4 +10,5 @@ import java.util.List;
 public class ConstraintSearchResponse {
     private List<CustomConstraint> customConstraints;
     private List<RequiredConstraint> requiredConstraints;
+    private List<ObjectiveFunction> objectiveFunctions;
 }

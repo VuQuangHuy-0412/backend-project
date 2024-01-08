@@ -43,6 +43,21 @@ public class ConstraintService {
     public ConstraintSearchResponse searchConstraint(ConstraintSearchRequest request) {
         ConstraintSearchResponse response = new ConstraintSearchResponse();
 
+        List<ObjectiveFunction> objectiveFunctions = new ArrayList<>();
+        ObjectiveFunction objectiveFunction1 = new ObjectiveFunction();
+        objectiveFunction1.setCode("OF1");
+        objectiveFunction1.setValue("Mức độ chênh lệch lớn nhất giữa tổng số giờ giảng dạy của 1 giảng viên và tích giữa số giờ giảng dạy tối đa của giảng viên với tỉ lệ giờ giảng dạy trung bình là nhỏ nhất");
+        objectiveFunction1.setStatus(1);
+        objectiveFunction1.setType("teacher");
+        objectiveFunctions.add(objectiveFunction1);
+        ObjectiveFunction objectiveFunction2 = new ObjectiveFunction();
+        objectiveFunction2.setCode("OF2");
+        objectiveFunction2.setValue("Mức độ chênh lệch lớn nhất giữa tổng số giờ hướng dẫn của 1 giảng viên và tích giữa số giờ hướng dẫn tối đa của giảng viên với tỉ lệ giờ hướng dẫn trung bình là nhỏ nhất");
+        objectiveFunction2.setStatus(1);
+        objectiveFunction2.setType("student");
+        objectiveFunctions.add(objectiveFunction2);
+        response.setObjectiveFunctions(objectiveFunctions);
+
         List<CustomConstraint> customConstraints = customConstraintRepository.searchCustomConstraintByFilter(request);
         response.setCustomConstraints(customConstraints);
 
