@@ -65,11 +65,6 @@ public class TeacherService {
         response.setPage(request.getPage() + 1);
         response.setPageSize(request.getPageSize());
 
-        if (request.getDataset() == null) {
-            response.setData(new ArrayList<>());
-            return response;
-        }
-
         if (request.getGroupTeacher() != null) {
             List<GroupTeacherMappingEntity> groupTeacherMappingEntities = groupTeacherMappingRepository.findAllByGroupIdAndDataset(request.getGroupTeacher(), request.getDataset());
             if (CollectionUtils.isEmpty(groupTeacherMappingEntities)) {
@@ -82,9 +77,9 @@ public class TeacherService {
 
         List<Teacher> data = teacherRepository.searchTeacherByFilter(request);
         for (Teacher teacher : data) {
-            List<GroupTeacherMappingEntity> mappingEntities = groupTeacherMappingRepository.findAllByTeacherIdAndDataset(teacher.getId(), request.getDataset());
+            List<GroupTeacherMappingEntity> mappingEntities = groupTeacherMappingRepository.findAllByTeacherIdAndDataset(teacher.getId(), teacher.getDataset());
             List<Long> groupIds = mappingEntities.stream().map(GroupTeacherMappingEntity::getGroupId).toList();
-            List<GroupTeacherEntity> groupTeacherEntities = groupTeacherRepository.findAllByIdInAndDataset(groupIds, request.getDataset());
+            List<GroupTeacherEntity> groupTeacherEntities = groupTeacherRepository.findAllByIdInAndDataset(groupIds, teacher.getDataset());
 
             teacher.setGroupTeacher(groupTeacherMapper.toDtos(groupTeacherEntities));
         }
@@ -161,8 +156,12 @@ public class TeacherService {
     }
 
     public void uploadFileTeacher(UploadTeacherRequest request) {
-        if (request == null || CollectionUtils.isEmpty(request.getTeacherCreateRequests()) || request.getDataset() == null) {
+        if (request == null || CollectionUtils.isEmpty(request.getTeacherCreateRequests())) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        if (request.getDataset() == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng chọn bộ dữ liệu khi upload file");
         }
 
         for (TeacherUpload teacher : request.getTeacherCreateRequests()) {
@@ -215,8 +214,12 @@ public class TeacherService {
     }
 
     public void uploadFileLanguageTeacherMapping(UploadLanguageTeacherRequest request) {
-        if (request == null || CollectionUtils.isEmpty(request.getLanguageTeacherCreateRequests()) || request.getDataset() == null) {
+        if (request == null || CollectionUtils.isEmpty(request.getLanguageTeacherCreateRequests())) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        if (request.getDataset() == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng chọn bộ dữ liệu khi upload file");
         }
 
         for (LanguageTeacherMappingUpload languageTeacherMapping : request.getLanguageTeacherCreateRequests()) {

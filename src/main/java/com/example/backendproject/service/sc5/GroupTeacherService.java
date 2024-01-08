@@ -61,11 +61,6 @@ public class GroupTeacherService {
         response.setPage(request.getPage() + 1);
         response.setPageSize(request.getPageSize());
 
-        if (request.getDataset() == null) {
-            response.setData(new ArrayList<>());
-            return response;
-        }
-
         List<GroupTeacher> data = groupTeacherRepository.searchGroupTeacherByFilter(request);
         for (GroupTeacher groupTeacher : data) {
             if (groupTeacher.getLeader() != null) {
@@ -132,8 +127,12 @@ public class GroupTeacherService {
     }
 
     public void uploadFileGroupTeacher(UploadGroupTeacherRequest request) {
-        if (request == null || CollectionUtils.isEmpty(request.getGroupTeacherCreateRequests()) || request.getDataset() == null) {
+        if (request == null || CollectionUtils.isEmpty(request.getGroupTeacherCreateRequests())) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        if (request.getDataset() == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng chọn bộ dữ liệu khi upload file");
         }
 
         for (GroupTeacherUpload groupTeacherUpload : request.getGroupTeacherCreateRequests()) {
@@ -143,12 +142,9 @@ public class GroupTeacherService {
         groupTeacherServiceHelper.uploadFileGroupTeacher(request);
     }
 
-    public GroupTeacherSearchResponse getAllGroupTeacher(Long dataset) {
-        if (dataset == null) {
-            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
-        }
+    public GroupTeacherSearchResponse getAllGroupTeacher() {
         GroupTeacherSearchResponse response = new GroupTeacherSearchResponse();
-        List<GroupTeacherEntity> allGroup = groupTeacherRepository.findByDataset(dataset);
+        List<GroupTeacherEntity> allGroup = groupTeacherRepository.findAll();
 
         response.setData(groupTeacherMapper.toDtos(allGroup));
         return response;
@@ -227,8 +223,12 @@ public class GroupTeacherService {
     }
 
     public void uploadExcelGroupTeacherMapping(UploadGroupTeacherMappingRequest request) {
-        if (request == null || CollectionUtils.isEmpty(request.getGroupTeacherMappingCreateRequests()) || request.getDataset() == null) {
+        if (request == null || CollectionUtils.isEmpty(request.getGroupTeacherMappingCreateRequests())) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        if (request.getDataset() == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng chọn bộ dữ liệu khi upload file");
         }
 
         for (GroupTeacherMappingUpload groupTeacherMapping : request.getGroupTeacherMappingCreateRequests()) {

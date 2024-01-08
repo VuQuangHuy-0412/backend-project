@@ -39,8 +39,8 @@ public class GroupTeacherController {
 
     @GetMapping(value = "/group-teacher/all")
     @ApiDescription(value = "Lấy danh sách toàn bộ nhóm chuyên môn", code = "group_teacher_get_all")
-    public GroupTeacherSearchResponse getAllGroupTeacher(Long dataset) {
-        return groupTeacherService.getAllGroupTeacher(dataset);
+    public GroupTeacherSearchResponse getAllGroupTeacher() {
+        return groupTeacherService.getAllGroupTeacher();
     }
 
     @GetMapping(value = "/group-teacher/detail/{id}")

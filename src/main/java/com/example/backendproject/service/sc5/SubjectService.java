@@ -52,11 +52,6 @@ public class SubjectService {
         response.setPage(request.getPage() + 1);
         response.setPageSize(request.getPageSize());
 
-        if (request.getDataset() == null) {
-            response.setData(new ArrayList<>());
-            return response;
-        }
-
         List<Subject> data = subjectRepository.searchSubjectByFilter(request);
         for (Subject subject : data) {
             if (subject.getGroupId() != null) {
@@ -125,8 +120,12 @@ public class SubjectService {
     }
 
     public void uploadFileSubject(UploadSubjectRequest request) {
-        if (request == null || CollectionUtils.isEmpty(request.getSubjectCreateRequests()) || request.getDataset() == null) {
+        if (request == null || CollectionUtils.isEmpty(request.getSubjectCreateRequests())) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        if (request.getDataset() == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng chọn bộ dữ liệu khi upload file");
         }
 
         for (SubjectUpload subject : request.getSubjectCreateRequests()) {

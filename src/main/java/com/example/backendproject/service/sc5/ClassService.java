@@ -61,11 +61,6 @@ public class ClassService {
         response.setPage(request.getPage() + 1);
         response.setPageSize(request.getPageSize());
 
-        if (request.getDataset() == null) {
-            response.setData(new ArrayList<>());
-            return response;
-        }
-
         List<Class> data = classRepository.searchClassByFilter(request);
         for (Class classDto : data) {
             if (classDto.getSubjectId() != null) {
@@ -148,8 +143,12 @@ public class ClassService {
     }
 
     public void uploadFileClass(UploadClassRequest request) {
-        if (request == null || CollectionUtils.isEmpty(request.getClassCreateRequests()) || request.getDataset() == null) {
+        if (request == null || CollectionUtils.isEmpty(request.getClassCreateRequests())) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        if (request.getDataset() == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng chọn bộ dữ liệu khi upload file");
         }
 
         for (ClassUpload classUpload : request.getClassCreateRequests()) {

@@ -53,11 +53,6 @@ public class StudentProjectService {
         response.setPage(request.getPage() + 1);
         response.setPageSize(request.getPageSize());
 
-        if (request.getDataset() == null) {
-            response.setData(new ArrayList<>());
-            return response;
-        }
-
         List<StudentProject> data = studentProjectRepository.searchStudentProjectByFilter(request);
         for (StudentProject studentProject : data) {
             if (studentProject.getTeacher1Id() != null) {
@@ -138,8 +133,12 @@ public class StudentProjectService {
     }
 
     public void uploadFileStudentProject(UploadStudentProjectRequest request) {
-        if (request == null || CollectionUtils.isEmpty(request.getStudentProjectCreateRequests()) || request.getDataset() == null) {
+        if (request == null || CollectionUtils.isEmpty(request.getStudentProjectCreateRequests())) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        if (request.getDataset() == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng chọn bộ dữ liệu khi upload file");
         }
 
         for (StudentProjectUpload studentProject : request.getStudentProjectCreateRequests()) {

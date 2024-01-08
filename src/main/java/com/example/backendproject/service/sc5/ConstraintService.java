@@ -43,12 +43,6 @@ public class ConstraintService {
     public ConstraintSearchResponse searchConstraint(ConstraintSearchRequest request) {
         ConstraintSearchResponse response = new ConstraintSearchResponse();
 
-        if (request.getDataset() == null) {
-            response.setRequiredConstraints(new ArrayList<>());
-            response.setCustomConstraints(new ArrayList<>());
-            return response;
-        }
-
         List<CustomConstraint> customConstraints = customConstraintRepository.searchCustomConstraintByFilter(request);
         response.setCustomConstraints(customConstraints);
 
