@@ -187,16 +187,16 @@ public class TimetablingServiceHelper {
         List<TeacherClassMapping> teacherClassMappings = new ArrayList<>();
         for (TeacherEntity teacherEntity : teacherEntities) {
             for (GroupTeacherMappingEntity groupTeacherMappingEntity : groupTeacherMappingEntities) {
-                if (teacherEntity.getId().equals(groupTeacherMappingEntity.getTeacherId())) {
+                if (groupTeacherMappingEntity.getTeacherId() != null && teacherEntity.getId().equals(groupTeacherMappingEntity.getTeacherId())) {
                     for (SubjectEntity subjectEntity : subjectEntities) {
-                        if (subjectEntity.getGroupId() != null && subjectEntity.getGroupId().equals(groupTeacherMappingEntity.getGroupId())) {
+                        if (subjectEntity.getGroupId() != null && groupTeacherMappingEntity.getGroupId() != null && subjectEntity.getGroupId().equals(groupTeacherMappingEntity.getGroupId())) {
                             for (ClassEntity classEntity : classEntities) {
-                                if (subjectEntity.getId().equals(classEntity.getSubjectId())) {
+                                if (classEntity.getSubjectId() != null && subjectEntity.getId().equals(classEntity.getSubjectId())) {
                                     for (LanguageTeacherMappingEntity languageTeacherMappingEntity : inputData.getLanguageTeacherMappings()) {
                                         if (languageTeacherMappingEntity.getTeacherId() != null &&
                                                 languageTeacherMappingEntity.getTeacherId().equals(teacherEntity.getId()) &&
                                                 languageTeacherMappingEntity.getLanguageId() != null &&
-                                                languageTeacherMappingEntity.getLanguageId().equals(classEntity.getId())) {
+                                                languageTeacherMappingEntity.getLanguageId().equals(classEntity.getLanguageId())) {
                                             TeacherClassMapping teacherClassMapping = new TeacherClassMapping();
                                             teacherClassMapping.setClassId(classEntity.getId());
                                             teacherClassMapping.setTeacherId(teacherEntity.getId());
