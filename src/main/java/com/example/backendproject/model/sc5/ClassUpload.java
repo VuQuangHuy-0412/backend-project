@@ -22,8 +22,6 @@ public class ClassUpload {
 
     private String languageName;
 
-    private String building;
-
     private String room;
 
     private Integer startTime;

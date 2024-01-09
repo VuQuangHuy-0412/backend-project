@@ -9,6 +9,7 @@ import com.example.backendproject.model.sc5.UploadClassRequest;
 import com.example.backendproject.repository.sc5.ClassRepository;
 import com.example.backendproject.repository.sc5.LanguageRepository;
 import com.example.backendproject.repository.sc5.SubjectRepository;
+import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -44,8 +45,12 @@ public class ClassServiceHelper {
             classEntity.setSemester(classDto.getSemester());
             classEntity.setWeek(classDto.getWeek());
             classEntity.setDayOfWeek(classDto.getDayOfWeek());
-            classEntity.setBuilding(classDto.getBuilding());
-            classEntity.setRoom(classDto.getRoom());
+            String room = classDto.getRoom();
+            if (!StringUtils.isBlank(room)) {
+                String[] rooms = room.split("-");
+                classEntity.setBuilding(rooms[0]);
+                classEntity.setRoom(rooms[rooms.length - 1]);
+            }
             classEntity.setStartTime(classDto.getStartTime());
             classEntity.setEndTime(classDto.getEndTime());
             classEntity.setClassType(classDto.getClassType());
