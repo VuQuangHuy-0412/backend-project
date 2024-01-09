@@ -24,13 +24,11 @@ public class ClassUpload {
 
     private String room;
 
-    private Integer startTime;
-
-    private Integer endTime;
+    private String timeInDay;
 
     private Integer numberOfStudent;
 
-    private Integer numberOfCredits;
+    private String numberOfCredits;
 
     private String classType;
 

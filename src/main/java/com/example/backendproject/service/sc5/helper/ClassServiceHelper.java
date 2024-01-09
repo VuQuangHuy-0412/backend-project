@@ -51,11 +51,19 @@ public class ClassServiceHelper {
                 classEntity.setBuilding(rooms[0]);
                 classEntity.setRoom(rooms[rooms.length - 1]);
             }
-            classEntity.setStartTime(classDto.getStartTime());
-            classEntity.setEndTime(classDto.getEndTime());
+            String timeInDay = classDto.getTimeInDay();
+            if (!StringUtils.isBlank(timeInDay)) {
+                String[] times = timeInDay.split("-");
+                classEntity.setStartTime(Integer.parseInt(times[0]));
+                classEntity.setEndTime(Integer.parseInt(times[times.length - 1]));
+            }
             classEntity.setClassType(classDto.getClassType());
             classEntity.setNumberOfStudent(classDto.getNumberOfStudent());
-            classEntity.setNumberOfCredits(classDto.getNumberOfCredits());
+            String credits = classDto.getNumberOfCredits();
+            if (!StringUtils.isBlank(credits)) {
+                String[] credit = credits.split("\\(");
+                classEntity.setNumberOfCredits(Integer.parseInt(credit[0]));
+            }
             classEntity.setProgram(classDto.getProgram());
             classEntity.setDataset(request.getDataset());
 
@@ -65,7 +73,7 @@ public class ClassServiceHelper {
             }
             classEntity.setSubjectId(subjectEntity.get(0).getId());
 
-            Double timeOfClass = getTimeOfClass(classDto);
+            Double timeOfClass = getTimeOfClass(classEntity);
             classEntity.setTimeOfClass(timeOfClass);
             List<LanguageEntity> languageEntity = languageRepository.findByName(classDto.getLanguageName());
             classEntity.setLanguageId(CollectionUtils.isEmpty(languageEntity) ? 1L : languageEntity.get(0).getId());
@@ -75,7 +83,7 @@ public class ClassServiceHelper {
         }
     }
 
-    private Double getTimeOfClass(ClassUpload classUpload) {
+    private Double getTimeOfClass(ClassEntity classUpload) {
         try {
             int tl = getTl(classUpload);
             int semester = Integer.parseInt(classUpload.getSemester());
@@ -90,7 +98,7 @@ public class ClassServiceHelper {
         }
     }
 
-    private int getTl(ClassUpload classUpload) {
+    private int getTl(ClassEntity classUpload) {
         int startTime = classUpload.getStartTime();
         int endTime = classUpload.getEndTime();
 
