@@ -189,11 +189,14 @@ public class TimetablingServiceHelper {
             for (GroupTeacherMappingEntity groupTeacherMappingEntity : groupTeacherMappingEntities) {
                 if (teacherEntity.getId().equals(groupTeacherMappingEntity.getTeacherId())) {
                     for (SubjectEntity subjectEntity : subjectEntities) {
-                        if (subjectEntity.getGroupId().equals(groupTeacherMappingEntity.getGroupId())) {
+                        if (subjectEntity.getGroupId() != null && subjectEntity.getGroupId().equals(groupTeacherMappingEntity.getGroupId())) {
                             for (ClassEntity classEntity : classEntities) {
-                                if (classEntity.getSubjectId().equals(subjectEntity.getId())) {
+                                if (subjectEntity.getId().equals(classEntity.getSubjectId())) {
                                     for (LanguageTeacherMappingEntity languageTeacherMappingEntity : inputData.getLanguageTeacherMappings()) {
-                                        if (languageTeacherMappingEntity.getTeacherId().equals(teacherEntity.getId()) && languageTeacherMappingEntity.getLanguageId().equals(classEntity.getId())) {
+                                        if (languageTeacherMappingEntity.getTeacherId() != null &&
+                                                languageTeacherMappingEntity.getTeacherId().equals(teacherEntity.getId()) &&
+                                                languageTeacherMappingEntity.getLanguageId() != null &&
+                                                languageTeacherMappingEntity.getLanguageId().equals(classEntity.getId())) {
                                             TeacherClassMapping teacherClassMapping = new TeacherClassMapping();
                                             teacherClassMapping.setClassId(classEntity.getId());
                                             teacherClassMapping.setTeacherId(teacherEntity.getId());
