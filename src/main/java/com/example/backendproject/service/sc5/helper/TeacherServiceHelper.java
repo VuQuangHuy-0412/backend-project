@@ -60,20 +60,24 @@ public class TeacherServiceHelper {
     @Async("async-thread-pool")
     public void uploadFileLanguageTeacherMapping(UploadLanguageTeacherRequest request) {
         for (LanguageTeacherMappingUpload languageTeacherMapping : request.getLanguageTeacherCreateRequests()) {
-            List<TeacherEntity> teacherEntities = teacherRepository.findByFullNameAndDataset(languageTeacherMapping.getTeacherName(), request.getDataset());
-            if (!CollectionUtils.isEmpty(teacherEntities)) {
-                Long teacherId = teacherEntities.get(0).getId();
-                List<LanguageEntity> languageEntities = languageRepository.findByName(languageTeacherMapping.getLanguageName());
-                Long languageId = CollectionUtils.isEmpty(languageEntities) ? 2L : languageEntities.get(0).getId();
-                List<LanguageTeacherMappingEntity> entity = languageTeacherMappingRepository.findByTeacherIdAndLanguageIdAndDataset(
-                        teacherId, languageId, request.getDataset());
-                if (CollectionUtils.isEmpty(entity)) {
-                    LanguageTeacherMappingEntity languageTeacherMappingEntity = new LanguageTeacherMappingEntity();
-                    languageTeacherMappingEntity.setTeacherId(teacherId);
-                    languageTeacherMappingEntity.setLanguageId(languageId);
-                    languageTeacherMappingEntity.setDataset(request.getDataset());
-                    languageTeacherMappingRepository.save(languageTeacherMappingEntity);
+            try {
+                List<TeacherEntity> teacherEntities = teacherRepository.findByFullNameAndDataset(languageTeacherMapping.getTeacherName(), request.getDataset());
+                if (!CollectionUtils.isEmpty(teacherEntities)) {
+                    Long teacherId = teacherEntities.get(0).getId();
+                    List<LanguageEntity> languageEntities = languageRepository.findByName(languageTeacherMapping.getLanguageName());
+                    Long languageId = CollectionUtils.isEmpty(languageEntities) ? 2L : languageEntities.get(0).getId();
+                    List<LanguageTeacherMappingEntity> entity = languageTeacherMappingRepository.findByTeacherIdAndLanguageIdAndDataset(
+                            teacherId, languageId, request.getDataset());
+                    if (CollectionUtils.isEmpty(entity)) {
+                        LanguageTeacherMappingEntity languageTeacherMappingEntity = new LanguageTeacherMappingEntity();
+                        languageTeacherMappingEntity.setTeacherId(teacherId);
+                        languageTeacherMappingEntity.setLanguageId(languageId);
+                        languageTeacherMappingEntity.setDataset(request.getDataset());
+                        languageTeacherMappingRepository.save(languageTeacherMappingEntity);
+                    }
                 }
+            } catch (Exception ex) {
+                log.error(ex.getMessage());
             }
         }
     }

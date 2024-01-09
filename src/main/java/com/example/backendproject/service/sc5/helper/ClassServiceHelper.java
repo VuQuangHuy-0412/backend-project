@@ -9,8 +9,8 @@ import com.example.backendproject.model.sc5.UploadClassRequest;
 import com.example.backendproject.repository.sc5.ClassRepository;
 import com.example.backendproject.repository.sc5.LanguageRepository;
 import com.example.backendproject.repository.sc5.SubjectRepository;
-import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -39,45 +39,55 @@ public class ClassServiceHelper {
     @Async("async-thread-pool")
     public void uploadFileClass(UploadClassRequest request) {
         for (ClassUpload classDto : request.getClassCreateRequests()) {
-            ClassEntity classEntity = new ClassEntity();
-            classEntity.setName(classDto.getName());
-            classEntity.setCode(classDto.getCode());
-            classEntity.setSemester(classDto.getSemester());
-            classEntity.setWeek(classDto.getWeek());
-            classEntity.setDayOfWeek(classDto.getDayOfWeek());
-            String room = classDto.getRoom();
-            if (!StringUtils.isBlank(room)) {
-                String[] rooms = room.split("-");
-                classEntity.setBuilding(rooms[0]);
-                classEntity.setRoom(rooms[rooms.length - 1]);
-            }
-            String timeInDay = classDto.getTimeInDay();
-            if (!StringUtils.isBlank(timeInDay)) {
-                String[] times = timeInDay.split("-");
-                classEntity.setStartTime(Integer.parseInt(times[0]));
-                classEntity.setEndTime(Integer.parseInt(times[times.length - 1]));
-            }
-            classEntity.setClassType(classDto.getClassType());
-            classEntity.setNumberOfStudent(classDto.getNumberOfStudent());
-            String credits = classDto.getNumberOfCredits();
-            if (!StringUtils.isBlank(credits)) {
-                String[] credit = credits.split("\\(");
-                classEntity.setNumberOfCredits(Integer.parseInt(credit[0]));
-            }
-            classEntity.setProgram(classDto.getProgram());
-            classEntity.setDataset(request.getDataset());
+            try {
+                ClassEntity classEntity = new ClassEntity();
+                classEntity.setName(classDto.getName());
+                classEntity.setCode(classDto.getCode());
+                classEntity.setSemester(classDto.getSemester());
+                classEntity.setWeek(classDto.getWeek());
+                classEntity.setDayOfWeek(classDto.getDayOfWeek());
+                String room = classDto.getRoom();
+                if (!StringUtils.isBlank(room)) {
+                    String[] rooms = room.split("-");
+                    if (rooms.length > 0 && StringUtils.isNotBlank(rooms[0])) {
+                        classEntity.setBuilding(rooms[0]);
+                        classEntity.setRoom(rooms[rooms.length - 1]);
+                    }
+                }
+                String timeInDay = classDto.getTimeInDay();
+                if (!StringUtils.isBlank(timeInDay)) {
+                    String[] times = timeInDay.split("-");
+                    if (times.length > 0 && StringUtils.isNotBlank(times[0])) {
+                        classEntity.setStartTime(Integer.parseInt(times[0]));
+                        classEntity.setEndTime(Integer.parseInt(times[times.length - 1]));
+                    }
+                }
+                classEntity.setClassType(classDto.getClassType());
+                classEntity.setNumberOfStudent(classDto.getNumberOfStudent());
+                String credits = classDto.getNumberOfCredits();
+                if (!StringUtils.isBlank(credits)) {
+                    String[] credit = credits.split("\\(");
+                    if (credit.length > 0 && StringUtils.isNotBlank(credit[0])) {
+                        classEntity.setNumberOfCredits(Integer.parseInt(credit[0]));
+                    }
+                }
+                classEntity.setProgram(classDto.getProgram());
+                classEntity.setDataset(request.getDataset());
 
-            List<SubjectEntity> subjectEntity = subjectRepository.findByCodeAndDataset(classDto.getSubjectCode(), request.getDataset());
-            if (!CollectionUtils.isEmpty(subjectEntity)) {
-                classEntity.setSubjectId(subjectEntity.get(0).getId());
+                List<SubjectEntity> subjectEntity = subjectRepository.findByCodeAndDataset(classDto.getSubjectCode(), request.getDataset());
+                if (!CollectionUtils.isEmpty(subjectEntity)) {
+                    classEntity.setSubjectId(subjectEntity.get(0).getId());
 
-                Double timeOfClass = getTimeOfClass(classEntity);
-                classEntity.setTimeOfClass(timeOfClass);
-                List<LanguageEntity> languageEntity = languageRepository.findByName(classDto.getLanguageName());
-                classEntity.setLanguageId(CollectionUtils.isEmpty(languageEntity) ? 2L : languageEntity.get(0).getId());
-                classEntity.setCreatedAt(new Date());
-                classEntity.setUpdatedAt(new Date());
-                classRepository.save(classEntity);
+                    Double timeOfClass = getTimeOfClass(classEntity);
+                    classEntity.setTimeOfClass(timeOfClass);
+                    List<LanguageEntity> languageEntity = languageRepository.findByName(classDto.getLanguageName());
+                    classEntity.setLanguageId(CollectionUtils.isEmpty(languageEntity) ? 2L : languageEntity.get(0).getId());
+                    classEntity.setCreatedAt(new Date());
+                    classEntity.setUpdatedAt(new Date());
+                    classRepository.save(classEntity);
+                }
+            } catch(Exception ex) {
+                log.error(ex.getMessage());
             }
         }
     }
