@@ -68,18 +68,17 @@ public class ClassServiceHelper {
             classEntity.setDataset(request.getDataset());
 
             List<SubjectEntity> subjectEntity = subjectRepository.findByCodeAndDataset(classDto.getSubjectCode(), request.getDataset());
-            if (CollectionUtils.isEmpty(subjectEntity)) {
-                break;
-            }
-            classEntity.setSubjectId(subjectEntity.get(0).getId());
+            if (!CollectionUtils.isEmpty(subjectEntity)) {
+                classEntity.setSubjectId(subjectEntity.get(0).getId());
 
-            Double timeOfClass = getTimeOfClass(classEntity);
-            classEntity.setTimeOfClass(timeOfClass);
-            List<LanguageEntity> languageEntity = languageRepository.findByName(classDto.getLanguageName());
-            classEntity.setLanguageId(CollectionUtils.isEmpty(languageEntity) ? 1L : languageEntity.get(0).getId());
-            classEntity.setCreatedAt(new Date());
-            classEntity.setUpdatedAt(new Date());
-            classRepository.save(classEntity);
+                Double timeOfClass = getTimeOfClass(classEntity);
+                classEntity.setTimeOfClass(timeOfClass);
+                List<LanguageEntity> languageEntity = languageRepository.findByName(classDto.getLanguageName());
+                classEntity.setLanguageId(CollectionUtils.isEmpty(languageEntity) ? 2L : languageEntity.get(0).getId());
+                classEntity.setCreatedAt(new Date());
+                classEntity.setUpdatedAt(new Date());
+                classRepository.save(classEntity);
+            }
         }
     }
 

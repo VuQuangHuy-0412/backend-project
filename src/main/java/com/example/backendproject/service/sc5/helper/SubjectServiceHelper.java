@@ -37,14 +37,13 @@ public class SubjectServiceHelper {
             entity.setName(subject.getName());
             entity.setCode(subject.getCode());
             List<GroupTeacherEntity> groupTeacherEntities = groupTeacherRepository.findByNameAndDataset(subject.getName(), request.getDataset());
-            if (CollectionUtils.isEmpty(groupTeacherEntities)) {
-                break;
+            if (!CollectionUtils.isEmpty(groupTeacherEntities)) {
+                entity.setGroupId(groupTeacherEntities.get(0).getId());
+                entity.setDataset(request.getDataset());
+                entity.setCreatedAt(new Date());
+                entity.setUpdatedAt(new Date());
+                subjectRepository.save(entity);
             }
-            entity.setGroupId(groupTeacherEntities.get(0).getId());
-            entity.setDataset(request.getDataset());
-            entity.setCreatedAt(new Date());
-            entity.setUpdatedAt(new Date());
-            subjectRepository.save(entity);
         }
     }
 }
