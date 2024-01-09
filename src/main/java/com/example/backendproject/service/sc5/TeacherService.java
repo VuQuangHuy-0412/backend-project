@@ -236,8 +236,8 @@ public class TeacherService {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Bộ dữ liệu không hợp lệ");
         }
 
-        double allTimeGd = classEntities.stream().map(ClassEntity::getTimeOfClass).reduce(0d, Double::sum);
-        double allTimeHd = studentProjectEntities.stream().map(StudentProjectEntity::getTimeHd).reduce(0d, Double::sum);
+        double allTimeGd = classEntities.stream().map(ClassEntity::getTimeOfClass).filter(Objects::nonNull).reduce(0d, Double::sum);
+        double allTimeHd = studentProjectEntities.stream().map(StudentProjectEntity::getTimeHd).filter(Objects::nonNull).reduce(0d, Double::sum);
 
         double rateGd = allTimeGd/(allTimeHd + allTimeGd);
         double rateHd = allTimeHd/(allTimeHd + allTimeGd);
@@ -245,6 +245,7 @@ public class TeacherService {
             teacherEntity.setGdTime(rateGd * teacherEntity.getTotalTime());
             teacherEntity.setHdTime(rateHd * teacherEntity.getTotalTime());
             teacherEntity.setUpdatedAt(new Date());
+            teacherRepository.save(teacherEntity);
         }
     }
 }
