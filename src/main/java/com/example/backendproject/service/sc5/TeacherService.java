@@ -175,10 +175,6 @@ public class TeacherService {
         if (StringUtils.isBlank(teacher.getFullName())) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Thiếu thông tin tên giảng viên.");
         }
-
-        if (teacher.getStatus() == null || !TeacherConstant.Status.LIST_STATUS_VALID.contains(teacher.getStatus())) {
-            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Trạng thái không hợp lệ.");
-        }
     }
 
     public TeacherSearchResponse getAllTeacherByGroup(Long groupId, Long dataset) {

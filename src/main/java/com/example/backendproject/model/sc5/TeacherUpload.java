@@ -12,15 +12,5 @@ public class TeacherUpload {
 
     private String fullName;
 
-    private String rankAndDegree;
-
-    private Date startTime;
-
-    private Date birthday;
-
-    private Float rating;
-
-    private Integer status;
-
     private Integer totalTime;
 }

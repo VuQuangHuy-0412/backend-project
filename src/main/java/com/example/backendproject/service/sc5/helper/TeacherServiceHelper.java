@@ -44,11 +44,11 @@ public class TeacherServiceHelper {
         for (TeacherUpload teacher : request.getTeacherCreateRequests()) {
             TeacherEntity entity = new TeacherEntity();
             entity.setFullName(teacher.getFullName());
-            entity.setRankAndDegree(teacher.getRankAndDegree());
-            entity.setStartTime(teacher.getStartTime());
-            entity.setBirthday(teacher.getBirthday());
-            entity.setRating(teacher.getRating());
-            entity.setStatus(teacher.getStatus());
+            entity.setRankAndDegree("GV");
+            entity.setStartTime(new Date());
+            entity.setBirthday(new Date());
+            entity.setRating(5.0f);
+            entity.setStatus(1);
             entity.setTotalTime(teacher.getTotalTime());
             entity.setDataset(request.getDataset());
             entity.setCreatedAt(new Date());
