@@ -52,11 +52,11 @@ public class GroupTeacherServiceHelper {
                 List<TeacherEntity> teacherEntity = teacherRepository.findByFullNameAndDataset(groupTeacherUpload.getLeaderName(), request.getDataset());
                 if (!CollectionUtils.isEmpty(teacherEntity)) {
                     entity.setLeader(teacherEntity.get(0).getId());
-                    entity.setDataset(request.getDataset());
-                    entity.setCreatedAt(new Date());
-                    entity.setUpdatedAt(new Date());
-                    entities.add(entity);
                 }
+                entity.setDataset(request.getDataset());
+                entity.setCreatedAt(new Date());
+                entity.setUpdatedAt(new Date());
+                entities.add(entity);
             } catch (Exception ex) {
                 log.error(ex.getMessage());
             }

@@ -40,11 +40,11 @@ public class SubjectServiceHelper {
                 List<GroupTeacherEntity> groupTeacherEntities = groupTeacherRepository.findByNameAndDataset(subject.getName(), request.getDataset());
                 if (!CollectionUtils.isEmpty(groupTeacherEntities)) {
                     entity.setGroupId(groupTeacherEntities.get(0).getId());
-                    entity.setDataset(request.getDataset());
-                    entity.setCreatedAt(new Date());
-                    entity.setUpdatedAt(new Date());
-                    subjectRepository.save(entity);
                 }
+                entity.setDataset(request.getDataset());
+                entity.setCreatedAt(new Date());
+                entity.setUpdatedAt(new Date());
+                subjectRepository.save(entity);
             } catch (Exception ex) {
                 log.error(ex.getMessage());
             }
