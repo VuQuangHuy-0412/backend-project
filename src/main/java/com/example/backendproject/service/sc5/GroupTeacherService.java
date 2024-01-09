@@ -135,6 +135,11 @@ public class GroupTeacherService {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng chọn bộ dữ liệu khi upload file");
         }
 
+        List<TeacherEntity> teacherEntities = teacherRepository.findByDataset(request.getDataset());
+        if (CollectionUtils.isEmpty(teacherEntities)) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng upload danh sách giảng viên trước");
+        }
+
         for (GroupTeacherUpload groupTeacherUpload : request.getGroupTeacherCreateRequests()) {
             validateCreateGroupTeacherRequestUpload(groupTeacherUpload);
         }
@@ -229,6 +234,12 @@ public class GroupTeacherService {
 
         if (request.getDataset() == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng chọn bộ dữ liệu khi upload file");
+        }
+
+        List<TeacherEntity> teacherEntities = teacherRepository.findByDataset(request.getDataset());
+        List<GroupTeacherEntity> groupTeacherEntities = groupTeacherRepository.findByDataset(request.getDataset());
+        if (CollectionUtils.isEmpty(teacherEntities) || CollectionUtils.isEmpty(groupTeacherEntities)) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng upload danh sách giảng viên và danh sách nhóm chuyên môn trước");
         }
 
         for (GroupTeacherMappingUpload groupTeacherMapping : request.getGroupTeacherMappingCreateRequests()) {

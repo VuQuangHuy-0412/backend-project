@@ -128,6 +128,11 @@ public class SubjectService {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng chọn bộ dữ liệu khi upload file");
         }
 
+        List<GroupTeacherEntity> groupTeacherEntities = groupTeacherRepository.findByDataset(request.getDataset());
+        if (CollectionUtils.isEmpty(groupTeacherEntities)) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng upload danh sách nhóm chuyên môn trước");
+        }
+
         for (SubjectUpload subject : request.getSubjectCreateRequests()) {
             validateCreateSubjectRequestUpload(subject);
         }

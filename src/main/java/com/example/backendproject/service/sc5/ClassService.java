@@ -3,6 +3,7 @@ package com.example.backendproject.service.sc5;
 import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.sc5.ClassEntity;
+import com.example.backendproject.entity.sc5.GroupTeacherEntity;
 import com.example.backendproject.entity.sc5.SubjectEntity;
 import com.example.backendproject.entity.sc5.TeacherEntity;
 import com.example.backendproject.mapper.ClassMapper;
@@ -149,6 +150,11 @@ public class ClassService {
 
         if (request.getDataset() == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng chọn bộ dữ liệu khi upload file");
+        }
+
+        List<SubjectEntity> subjectEntities = subjectRepository.findByDataset(request.getDataset());
+        if (CollectionUtils.isEmpty(subjectEntities)) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng upload danh sách học phần trước");
         }
 
         for (ClassUpload classUpload : request.getClassCreateRequests()) {

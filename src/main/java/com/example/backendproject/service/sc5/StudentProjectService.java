@@ -2,13 +2,12 @@ package com.example.backendproject.service.sc5;
 
 import com.example.backendproject.config.constant.ErrorEnum;
 import com.example.backendproject.config.exception.Sc5Exception;
-import com.example.backendproject.entity.sc5.StudentProjectEntity;
-import com.example.backendproject.entity.sc5.SubjectEntity;
-import com.example.backendproject.entity.sc5.TeacherEntity;
+import com.example.backendproject.entity.sc5.*;
 import com.example.backendproject.mapper.StudentProjectMapper;
 import com.example.backendproject.mapper.TeacherMapper;
 import com.example.backendproject.model.sc5.*;
 import com.example.backendproject.model.sc5.Class;
+import com.example.backendproject.repository.sc5.ClassRepository;
 import com.example.backendproject.repository.sc5.StudentProjectRepository;
 import com.example.backendproject.repository.sc5.TeacherRepository;
 import com.example.backendproject.service.AdminLogService;
@@ -33,19 +32,22 @@ public class StudentProjectService {
     private final StudentProjectServiceHelper studentProjectServiceHelper;
     private final TeacherRepository teacherRepository;
     private final TeacherMapper teacherMapper;
+    private final ClassRepository classRepository;
 
     public StudentProjectService(StudentProjectRepository studentProjectRepository,
                                  AdminLogService adminLogService,
                                  StudentProjectMapper studentProjectMapper,
                                  StudentProjectServiceHelper studentProjectServiceHelper,
                                  TeacherRepository teacherRepository,
-                                 TeacherMapper teacherMapper) {
+                                 TeacherMapper teacherMapper,
+                                 ClassRepository classRepository) {
         this.studentProjectRepository = studentProjectRepository;
         this.adminLogService = adminLogService;
         this.studentProjectMapper = studentProjectMapper;
         this.studentProjectServiceHelper = studentProjectServiceHelper;
         this.teacherRepository = teacherRepository;
         this.teacherMapper = teacherMapper;
+        this.classRepository = classRepository;
     }
 
     public StudentProjectSearchResponse searchStudentProject(StudentProjectSearchRequest request) {
@@ -139,6 +141,12 @@ public class StudentProjectService {
 
         if (request.getDataset() == null) {
             throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng chọn bộ dữ liệu khi upload file");
+        }
+
+        List<TeacherEntity> teacherEntities = teacherRepository.findByDataset(request.getDataset());
+        List<ClassEntity> classEntities = classRepository.findByDataset(request.getDataset());
+        if (CollectionUtils.isEmpty(teacherEntities) || CollectionUtils.isEmpty(classEntities)) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT_COMMON, "Vui lòng upload danh sách giảng viên và danh sách lớp học trước");
         }
 
         for (StudentProjectUpload studentProject : request.getStudentProjectCreateRequests()) {
