@@ -35,7 +35,7 @@ public class TimetablingServiceHelper {
     private final TimetablingProcessRepository timetablingProcessRepository;
     public static final Integer POPULATION_SIZE = 10;
     public static final Integer NUM_OF_CROSS = 2;
-    public static final Integer NUM_LOOP = 30;
+    public static final Integer NUM_LOOP = 20;
 
     public TimetablingServiceHelper(TeacherRepository teacherRepository,
                                     LanguageTeacherMappingRepository languageTeacherMappingRepository,
