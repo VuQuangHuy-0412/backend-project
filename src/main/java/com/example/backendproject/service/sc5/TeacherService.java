@@ -248,6 +248,7 @@ public class TeacherService {
         for (TeacherEntity teacherEntity : teacherEntities) {
             teacherEntity.setGdTime(rateGd * teacherEntity.getTotalTime());
             teacherEntity.setHdTime(rateHd * teacherEntity.getTotalTime());
+            teacherEntity.setUpdatedAt(new Date());
         }
     }
 }
