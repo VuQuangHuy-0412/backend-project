@@ -48,21 +48,21 @@ public class StudentProjectServiceHelper {
                 List<ClassEntity> classEntities = classRepository.findByCodeAndDataset(studentProject.getClassId(), request.getDataset());
                 if (!CollectionUtils.isEmpty(classEntities)) {
                     entity.setClassId(studentProject.getClassId());
-
-                    Double timeHd = getTimeHd(studentProject, request.getDataset());
-                    entity.setTimeHd(timeHd);
-
-                    List<TeacherEntity> teacher1Entity = teacherRepository.findByFullNameAndDataset(studentProject.getTeacher1Name(), request.getDataset());
-                    entity.setTeacher1Id(CollectionUtils.isEmpty(teacher1Entity) ? null : teacher1Entity.get(0).getId());
-                    List<TeacherEntity> teacher2Entity = teacherRepository.findByFullNameAndDataset(studentProject.getTeacher2Name(), request.getDataset());
-                    entity.setTeacher2Id(CollectionUtils.isEmpty(teacher2Entity) ? null : teacher2Entity.get(0).getId());
-                    List<TeacherEntity> teacher3Entity = teacherRepository.findByFullNameAndDataset(studentProject.getTeacher3Name(), request.getDataset());
-                    entity.setTeacher3Id(CollectionUtils.isEmpty(teacher3Entity) ? null : teacher3Entity.get(0).getId());
-                    entity.setDataset(request.getDataset());
-                    entity.setCreatedAt(new Date());
-                    entity.setUpdatedAt(new Date());
-                    studentProjectRepository.save(entity);
                 }
+
+                Double timeHd = getTimeHd(studentProject, request.getDataset());
+                entity.setTimeHd(timeHd);
+
+                List<TeacherEntity> teacher1Entity = teacherRepository.findByFullNameAndDataset(studentProject.getTeacher1Name(), request.getDataset());
+                entity.setTeacher1Id(CollectionUtils.isEmpty(teacher1Entity) ? null : teacher1Entity.get(0).getId());
+                List<TeacherEntity> teacher2Entity = teacherRepository.findByFullNameAndDataset(studentProject.getTeacher2Name(), request.getDataset());
+                entity.setTeacher2Id(CollectionUtils.isEmpty(teacher2Entity) ? null : teacher2Entity.get(0).getId());
+                List<TeacherEntity> teacher3Entity = teacherRepository.findByFullNameAndDataset(studentProject.getTeacher3Name(), request.getDataset());
+                entity.setTeacher3Id(CollectionUtils.isEmpty(teacher3Entity) ? null : teacher3Entity.get(0).getId());
+                entity.setDataset(request.getDataset());
+                entity.setCreatedAt(new Date());
+                entity.setUpdatedAt(new Date());
+                studentProjectRepository.save(entity);
             } catch (Exception ex) {
                 log.error(ex.getMessage());
             }
@@ -75,7 +75,7 @@ public class StudentProjectServiceHelper {
         String projectName = studentProjectUpload.getProjectName();
         List<ClassEntity> classEntity = classRepository.findByCodeAndDataset(classCode, dataset);
         if (CollectionUtils.isEmpty(classEntity)) {
-            return 0d;
+            return 1.0d;
         }
         if ("ĐAMH".equals(projectType)) {
             int numOfCredits = classEntity.get(0).getNumberOfCredits();

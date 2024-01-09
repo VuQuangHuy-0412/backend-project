@@ -77,16 +77,16 @@ public class ClassServiceHelper {
                 List<SubjectEntity> subjectEntity = subjectRepository.findByCodeAndDataset(classDto.getSubjectCode(), request.getDataset());
                 if (!CollectionUtils.isEmpty(subjectEntity)) {
                     classEntity.setSubjectId(subjectEntity.get(0).getId());
-
-                    Double timeOfClass = getTimeOfClass(classEntity);
-                    classEntity.setTimeOfClass(timeOfClass);
-                    List<LanguageEntity> languageEntity = languageRepository.findByName(classDto.getLanguageName());
-                    classEntity.setLanguageId(CollectionUtils.isEmpty(languageEntity) ? 2L : languageEntity.get(0).getId());
-                    classEntity.setCreatedAt(new Date());
-                    classEntity.setUpdatedAt(new Date());
-                    classRepository.save(classEntity);
                 }
-            } catch(Exception ex) {
+
+                Double timeOfClass = getTimeOfClass(classEntity);
+                classEntity.setTimeOfClass(timeOfClass);
+                List<LanguageEntity> languageEntity = languageRepository.findByName(classDto.getLanguageName());
+                classEntity.setLanguageId(CollectionUtils.isEmpty(languageEntity) ? 2L : languageEntity.get(0).getId());
+                classEntity.setCreatedAt(new Date());
+                classEntity.setUpdatedAt(new Date());
+                classRepository.save(classEntity);
+            } catch (Exception ex) {
                 log.error(ex.getMessage());
             }
         }
@@ -118,28 +118,28 @@ public class ClassServiceHelper {
     private double getKc(int semester, String classType, String program) {
         List<String> LTBT = List.of("LT", "BT", "LT+BT");
         List<String> THTN = List.of("TH", "TN");
-        if ("CT CHUẨN".equals(program) && semester % 10 != 3  && LTBT.contains(classType)) {
+        if ("CT CHUẨN".equals(program) && semester % 10 != 3 && LTBT.contains(classType)) {
             return 1.5;
         }
-        if ("CT CHUẨN".equals(program) && semester % 10 != 3  && THTN.contains(classType)) {
+        if ("CT CHUẨN".equals(program) && semester % 10 != 3 && THTN.contains(classType)) {
             return 1.0;
         }
-        if ("CT CHUẨN".equals(program) && semester % 10 == 3  && LTBT.contains(classType)) {
+        if ("CT CHUẨN".equals(program) && semester % 10 == 3 && LTBT.contains(classType)) {
             return 2.5;
         }
-        if ("CT CHUẨN".equals(program) && semester % 10 == 3  && THTN.contains(classType)) {
+        if ("CT CHUẨN".equals(program) && semester % 10 == 3 && THTN.contains(classType)) {
             return 1.5;
         }
-        if ("ELITECH".equals(program)  && THTN.contains(classType)) {
+        if ("ELITECH".equals(program) && THTN.contains(classType)) {
             return 1.5;
         }
-        if ("ELITECH".equals(program)  && LTBT.contains(classType)) {
+        if ("ELITECH".equals(program) && LTBT.contains(classType)) {
             return 1.8;
         }
-        if ("SIE".equals(program)  && LTBT.contains(classType)) {
+        if ("SIE".equals(program) && LTBT.contains(classType)) {
             return 2.0;
         }
-        if ("SIE".equals(program)  && THTN.contains(classType)) {
+        if ("SIE".equals(program) && THTN.contains(classType)) {
             return 1.5;
         }
         return 0d;
