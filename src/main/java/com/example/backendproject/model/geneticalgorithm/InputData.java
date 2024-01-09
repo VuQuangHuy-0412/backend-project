@@ -1,6 +1,7 @@
 package com.example.backendproject.model.geneticalgorithm;
 
 import com.example.backendproject.entity.sc5.*;
+import com.example.backendproject.model.sc5.TeacherClassMapping;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +20,7 @@ public class InputData {
     private List<LanguageEntity> languages;
     private List<RequiredConstraintEntity> requiredConstraints;
     private List<CustomConstraintEntity> customConstraints;
+    private List<TeacherClassMapping> teacherClassMappings;
 
     private Integer numOfTeachers;
     private Integer numOfLanguages;

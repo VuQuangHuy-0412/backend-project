@@ -7,6 +7,7 @@ import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.sc5.*;
 import com.example.backendproject.model.geneticalgorithm.InputData;
 import com.example.backendproject.model.geneticalgorithm.Population;
+import com.example.backendproject.model.sc5.TeacherClassMapping;
 import com.example.backendproject.repository.sc5.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -172,7 +173,41 @@ public class TimetablingServiceHelper {
         Double averageGD = allTimeClass / allTimeGdTeacher;
         inputData.setAverageGD(averageGD);
 
+        List<TeacherClassMapping> teacherClassMappings = getTeacherClassMapping(inputData);
+        inputData.setTeacherClassMappings(teacherClassMappings);
         return inputData;
+    }
+
+    private List<TeacherClassMapping> getTeacherClassMapping(InputData inputData) {
+        List<TeacherEntity> teacherEntities = inputData.getTeachers();
+        List<GroupTeacherMappingEntity> groupTeacherMappingEntities = inputData.getGroupTeacherMappings();
+        List<SubjectEntity> subjectEntities = inputData.getSubjects();
+        List<ClassEntity> classEntities = inputData.getClasses();
+
+        List<TeacherClassMapping> teacherClassMappings = new ArrayList<>();
+        for (TeacherEntity teacherEntity : teacherEntities) {
+            for (GroupTeacherMappingEntity groupTeacherMappingEntity : groupTeacherMappingEntities) {
+                if (teacherEntity.getId().equals(groupTeacherMappingEntity.getTeacherId())) {
+                    for (SubjectEntity subjectEntity : subjectEntities) {
+                        if (subjectEntity.getGroupId().equals(groupTeacherMappingEntity.getGroupId())) {
+                            for (ClassEntity classEntity : classEntities) {
+                                if (classEntity.getSubjectId().equals(subjectEntity.getId())) {
+                                    for (LanguageTeacherMappingEntity languageTeacherMappingEntity : inputData.getLanguageTeacherMappings()) {
+                                        if (languageTeacherMappingEntity.getTeacherId().equals(teacherEntity.getId()) && languageTeacherMappingEntity.getLanguageId().equals(classEntity.getId())) {
+                                            TeacherClassMapping teacherClassMapping = new TeacherClassMapping();
+                                            teacherClassMapping.setClassId(classEntity.getId());
+                                            teacherClassMapping.setTeacherId(teacherEntity.getId());
+                                            teacherClassMappings.add(teacherClassMapping);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return teacherClassMappings;
     }
 
     private Population initPopulation(InputData inputData) {
@@ -224,37 +259,17 @@ public class TimetablingServiceHelper {
             member.setObjective(objectiveFunction(inputData, member));
 
             for (ClassEntity classEntity : inputData.getClasses()) {
-                int ct1 = 0;
                 int ct2 = 0;
                 int ct3 = 0;
                 for (TeacherEntity teacherEntity : inputData.getTeachers()) {
                     if (isTeacherOfClass(member, teacherEntity, classEntity) == 1) {
-
-                        if (!CollectionUtils.isEmpty(CT1)) {
-                            for (LanguageEntity languageEntity : inputData.getLanguages()) {
-                                ct1 += classHasLanguage(languageEntity, classEntity) * teacherHasLanguage(languageEntity, teacherEntity, inputData.getLanguageTeacherMappings());
-                            }
-                        }
-
-
                         if (!CollectionUtils.isEmpty(CT2)) {
-                            for (GroupTeacherEntity groupTeacherEntity : inputData.getGroupTeachers()) {
-                                for (SubjectEntity subjectEntity : inputData.getSubjects()) {
-                                    ct2 += teacherOfGroup(groupTeacherEntity, teacherEntity, inputData.getGroupTeacherMappings()) *
-                                            groupHasSubject(subjectEntity, groupTeacherEntity) * subjectHasClass(subjectEntity, classEntity);
-                                }
-                            }
+                            ct2 += isTeacherClassMapping(teacherEntity, classEntity, inputData);
                         }
 
                         if (!CollectionUtils.isEmpty(CT3)) {
                             ct3 += 1;
                         }
-                    }
-                }
-
-                if (!CollectionUtils.isEmpty(CT1)) {
-                    if (ct1 != 1) {
-                        member.setObjective(member.getObjective() + 100000);
                     }
                 }
 
@@ -312,6 +327,14 @@ public class TimetablingServiceHelper {
                 }
             }
         }
+    }
+
+    private int isTeacherClassMapping(TeacherEntity teacherEntity, ClassEntity classEntity, InputData inputData) {
+        List<TeacherClassMapping> teacherClassMappings = inputData.getTeacherClassMappings().stream().filter(x -> (teacherEntity.getId().equals(x.getTeacherId()) && classEntity.getId().equals(x.getClassId()))).toList();
+        if (CollectionUtils.isEmpty(teacherClassMappings)) {
+            return 0;
+        }
+        return 1;
     }
 
     private void selection(Population population) {
@@ -455,33 +478,14 @@ public class TimetablingServiceHelper {
         return (CollectionUtils.isEmpty(ltMapping)) ? 0 : 1;
     }
 
-    private int teacherOfGroup(GroupTeacherEntity groupTeacherEntity, TeacherEntity teacherEntity, List<GroupTeacherMappingEntity> gtMappings) {
-        List<GroupTeacherMappingEntity> gtMapping = gtMappings.stream()
-                .filter(x -> x.getGroupId().equals(groupTeacherEntity.getId()) && x.getTeacherId().equals(teacherEntity.getId()))
-                .toList();
-
-        return (CollectionUtils.isEmpty(gtMapping)) ? 0 : 1;
-    }
-
-    private int groupHasSubject(SubjectEntity subjectEntity, GroupTeacherEntity groupTeacherEntity) {
-        return subjectEntity.getGroupId().equals(groupTeacherEntity.getId()) ? 1 : 0;
-    }
-
-    private int subjectHasClass(SubjectEntity subjectEntity, ClassEntity classEntity) {
-        return classEntity.getSubjectId().equals(subjectEntity.getId()) ? 1 : 0;
-    }
-
     private TeacherEntity getRandomTeacherFromList(List<TeacherEntity> teachers, InputData inputData, ClassEntity classEntity) {
         Random rand = new Random();
-        Long subjectId = classEntity.getSubjectId();
-        List<SubjectEntity> subjectEntities = inputData.getSubjects().stream().filter(x -> x.getId().equals(subjectId)).toList();
-        if (CollectionUtils.isEmpty(subjectEntities)) {
+        Long classId = classEntity.getId();
+        List<TeacherClassMapping> teacherClassMappings = inputData.getTeacherClassMappings().stream().filter(x -> x.getClassId().equals(classId)).toList();
+        if (CollectionUtils.isEmpty(teacherClassMappings)) {
             return teachers.get(rand.nextInt(teachers.size()));
         }
-        SubjectEntity subjectEntity = subjectEntities.get(0);
-        Long groupId = subjectEntity.getGroupId();
-        List<Long> teacherIds = inputData.getGroupTeacherMappings().stream().filter(x -> x.getGroupId().equals(groupId)).
-                map(GroupTeacherMappingEntity::getTeacherId).toList();
+        List<Long> teacherIds = teacherClassMappings.stream().map(TeacherClassMapping::getTeacherId).toList();
         if (CollectionUtils.isEmpty(teacherIds)) {
             return teachers.get(rand.nextInt(teachers.size()));
         }
