@@ -35,7 +35,7 @@ public class Teacher {
 
     private String role;
 
-    private Integer totalTime;
+    private Double totalTime;
 
     private Long dataset;
 }

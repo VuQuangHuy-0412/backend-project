@@ -12,5 +12,5 @@ public class TeacherUpload {
 
     private String fullName;
 
-    private Integer totalTime;
+    private Double totalTime;
 }

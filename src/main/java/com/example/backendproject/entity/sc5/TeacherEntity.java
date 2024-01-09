@@ -51,7 +51,7 @@ public class TeacherEntity implements Serializable {
     private Integer status;
 
     @Column(name = "total_time")
-    private Integer totalTime;
+    private Double totalTime;
 
     @Column(name = "dataset")
     private Long dataset;
