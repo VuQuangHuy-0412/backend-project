@@ -43,6 +43,11 @@ public class StudentProjectServiceHelper {
             entity.setStudentCode(studentProject.getStudentCode());
             entity.setProjectType(studentProject.getProjectType());
             entity.setProjectName(studentProject.getProjectName());
+
+            List<ClassEntity> classEntities = classRepository.findByCodeAndDataset(studentProject.getClassId(), request.getDataset());
+            if (CollectionUtils.isEmpty(classEntities)) {
+                break;
+            }
             entity.setClassId(studentProject.getClassId());
 
             Double timeHd = getTimeHd(studentProject, request.getDataset());

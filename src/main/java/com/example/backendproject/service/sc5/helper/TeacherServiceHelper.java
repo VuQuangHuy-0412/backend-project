@@ -61,9 +61,12 @@ public class TeacherServiceHelper {
     public void uploadFileLanguageTeacherMapping(UploadLanguageTeacherRequest request) {
         for (LanguageTeacherMappingUpload languageTeacherMapping : request.getLanguageTeacherCreateRequests()) {
             List<TeacherEntity> teacherEntities = teacherRepository.findByFullNameAndDataset(languageTeacherMapping.getTeacherName(), request.getDataset());
-            Long teacherId = CollectionUtils.isEmpty(teacherEntities) ? 1L : teacherEntities.get(0).getId();
+            if (CollectionUtils.isEmpty(teacherEntities)) {
+                break;
+            }
+            Long teacherId = teacherEntities.get(0).getId();
             List<LanguageEntity> languageEntities = languageRepository.findByName(languageTeacherMapping.getLanguageName());
-            Long languageId = CollectionUtils.isEmpty(languageEntities) ? 1L : languageEntities.get(0).getId();
+            Long languageId = CollectionUtils.isEmpty(languageEntities) ? 2L : languageEntities.get(0).getId();
             List<LanguageTeacherMappingEntity> entity = languageTeacherMappingRepository.findByTeacherIdAndLanguageIdAndDataset(
                     teacherId, languageId, request.getDataset());
             if (CollectionUtils.isEmpty(entity)) {

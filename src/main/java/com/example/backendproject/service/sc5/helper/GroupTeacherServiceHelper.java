@@ -49,7 +49,10 @@ public class GroupTeacherServiceHelper {
             entity.setName(groupTeacherUpload.getName());
             entity.setDescription(groupTeacherUpload.getDescription());
             List<TeacherEntity> teacherEntity = teacherRepository.findByFullNameAndDataset(groupTeacherUpload.getLeaderName(), request.getDataset());
-            entity.setLeader(CollectionUtils.isEmpty(teacherEntity) ? 1L : teacherEntity.get(0).getId());
+            if (CollectionUtils.isEmpty(teacherEntity)) {
+                break;
+            }
+            entity.setLeader(teacherEntity.get(0).getId());
             entity.setDataset(request.getDataset());
             entity.setCreatedAt(new Date());
             entity.setUpdatedAt(new Date());
@@ -74,9 +77,15 @@ public class GroupTeacherServiceHelper {
     public void uploadExcelGroupTeacherMapping(UploadGroupTeacherMappingRequest request) {
         for (GroupTeacherMappingUpload groupTeacherMapping : request.getGroupTeacherMappingCreateRequests()) {
             List<GroupTeacherEntity> groupTeacherEntities = groupTeacherRepository.findByNameAndDataset(groupTeacherMapping.getGroupName(), request.getDataset());
-            Long groupId = CollectionUtils.isEmpty(groupTeacherEntities) ? 1L : groupTeacherEntities.get(0).getId();
+            if (CollectionUtils.isEmpty(groupTeacherEntities)) {
+                break;
+            }
+            Long groupId = groupTeacherEntities.get(0).getId();
             List<TeacherEntity> teacherEntities = teacherRepository.findByFullNameAndDataset(groupTeacherMapping.getTeacherName(), request.getDataset());
-            Long teacherId = CollectionUtils.isEmpty(teacherEntities) ? 1L : teacherEntities.get(0).getId();
+            if (CollectionUtils.isEmpty(teacherEntities)) {
+                break;
+            }
+            Long teacherId = teacherEntities.get(0).getId();
 
             List<GroupTeacherMappingEntity> entity = groupTeacherMappingRepository.findByGroupIdAndTeacherIdAndDataset(groupId, teacherId, request.getDataset());
             if (CollectionUtils.isEmpty(entity)) {

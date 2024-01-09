@@ -37,7 +37,10 @@ public class SubjectServiceHelper {
             entity.setName(subject.getName());
             entity.setCode(subject.getCode());
             List<GroupTeacherEntity> groupTeacherEntities = groupTeacherRepository.findByNameAndDataset(subject.getName(), request.getDataset());
-            entity.setGroupId(CollectionUtils.isEmpty(groupTeacherEntities) ? 1L : groupTeacherEntities.get(0).getId());
+            if (CollectionUtils.isEmpty(groupTeacherEntities)) {
+                break;
+            }
+            entity.setGroupId(groupTeacherEntities.get(0).getId());
             entity.setDataset(request.getDataset());
             entity.setCreatedAt(new Date());
             entity.setUpdatedAt(new Date());

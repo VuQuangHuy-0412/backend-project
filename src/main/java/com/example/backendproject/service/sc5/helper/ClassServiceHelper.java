@@ -55,7 +55,10 @@ public class ClassServiceHelper {
             classEntity.setDataset(request.getDataset());
 
             List<SubjectEntity> subjectEntity = subjectRepository.findByCodeAndDataset(classDto.getSubjectCode(), request.getDataset());
-            classEntity.setSubjectId(CollectionUtils.isEmpty(subjectEntity) ? 1L : subjectEntity.get(0).getId());
+            if (CollectionUtils.isEmpty(subjectEntity)) {
+                break;
+            }
+            classEntity.setSubjectId(subjectEntity.get(0).getId());
 
             Double timeOfClass = getTimeOfClass(classDto);
             classEntity.setTimeOfClass(timeOfClass);
