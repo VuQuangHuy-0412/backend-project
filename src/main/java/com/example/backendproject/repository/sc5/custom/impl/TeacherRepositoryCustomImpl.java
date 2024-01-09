@@ -96,7 +96,7 @@ public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
                 " join teacher t on gtm.teacher_id = t.id " +
                 " where 1=1 " +
                 " and gtm.group_id = :groupId " +
-                " and qtm.dataset = :dataset ";
+                " and gtm.dataset = :dataset ";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("groupId", groupId);
         params.addValue("dataset", dataset);
