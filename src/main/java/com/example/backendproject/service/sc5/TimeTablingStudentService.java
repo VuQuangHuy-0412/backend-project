@@ -7,6 +7,7 @@ import com.example.backendproject.entity.sc5.*;
 import com.example.backendproject.mapper.StudentProjectMapper;
 import com.example.backendproject.mapper.TeacherMapper;
 import com.example.backendproject.model.geneticalgorithm.InputData;
+import com.example.backendproject.model.sc5.EvaluateResponse;
 import com.example.backendproject.model.sc5.TimetableStudent;
 import com.example.backendproject.repository.sc5.*;
 import com.example.backendproject.service.AdminLogService;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -102,5 +104,44 @@ public class TimeTablingStudentService {
         inputData.setNumOfStudents(studentProjectEntities.size());
 
         return inputData;
+    }
+
+    public EvaluateResponse evaluateTimetablingStudent(Long dataset) {
+        EvaluateResponse response = new EvaluateResponse();
+        InputData inputData = timeTablingStudentServiceHelper.getInputData(dataset);
+
+        int x1 = 0; // số SV chưa được pc
+        int x2 = 0; // số SV chưa pc đúng nguyện vọng
+        int x3 = 0; // số GV dạy quá số giờ tối đa
+        for (StudentProjectEntity studentProjectEntity : inputData.getStudentProjects()) {
+            if (studentProjectEntity.getTeacherAssignedId() == null) {
+                x1 += 1;
+            } else {
+                Optional<TeacherEntity> teacherEntity = teacherRepository.findById(studentProjectEntity.getTeacherAssignedId());
+                if (teacherEntity.isPresent() && studentProjectEntity.getTeacher1Id() != null &&
+                        studentProjectEntity.getTeacher2Id() != null && studentProjectEntity.getTeacher3Id() != null &&
+                        !teacherEntity.get().getId().equals(studentProjectEntity.getTeacher1Id()) &&
+                        !teacherEntity.get().getId().equals(studentProjectEntity.getTeacher2Id()) &&
+                        !teacherEntity.get().getId().equals(studentProjectEntity.getTeacher3Id())) {
+                    x2 += 1;
+                }
+            }
+        }
+
+        for (TeacherEntity teacherEntity : inputData.getTeachers()) {
+            List<StudentProjectEntity> studentProjectEntities = studentProjectRepository.findByTeacherAssignedIdAndDataset(teacherEntity.getId(), dataset);
+            double totalTimeHD = studentProjectEntities.stream().map(StudentProjectEntity::getTimeHd).reduce(0d, Double::sum);
+
+            if (totalTimeHD > inputData.getAverageHD() * teacherEntity.getHdTime()) {
+                x3 += 1;
+            }
+        }
+
+        List<EvaluateResponse.EvaluateDetail> data = new ArrayList<>();
+        data.add(new EvaluateResponse.EvaluateDetail("Số SV chưa được phân công", String.valueOf(x1)));
+        data.add(new EvaluateResponse.EvaluateDetail("Số SV được phân công chưa đáp ứng nguyện vọng đăng ký", String.valueOf(x2)));
+        data.add(new EvaluateResponse.EvaluateDetail("Số giảng viên có số giờ được phân công lớn hơn số giờ HD tối đa", String.valueOf(x3)));
+        response.setData(data);
+        return response;
     }
 }

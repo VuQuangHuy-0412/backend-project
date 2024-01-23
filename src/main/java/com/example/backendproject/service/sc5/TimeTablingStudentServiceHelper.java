@@ -89,7 +89,7 @@ public class TimeTablingStudentServiceHelper {
         }
     }
 
-    private void saveSolution(List<StudentProjectEntity> studentProjectEntities, PopulationStudent.Member member) {
+    public void saveSolution(List<StudentProjectEntity> studentProjectEntities, PopulationStudent.Member member) {
         for (StudentProjectEntity studentProjectEntity : studentProjectEntities) {
             for (PopulationStudent.Member.MemberDetail detail : member.getDetails()) {
                 if (studentProjectEntity.getId().equals(detail.getStudentId())) {
@@ -103,7 +103,7 @@ public class TimeTablingStudentServiceHelper {
         studentProjectRepository.saveAll(studentProjectEntities);
     }
 
-    private InputData getInputData(Long dataset) {
+    public InputData getInputData(Long dataset) {
         InputData inputData = new InputData();
         List<TeacherEntity> teachers = teacherRepository.findAllByStatusAndDataset(TeacherConstant.Status.ACTIVE, dataset);
         List<StudentProjectEntity> studentProjects = studentProjectRepository.findByDataset(dataset);
@@ -131,7 +131,7 @@ public class TimeTablingStudentServiceHelper {
         return inputData;
     }
 
-    private PopulationStudent initPopulation(InputData inputData) {
+    public PopulationStudent initPopulation(InputData inputData) {
         PopulationStudent population = new PopulationStudent();
         List<PopulationStudent.Member> members = new ArrayList<>();
         for (int i = 0; i < POPULATION_SIZE; i++) {
@@ -150,7 +150,7 @@ public class TimeTablingStudentServiceHelper {
         return population;
     }
 
-    private void evaluateConstraint(InputData inputData, PopulationStudent population) {
+    public void evaluateConstraint(InputData inputData, PopulationStudent population) {
         clearPopulationObjective(population);
         List<RequiredConstraintEntity> requiredConstraints = inputData.getRequiredConstraints();
         List<RequiredConstraintEntity> CT7 = requiredConstraints.stream().filter(x -> x.getCode().equals("CT7") && x.getStatus().equals(1)).toList();
@@ -206,7 +206,7 @@ public class TimeTablingStudentServiceHelper {
         }
     }
 
-    private double objectiveFunction(InputData inputData, PopulationStudent.Member member) {
+    public double objectiveFunction(InputData inputData, PopulationStudent.Member member) {
         double objective = 0;
         for (TeacherEntity teacherEntity : inputData.getTeachers()) {
             int timeTraining = 0;
@@ -221,7 +221,7 @@ public class TimeTablingStudentServiceHelper {
         return objective;
     }
 
-    private PopulationStudent.Member getTheMostObjectiveResult(PopulationStudent population) {
+    public PopulationStudent.Member getTheMostObjectiveResult(PopulationStudent population) {
         List<PopulationStudent.Member> listMember = population.getPopulation();
         List<Double> objectiveTemp = new ArrayList<>(listMember.stream().map(PopulationStudent.Member::getObjective).toList());
         Collections.sort(objectiveTemp);
@@ -236,7 +236,7 @@ public class TimeTablingStudentServiceHelper {
         return null;
     }
 
-    private void selection(PopulationStudent population) {
+    public void selection(PopulationStudent population) {
         List<PopulationStudent.Member> listMember = population.getPopulation();
         List<Double> objectiveTemp = new ArrayList<>(listMember.stream().map(PopulationStudent.Member::getObjective).toList());
         Collections.sort(objectiveTemp);
@@ -252,7 +252,7 @@ public class TimeTablingStudentServiceHelper {
         }
     }
 
-    private void crossover(InputData inputData, PopulationStudent population) {
+    public void crossover(InputData inputData, PopulationStudent population) {
         List<PopulationStudent.Member> listMember = population.getPopulation();
         for (int i = 0; i < NUM_OF_CROSS; i++) {
             Random rand = new Random();
@@ -275,7 +275,7 @@ public class TimeTablingStudentServiceHelper {
         }
     }
 
-    private void mutation(InputData inputData, PopulationStudent population) {
+    public void mutation(InputData inputData, PopulationStudent population) {
         Random rand = new Random();
         PopulationStudent.Member member = population.getPopulation().get(rand.nextInt(population.getPopulation().size()));
 
@@ -293,7 +293,7 @@ public class TimeTablingStudentServiceHelper {
         }
     }
 
-    private void setTeacherForStudent(PopulationStudent.Member member, TeacherEntity teacherEntity, StudentProjectEntity studentProjectEntity) {
+    public void setTeacherForStudent(PopulationStudent.Member member, TeacherEntity teacherEntity, StudentProjectEntity studentProjectEntity) {
         for (PopulationStudent.Member.MemberDetail detail : member.getDetails()) {
             if (detail.getStudentId().equals(studentProjectEntity.getId())) {
                 detail.setTeacherId(teacherEntity.getId());
@@ -301,20 +301,20 @@ public class TimeTablingStudentServiceHelper {
         }
     }
 
-    private int isTeacherOfStudent(PopulationStudent.Member member, TeacherEntity teacherEntity, StudentProjectEntity studentProjectEntity) {
+    public int isTeacherOfStudent(PopulationStudent.Member member, TeacherEntity teacherEntity, StudentProjectEntity studentProjectEntity) {
         List<PopulationStudent.Member.MemberDetail> memberDetail = member.getDetails().stream()
                 .filter(x -> (x.getTeacherId().equals(teacherEntity.getId()) && x.getStudentId().equals(studentProjectEntity.getId()))).toList();
 
         return (CollectionUtils.isEmpty(memberDetail)) ? 0 : 1;
     }
 
-    private void clearPopulationObjective(PopulationStudent population) {
+    public void clearPopulationObjective(PopulationStudent population) {
         for (PopulationStudent.Member member : population.getPopulation()) {
             member.setObjective(0D);
         }
     }
 
-    private Long getRandomTeacherFromList(List<TeacherEntity> teachers, StudentProjectEntity studentProjectEntity) {
+    public Long getRandomTeacherFromList(List<TeacherEntity> teachers, StudentProjectEntity studentProjectEntity) {
         Random rand = new Random();
         if (studentProjectEntity.getTeacher1Id() == null) {
             return teachers.get(rand.nextInt(teachers.size())).getId();

@@ -106,7 +106,7 @@ public class TimetablingServiceHelper {
         }
     }
 
-    private void saveSolution(List<ClassEntity> classEntities, Population.Member member) {
+    public void saveSolution(List<ClassEntity> classEntities, Population.Member member) {
         for (ClassEntity classEntity : classEntities) {
             for (Population.Member.MemberDetail detail : member.getDetails()) {
                 if (classEntity.getId().equals(detail.getClassId())) {
@@ -120,7 +120,7 @@ public class TimetablingServiceHelper {
         classRepository.saveAll(classEntities);
     }
 
-    private Population.Member getTheMostObjectiveResult(Population population) {
+    public Population.Member getTheMostObjectiveResult(Population population) {
         List<Population.Member> listMember = population.getPopulation();
         List<Double> objectiveTemp = new ArrayList<>(listMember.stream().map(Population.Member::getObjective).toList());
         Collections.sort(objectiveTemp);
@@ -135,7 +135,7 @@ public class TimetablingServiceHelper {
         return null;
     }
 
-    private InputData getInputData(Long dataset) {
+    public InputData getInputData(Long dataset) {
         InputData inputData = new InputData();
         List<TeacherEntity> teachers = teacherRepository.findAllByStatusAndDataset(TeacherConstant.Status.ACTIVE, dataset);
         List<LanguageTeacherMappingEntity> languageTeacherMappings = languageTeacherMappingRepository.findByDataset(dataset);
@@ -178,7 +178,7 @@ public class TimetablingServiceHelper {
         return inputData;
     }
 
-    private List<TeacherClassMapping> getTeacherClassMapping(InputData inputData) {
+    public List<TeacherClassMapping> getTeacherClassMapping(InputData inputData) {
         List<TeacherEntity> teacherEntities = inputData.getTeachers();
         List<GroupTeacherMappingEntity> groupTeacherMappingEntities = inputData.getGroupTeacherMappings();
         List<SubjectEntity> subjectEntities = inputData.getSubjects();
@@ -213,7 +213,7 @@ public class TimetablingServiceHelper {
         return teacherClassMappings;
     }
 
-    private Population initPopulation(InputData inputData) {
+    public Population initPopulation(InputData inputData) {
         Population population = new Population();
         List<Population.Member> members = new ArrayList<>();
         for (int i = 0; i < POPULATION_SIZE; i++) {
@@ -232,7 +232,7 @@ public class TimetablingServiceHelper {
         return population;
     }
 
-    private double objectiveFunction(InputData inputData, Population.Member member) {
+    public double objectiveFunction(InputData inputData, Population.Member member) {
         double objective = 0;
         for (TeacherEntity teacherEntity : inputData.getTeachers()) {
             int timeTeaching = 0;
@@ -247,7 +247,7 @@ public class TimetablingServiceHelper {
         return objective;
     }
 
-    private void evaluateConstraint(InputData inputData, Population population) {
+    public void evaluateConstraint(InputData inputData, Population population) {
         clearPopulationObjective(population);
         List<RequiredConstraintEntity> requiredConstraints = inputData.getRequiredConstraints();
         List<RequiredConstraintEntity> CT1 = requiredConstraints.stream().filter(x -> x.getCode().equals("CT1") && x.getStatus().equals(1)).toList();
@@ -332,7 +332,7 @@ public class TimetablingServiceHelper {
         }
     }
 
-    private int isTeacherClassMapping(TeacherEntity teacherEntity, ClassEntity classEntity, InputData inputData) {
+    public int isTeacherClassMapping(TeacherEntity teacherEntity, ClassEntity classEntity, InputData inputData) {
         List<TeacherClassMapping> teacherClassMappings = inputData.getTeacherClassMappings().stream().filter(x -> (teacherEntity.getId().equals(x.getTeacherId()) && classEntity.getId().equals(x.getClassId()))).toList();
         if (CollectionUtils.isEmpty(teacherClassMappings)) {
             return 0;
@@ -340,7 +340,7 @@ public class TimetablingServiceHelper {
         return 1;
     }
 
-    private void selection(Population population) {
+    public void selection(Population population) {
         List<Population.Member> listMember = population.getPopulation();
         List<Double> objectiveTemp = new ArrayList<>(listMember.stream().map(Population.Member::getObjective).toList());
         Collections.sort(objectiveTemp);
@@ -356,7 +356,7 @@ public class TimetablingServiceHelper {
         }
     }
 
-    private void crossover(InputData inputData, Population population) {
+    public void crossover(InputData inputData, Population population) {
         List<Population.Member> listMember = population.getPopulation();
         for (int i = 0; i < NUM_OF_CROSS; i++) {
             Random rand = new Random();
@@ -379,7 +379,7 @@ public class TimetablingServiceHelper {
         }
     }
 
-    private void mutation(InputData inputData, Population population) {
+    public void mutation(InputData inputData, Population population) {
         Random rand = new Random();
         Population.Member member = population.getPopulation().get(rand.nextInt(population.getPopulation().size()));
 
@@ -397,7 +397,7 @@ public class TimetablingServiceHelper {
         }
     }
 
-    private void setTeacherForClass(Population.Member member, TeacherEntity teacherEntity, ClassEntity classEntity) {
+    public void setTeacherForClass(Population.Member member, TeacherEntity teacherEntity, ClassEntity classEntity) {
         for (Population.Member.MemberDetail detail : member.getDetails()) {
             if (detail.getClassId().equals(classEntity.getId())) {
                 detail.setTeacherId(teacherEntity.getId());
@@ -405,7 +405,7 @@ public class TimetablingServiceHelper {
         }
     }
 
-    private int isConflictClass(ClassEntity class1, ClassEntity class2) {
+    public int isConflictClass(ClassEntity class1, ClassEntity class2) {
         try {
             if (class1.equals(class2)) {
                 return 0;
@@ -456,24 +456,24 @@ public class TimetablingServiceHelper {
         }
     }
 
-    private void clearPopulationObjective(Population population) {
+    public void clearPopulationObjective(Population population) {
         for (Population.Member member : population.getPopulation()) {
             member.setObjective(0D);
         }
     }
 
-    private int isTeacherOfClass(Population.Member member, TeacherEntity teacherEntity, ClassEntity classEntity) {
+    public int isTeacherOfClass(Population.Member member, TeacherEntity teacherEntity, ClassEntity classEntity) {
         List<Population.Member.MemberDetail> memberDetail = member.getDetails().stream()
                 .filter(x -> (x.getTeacherId().equals(teacherEntity.getId()) && x.getClassId().equals(classEntity.getId()))).toList();
 
         return (CollectionUtils.isEmpty(memberDetail)) ? 0 : 1;
     }
 
-    private int classHasLanguage(LanguageEntity languageEntity, ClassEntity classEntity) {
+    public int classHasLanguage(LanguageEntity languageEntity, ClassEntity classEntity) {
         return classEntity.getLanguageId().equals(languageEntity.getId()) ? 1 : 0;
     }
 
-    private int teacherHasLanguage(LanguageEntity languageEntity, TeacherEntity teacherEntity, List<LanguageTeacherMappingEntity> ltMappings) {
+    public int teacherHasLanguage(LanguageEntity languageEntity, TeacherEntity teacherEntity, List<LanguageTeacherMappingEntity> ltMappings) {
         List<LanguageTeacherMappingEntity> ltMapping = ltMappings.stream()
                 .filter(x -> x.getLanguageId().equals(languageEntity.getId()) && x.getTeacherId().equals(teacherEntity.getId()))
                 .toList();
@@ -481,7 +481,7 @@ public class TimetablingServiceHelper {
         return (CollectionUtils.isEmpty(ltMapping)) ? 0 : 1;
     }
 
-    private TeacherEntity getRandomTeacherFromList(List<TeacherEntity> teachers, InputData inputData, ClassEntity classEntity) {
+    public TeacherEntity getRandomTeacherFromList(List<TeacherEntity> teachers, InputData inputData, ClassEntity classEntity) {
         Random rand = new Random();
         Long classId = classEntity.getId();
         List<TeacherClassMapping> teacherClassMappings = inputData.getTeacherClassMappings().stream().filter(x -> x.getClassId().equals(classId)).toList();

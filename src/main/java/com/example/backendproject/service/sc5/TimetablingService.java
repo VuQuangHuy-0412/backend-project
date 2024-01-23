@@ -7,6 +7,7 @@ import com.example.backendproject.entity.sc5.*;
 import com.example.backendproject.mapper.ClassMapper;
 import com.example.backendproject.mapper.TeacherMapper;
 import com.example.backendproject.model.geneticalgorithm.InputData;
+import com.example.backendproject.model.sc5.EvaluateResponse;
 import com.example.backendproject.model.sc5.TimetableTeacher;
 import com.example.backendproject.repository.sc5.*;
 import com.example.backendproject.service.AdminLogService;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -112,4 +114,48 @@ public class TimetablingService {
         return timetablingProcessRepository.findByTypeAndDataset("student", dataset);
     }
 
+    public EvaluateResponse evaluateTimetablingTeacher(Long dataset) {
+        EvaluateResponse response = new EvaluateResponse();
+        InputData inputData = timetablingServiceHelper.getInputData(dataset);
+
+        int x1 = 0; // số lớp chưa được pc
+        int x2 = 0; // số lớp chưa pc đúng chuyên môn hoặc ngôn ngữ
+        int x3 = 0; // số GV dạy quá số giờ tối đa
+        int x4 = 0; // số cặp lớp xung đột được pc chung 1 GV
+        for (ClassEntity classEntity : inputData.getClasses()) {
+            if (classEntity.getTeacherId() == null) {
+                x1 += 1;
+            } else {
+                Optional<TeacherEntity> teacherEntity = teacherRepository.findById(classEntity.getTeacherId());
+                if (teacherEntity.isPresent() && timetablingServiceHelper.isTeacherClassMapping(teacherEntity.get(), classEntity, inputData) == 0) {
+                    x2 += 1;
+                }
+
+                for (ClassEntity classEntity1 : inputData.getClasses()) {
+                    if (classEntity1.getTeacherId() != null && classEntity.getId() < classEntity1.getId() && classEntity.getTeacherId().equals(classEntity1.getTeacherId())) {
+                        if (timetablingServiceHelper.isConflictClass(classEntity, classEntity1) == 1) {
+                            x4 += 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        for (TeacherEntity teacherEntity : inputData.getTeachers()) {
+            List<ClassEntity> classes = classRepository.findByTeacherIdAndDataset(teacherEntity.getId(), dataset);
+            double totalTimeGD = classes.stream().map(ClassEntity::getTimeOfClass).reduce(0d, Double::sum);
+
+            if (totalTimeGD > inputData.getAverageGD() * teacherEntity.getGdTime()) {
+                x3 += 1;
+            }
+        }
+
+        List<EvaluateResponse.EvaluateDetail> data = new ArrayList<>();
+        data.add(new EvaluateResponse.EvaluateDetail("Số lớp chưa được phân công", String.valueOf(x1)));
+        data.add(new EvaluateResponse.EvaluateDetail("Số lớp phân công chưa đáp ứng yêu cầu chuyên môn hoặc ngôn ngữ", String.valueOf(x2)));
+        data.add(new EvaluateResponse.EvaluateDetail("Số giảng viên có số giờ được phân công lớn hơn số giờ GD tối đa", String.valueOf(x3)));
+        data.add(new EvaluateResponse.EvaluateDetail("Số cặp lớp xung đột được phân công cho cùng GV", String.valueOf(x4)));
+        response.setData(data);
+        return response;
+    }
 }
