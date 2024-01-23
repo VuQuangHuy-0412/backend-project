@@ -8,12 +8,15 @@ import com.example.backendproject.mapper.StudentProjectMapper;
 import com.example.backendproject.mapper.TeacherMapper;
 import com.example.backendproject.model.geneticalgorithm.InputData;
 import com.example.backendproject.model.sc5.EvaluateResponse;
+import com.example.backendproject.model.sc5.TimetableResponse;
 import com.example.backendproject.model.sc5.TimetableStudent;
+import com.example.backendproject.model.sc5.TimetableStudentResponse;
 import com.example.backendproject.repository.sc5.*;
 import com.example.backendproject.service.AdminLogService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -108,11 +111,15 @@ public class TimeTablingStudentService {
 
     public EvaluateResponse evaluateTimetablingStudent(Long dataset) {
         EvaluateResponse response = new EvaluateResponse();
+        if (dataset == null) {
+            return response;
+        }
         InputData inputData = timeTablingStudentServiceHelper.getInputData(dataset);
 
         int x1 = 0; // số SV chưa được pc
         int x2 = 0; // số SV chưa pc đúng nguyện vọng
         int x3 = 0; // số GV dạy quá số giờ tối đa
+        int x4 = 0; // số GV chưa được pc HD
         for (StudentProjectEntity studentProjectEntity : inputData.getStudentProjects()) {
             if (studentProjectEntity.getTeacherAssignedId() == null) {
                 x1 += 1;
@@ -130,10 +137,14 @@ public class TimeTablingStudentService {
 
         for (TeacherEntity teacherEntity : inputData.getTeachers()) {
             List<StudentProjectEntity> studentProjectEntities = studentProjectRepository.findByTeacherAssignedIdAndDataset(teacherEntity.getId(), dataset);
-            double totalTimeHD = studentProjectEntities.stream().map(StudentProjectEntity::getTimeHd).reduce(0d, Double::sum);
+            if (CollectionUtils.isEmpty(studentProjectEntities)) {
+                x4 += 1;
+            } else {
+                double totalTimeHD = studentProjectEntities.stream().map(StudentProjectEntity::getTimeHd).reduce(0d, Double::sum);
 
-            if (totalTimeHD > inputData.getAverageHD() * teacherEntity.getHdTime()) {
-                x3 += 1;
+                if (totalTimeHD > inputData.getAverageHD() * teacherEntity.getHdTime()) {
+                    x3 += 1;
+                }
             }
         }
 
@@ -141,6 +152,30 @@ public class TimeTablingStudentService {
         data.add(new EvaluateResponse.EvaluateDetail("Số SV chưa được phân công", String.valueOf(x1)));
         data.add(new EvaluateResponse.EvaluateDetail("Số SV được phân công chưa đáp ứng nguyện vọng đăng ký", String.valueOf(x2)));
         data.add(new EvaluateResponse.EvaluateDetail("Số giảng viên có số giờ được phân công lớn hơn số giờ HD tối đa", String.valueOf(x3)));
+        data.add(new EvaluateResponse.EvaluateDetail("Số giảng viên chưa được phân công HD", String.valueOf(x4)));
+        response.setData(data);
+        return response;
+    }
+
+    public TimetableStudentResponse studentTimetable(Long dataset, Long teacherId) {
+        TimetableStudentResponse response = new TimetableStudentResponse();
+        if (dataset == null || teacherId == null) {
+            return response;
+        }
+
+        List<StudentProjectEntity> studentProjectEntities = studentProjectRepository.findByTeacherAssignedIdAndDataset(teacherId, dataset);
+        List<TimetableStudentResponse.TimetableDetail> data = new ArrayList<>();
+        if (CollectionUtils.isEmpty(studentProjectEntities)) {
+            response.setData(data);
+            return response;
+        }
+
+        for (StudentProjectEntity studentProjectEntity : studentProjectEntities) {
+            data.add(new TimetableStudentResponse.TimetableDetail(studentProjectEntity.getName(),
+                    studentProjectEntity.getStudentCode(), studentProjectEntity.getClassId(),
+                    studentProjectEntity.getProjectName(), studentProjectEntity.getProjectType()));
+        }
+
         response.setData(data);
         return response;
     }

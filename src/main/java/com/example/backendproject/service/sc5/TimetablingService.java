@@ -8,12 +8,14 @@ import com.example.backendproject.mapper.ClassMapper;
 import com.example.backendproject.mapper.TeacherMapper;
 import com.example.backendproject.model.geneticalgorithm.InputData;
 import com.example.backendproject.model.sc5.EvaluateResponse;
+import com.example.backendproject.model.sc5.TimetableResponse;
 import com.example.backendproject.model.sc5.TimetableTeacher;
 import com.example.backendproject.repository.sc5.*;
 import com.example.backendproject.service.AdminLogService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,6 +34,8 @@ public class TimetablingService {
     private final ClassMapper classMapper;
     private final TimetablingProcessRepository timetablingProcessRepository;
     private final TimetablingServiceHelper timetablingServiceHelper;
+    private final SubjectRepository subjectRepository;
+    private final LanguageRepository languageRepository;
 
     public TimetablingService(TeacherRepository teacherRepository,
                               ClassRepository classRepository,
@@ -41,7 +45,7 @@ public class TimetablingService {
                               TeacherMapper teacherMapper,
                               ClassMapper classMapper,
                               TimetablingProcessRepository timetablingProcessRepository,
-                              TimetablingServiceHelper timetablingServiceHelper) {
+                              TimetablingServiceHelper timetablingServiceHelper, SubjectRepository subjectRepository, LanguageRepository languageRepository) {
         this.teacherRepository = teacherRepository;
         this.classRepository = classRepository;
         this.requiredConstraintRepository = requiredConstraintRepository;
@@ -51,6 +55,8 @@ public class TimetablingService {
         this.classMapper = classMapper;
         this.timetablingProcessRepository = timetablingProcessRepository;
         this.timetablingServiceHelper = timetablingServiceHelper;
+        this.subjectRepository = subjectRepository;
+        this.languageRepository = languageRepository;
     }
 
     public void timetablingTeacher(Long dataset) throws JsonProcessingException {
@@ -116,12 +122,16 @@ public class TimetablingService {
 
     public EvaluateResponse evaluateTimetablingTeacher(Long dataset) {
         EvaluateResponse response = new EvaluateResponse();
+        if (dataset == null) {
+            return response;
+        }
         InputData inputData = timetablingServiceHelper.getInputData(dataset);
 
         int x1 = 0; // số lớp chưa được pc
         int x2 = 0; // số lớp chưa pc đúng chuyên môn hoặc ngôn ngữ
         int x3 = 0; // số GV dạy quá số giờ tối đa
         int x4 = 0; // số cặp lớp xung đột được pc chung 1 GV
+        int x5 = 0; // số GV chưa được pc GD
         for (ClassEntity classEntity : inputData.getClasses()) {
             if (classEntity.getTeacherId() == null) {
                 x1 += 1;
@@ -143,10 +153,14 @@ public class TimetablingService {
 
         for (TeacherEntity teacherEntity : inputData.getTeachers()) {
             List<ClassEntity> classes = classRepository.findByTeacherIdAndDataset(teacherEntity.getId(), dataset);
-            double totalTimeGD = classes.stream().map(ClassEntity::getTimeOfClass).reduce(0d, Double::sum);
+            if (CollectionUtils.isEmpty(classes)) {
+                x5 += 1;
+            } else {
+                double totalTimeGD = classes.stream().map(ClassEntity::getTimeOfClass).reduce(0d, Double::sum);
 
-            if (totalTimeGD > inputData.getAverageGD() * teacherEntity.getGdTime()) {
-                x3 += 1;
+                if (totalTimeGD > inputData.getAverageGD() * teacherEntity.getGdTime()) {
+                    x3 += 1;
+                }
             }
         }
 
@@ -155,6 +169,34 @@ public class TimetablingService {
         data.add(new EvaluateResponse.EvaluateDetail("Số lớp phân công chưa đáp ứng yêu cầu chuyên môn hoặc ngôn ngữ", String.valueOf(x2)));
         data.add(new EvaluateResponse.EvaluateDetail("Số giảng viên có số giờ được phân công lớn hơn số giờ GD tối đa", String.valueOf(x3)));
         data.add(new EvaluateResponse.EvaluateDetail("Số cặp lớp xung đột được phân công cho cùng GV", String.valueOf(x4)));
+        data.add(new EvaluateResponse.EvaluateDetail("Số GV chưa được phân công GD", String.valueOf(x5)));
+        response.setData(data);
+        return response;
+    }
+
+    public TimetableResponse teacherTimetable(Long dataset, Long teacherId) {
+        TimetableResponse response = new TimetableResponse();
+        if (dataset == null || teacherId == null) {
+            return response;
+        }
+
+        List<ClassEntity> classEntities = classRepository.findByTeacherIdAndDatasetOrderByDayOfWeekAscStartTimeAsc(teacherId, dataset);
+        List<TimetableResponse.TimetableDetail> data = new ArrayList<>();
+        if (CollectionUtils.isEmpty(classEntities)) {
+            response.setData(data);
+            return response;
+        }
+
+        for (ClassEntity classEntity : classEntities) {
+            Optional<SubjectEntity> subjectEntity = subjectRepository.findById(classEntity.getSubjectId());
+            Optional<LanguageEntity> languageEntity = languageRepository.findById(classEntity.getLanguageId());
+            data.add(new TimetableResponse.TimetableDetail(classEntity.getDayOfWeek(),
+                    classEntity.getStartTime() + "-" + classEntity.getEndTime(),
+                    subjectEntity.isEmpty() ? classEntity.getName() : subjectEntity.get().getName(),
+                    classEntity.getCode(), classEntity.getWeek(),
+                    classEntity.getProgram(), languageEntity.isEmpty() ? "" : languageEntity.get().getName()));
+        }
+
         response.setData(data);
         return response;
     }

@@ -71,6 +71,7 @@ public class FileExportService {
             if (classDto.getSubjectId() != null) {
                 Optional<SubjectEntity> subjectEntity = subjectRepository.findById(classDto.getSubjectId());
                 subjectEntity.ifPresent(entity -> classDto.setSubject(subjectMapper.toDto(entity)));
+                subjectEntity.ifPresent(entity -> classDto.setName(entity.getName()));
             }
             if (classDto.getTeacherId() != null) {
                 Optional<TeacherEntity> teacherEntity = teacherRepository.findById(classDto.getTeacherId());

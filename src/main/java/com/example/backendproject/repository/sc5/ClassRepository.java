@@ -13,4 +13,6 @@ public interface ClassRepository extends JpaRepository<ClassEntity, Long>, Class
 
     List<ClassEntity> findByCodeAndDataset(String code, Long dataset);
     List<ClassEntity> findByDataset(Long dataset);
+
+    List<ClassEntity> findByTeacherIdAndDatasetOrderByDayOfWeekAscStartTimeAsc(Long teacherId, Long dataset);
 }

@@ -2,9 +2,7 @@ package com.example.backendproject.controller.sc5;
 
 import com.example.backendproject.entity.sc5.TimetablingProcessEntity;
 import com.example.backendproject.model.geneticalgorithm.InputData;
-import com.example.backendproject.model.sc5.EvaluateResponse;
-import com.example.backendproject.model.sc5.TimetableStudent;
-import com.example.backendproject.model.sc5.TimetableTeacher;
+import com.example.backendproject.model.sc5.*;
 import com.example.backendproject.service.sc5.TimeTablingStudentService;
 import com.example.backendproject.service.sc5.TimetablingService;
 import com.example.backendproject.util.ApiDescription;
@@ -83,5 +81,17 @@ public class TimetablingController {
     @ApiDescription(value = "Đánh giá kết quả sau phân công HD", code = "timetabling_student_evaluate")
     public EvaluateResponse evaluateTimetablingStudent(Long dataset) {
         return timeTablingStudentService.evaluateTimetablingStudent(dataset);
+    }
+
+    @GetMapping("/timetabling/teacher/timetable")
+    @ApiDescription(value = "Thời khóa biểu của các giảng viên", code = "timetabling_teacher_timetable")
+    public TimetableResponse teacherTimetable(Long dataset, Long teacherId) {
+        return timetablingService.teacherTimetable(dataset, teacherId);
+    }
+
+    @GetMapping("/timetabling/student/timetable")
+    @ApiDescription(value = "Danh sách sinh viên của các giảng viên", code = "timetabling_student_timetable")
+    public TimetableStudentResponse studentTimetable(Long dataset, Long teacherId) {
+        return timeTablingStudentService.studentTimetable(dataset, teacherId);
     }
 }
