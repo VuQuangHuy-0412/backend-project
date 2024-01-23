@@ -44,6 +44,8 @@ public class Class {
 
     private Teacher teacher;
 
+    private Language language;
+
     private Integer startTime;
 
     private Integer endTime;
