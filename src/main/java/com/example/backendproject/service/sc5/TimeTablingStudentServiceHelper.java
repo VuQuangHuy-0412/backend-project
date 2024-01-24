@@ -26,9 +26,9 @@ public class TimeTablingStudentServiceHelper {
     private final CustomConstraintRepository customConstraintRepository;
     private final ObjectMapper objectMapper;
     private final TimetablingProcessRepository timetablingProcessRepository;
-    public static final Integer POPULATION_SIZE = 10;
-    public static final Integer NUM_OF_CROSS = 2;
-    public static final Integer NUM_LOOP = 30;
+    public static final Integer POPULATION_SIZE = 500;
+    public static final Integer NUM_OF_CROSS = 50;
+    public static final Integer NUM_LOOP = 1000;
 
     public TimeTablingStudentServiceHelper(TeacherRepository teacherRepository,
                                            StudentProjectRepository studentProjectRepository,
