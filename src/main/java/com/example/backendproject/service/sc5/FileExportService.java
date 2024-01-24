@@ -6,6 +6,8 @@ import com.example.backendproject.entity.sc5.*;
 import com.example.backendproject.mapper.*;
 import com.example.backendproject.model.sc5.Class;
 import com.example.backendproject.model.sc5.StudentProject;
+import com.example.backendproject.model.sc5.TimetableResponse;
+import com.example.backendproject.model.sc5.TimetableStudentResponse;
 import com.example.backendproject.repository.sc5.*;
 import com.example.backendproject.service.AdminLogService;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,8 @@ public class FileExportService {
     private final SubjectMapper subjectMapper;
     private final LanguageRepository languageRepository;
     private final LanguageMapper languageMapper;
+    private final TimetablingService timetablingService;
+    private final TimeTablingStudentService timeTablingStudentService;
 
     public FileExportService(AdminLogService adminLogService,
                              ClassRepository classRepository, ClassMapper classMapper,
@@ -44,7 +48,8 @@ public class FileExportService {
                              TeacherRepository teacherRepository,
                              TeacherMapper teacherMapper,
                              SubjectRepository subjectRepository, SubjectMapper subjectMapper,
-                             LanguageRepository languageRepository, LanguageMapper languageMapper) {
+                             LanguageRepository languageRepository, LanguageMapper languageMapper,
+                             TimetablingService timetablingService, TimeTablingStudentService timeTablingStudentService) {
         this.adminLogService = adminLogService;
         this.classRepository = classRepository;
         this.classMapper = classMapper;
@@ -56,6 +61,8 @@ public class FileExportService {
         this.subjectMapper = subjectMapper;
         this.languageRepository = languageRepository;
         this.languageMapper = languageMapper;
+        this.timetablingService = timetablingService;
+        this.timeTablingStudentService = timeTablingStudentService;
     }
 
     public InputStreamResource exportListTimetablingTeacher(Long dataset) {
@@ -420,6 +427,269 @@ public class FileExportService {
             return new InputStreamResource(inputStream);
         } catch (Exception exception) {
             log.error("Export timetabling student failed", exception);
+            throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public InputStreamResource exportListTimetablingTeacherResult(Long dataset, Long teacherId) {
+        adminLogService.log("exportListTimetablingTeacherResult", String.valueOf(dataset));
+        if (dataset == null || teacherId == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        TimetableResponse entities = timetablingService.teacherTimetable(dataset, teacherId);
+
+        return createFileExcelListTimeTablingTeacherResult(entities.getData());
+    }
+
+    private InputStreamResource createFileExcelListTimeTablingTeacherResult(List<TimetableResponse.TimetableDetail> entities) {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); SXSSFWorkbook workbook = new SXSSFWorkbook()) {
+            // set style of cell: bold, center
+            CellStyle styleHeader = workbook.createCellStyle();
+            Font fontHeader = workbook.createFont();
+            fontHeader.setBold(true);
+            styleHeader.setFont(fontHeader);
+            styleHeader.setAlignment(HorizontalAlignment.CENTER);
+
+            // set style of cell: left-center
+            CellStyle styleLeft = workbook.createCellStyle();
+            styleLeft.setWrapText(true);
+            styleLeft.setAlignment(HorizontalAlignment.LEFT);
+            styleLeft.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            // set style of cell: right-center
+            CellStyle styleRight = workbook.createCellStyle();
+            styleRight.setWrapText(true);
+            styleRight.setAlignment(HorizontalAlignment.RIGHT);
+            styleRight.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            CellStyle styleLongContent = workbook.createCellStyle();
+            styleLongContent.setWrapText(false);
+            styleLongContent.setAlignment(HorizontalAlignment.LEFT);
+            styleLongContent.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            Sheet listTimetablingTeacher = workbook.createSheet("Thời khóa biểu");
+            // title row
+            int row = 0;
+            Row rowTitle = listTimetablingTeacher.createRow(row);
+            Cell cellTitle = rowTitle.createCell(0);
+            cellTitle.setCellValue("THỜI KHÓA BIỂU CỦA GIẢNG VIÊN");
+            cellTitle.setCellStyle(styleHeader);
+            listTimetablingTeacher.addMergedRegion(new CellRangeAddress(0, 0, 0, 8));
+            // header row
+            row += 1;
+            Row headerRow = listTimetablingTeacher.createRow(row);
+
+            Cell cellSTT = headerRow.createCell(0);
+            cellSTT.setCellValue("STT");
+            cellSTT.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(0, ((int) (6 * 1.14388)) * 256);
+
+            Cell cellDayOfWeek = headerRow.createCell(1);
+            cellDayOfWeek.setCellValue("Thứ trong tuần");
+            cellDayOfWeek.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(1, ((int) (12 * 1.14388)) * 256);
+
+            Cell cellTimeTeaching = headerRow.createCell(2);
+            cellTimeTeaching.setCellValue("Thời gian");
+            cellTimeTeaching.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(2, ((int) (12 * 1.14388)) * 256);
+
+            Cell cellClassName = headerRow.createCell(3);
+            cellClassName.setCellValue("Lớp học");
+            cellClassName.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(3, ((int) (24 * 1.14388)) * 256);
+
+            Cell cellClassCode = headerRow.createCell(4);
+            cellClassCode.setCellValue("Mã lớp học");
+            cellClassCode.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(4, ((int) (12 * 1.14388)) * 256);
+
+            Cell cellRoom = headerRow.createCell(5);
+            cellRoom.setCellValue("Phòng học");
+            cellRoom.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(5, ((int) (12 * 1.14388)) * 256);
+
+            Cell cellWeek = headerRow.createCell(6);
+            cellWeek.setCellValue("Tuần học");
+            cellWeek.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(6, ((int) (12 * 1.14388)) * 256);
+
+            Cell cellProgram = headerRow.createCell(7);
+            cellProgram.setCellValue("Chương trình học");
+            cellProgram.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(7, ((int) (12 * 1.14388)) * 256);
+
+            Cell cellLanguage = headerRow.createCell(8);
+            cellLanguage.setCellValue("Ngôn ngữ");
+            cellLanguage.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(8, ((int) (12 * 1.14388)) * 256);
+
+            for (TimetableResponse.TimetableDetail classEntity : entities) {
+                row += 1;
+                Row rowClass = listTimetablingTeacher.createRow(row);
+
+                Cell stt = rowClass.createCell(0);
+                stt.setCellValue(row - 1);
+                stt.setCellStyle(styleLeft);
+
+                Cell dayOfWeek = rowClass.createCell(1);
+                dayOfWeek.setCellValue(StringUtils.isBlank(classEntity.getDayOfWeek()) ? "" : classEntity.getDayOfWeek());
+                dayOfWeek.setCellStyle(styleLeft);
+
+                Cell timeTeaching = rowClass.createCell(2);
+                timeTeaching.setCellValue(StringUtils.isBlank(classEntity.getTimeTeaching()) ? "" : classEntity.getTimeTeaching());
+                timeTeaching.setCellStyle(styleLeft);
+
+                Cell className = rowClass.createCell(3);
+                className.setCellValue(StringUtils.isBlank(classEntity.getClassName()) ? "" : classEntity.getClassName());
+                className.setCellStyle(styleLeft);
+
+                Cell classCode = rowClass.createCell(4);
+                classCode.setCellValue(StringUtils.isBlank(classEntity.getClassCode()) ? "" : classEntity.getClassCode());
+                classCode.setCellStyle(styleLeft);
+
+                Cell room = rowClass.createCell(5);
+                room.setCellValue(StringUtils.isBlank(classEntity.getRoom()) ? "" : classEntity.getRoom());
+                room.setCellStyle(styleLeft);
+
+                Cell week = rowClass.createCell(6);
+                week.setCellValue(StringUtils.isBlank(classEntity.getWeek()) ? "" : classEntity.getWeek());
+                week.setCellStyle(styleLeft);
+
+                Cell program = rowClass.createCell(7);
+                program.setCellValue(StringUtils.isBlank(classEntity.getProgram()) ? "" : classEntity.getProgram());
+                program.setCellStyle(styleLeft);
+
+                Cell language = rowClass.createCell(8);
+                language.setCellValue(StringUtils.isBlank(classEntity.getLanguageName()) ? "" : classEntity.getLanguageName());
+                language.setCellStyle(styleLeft);
+            }
+
+            workbook.write(bos);
+            byte[] bytes = bos.toByteArray();
+            InputStream inputStream = new ByteArrayInputStream(bytes);
+            return new InputStreamResource(inputStream);
+        } catch (Exception exception) {
+            log.error("Export timetabling teacher result failed", exception);
+            throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public InputStreamResource exportListTimetablingStudentResult(Long dataset, Long teacherId) {
+        adminLogService.log("exportListTimetablingStudentResult", String.valueOf(dataset));
+        if (dataset == null || teacherId == null) {
+            throw new Sc5Exception(ErrorEnum.INVALID_INPUT);
+        }
+
+        TimetableStudentResponse entities = timeTablingStudentService.studentTimetable(dataset, teacherId);
+
+        return createFileExcelListTimeTablingStudentResult(entities.getData());
+    }
+
+    private InputStreamResource createFileExcelListTimeTablingStudentResult(List<TimetableStudentResponse.TimetableDetail> entities) {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); SXSSFWorkbook workbook = new SXSSFWorkbook()) {
+            // set style of cell: bold, center
+            CellStyle styleHeader = workbook.createCellStyle();
+            Font fontHeader = workbook.createFont();
+            fontHeader.setBold(true);
+            styleHeader.setFont(fontHeader);
+            styleHeader.setAlignment(HorizontalAlignment.CENTER);
+
+            // set style of cell: left-center
+            CellStyle styleLeft = workbook.createCellStyle();
+            styleLeft.setWrapText(true);
+            styleLeft.setAlignment(HorizontalAlignment.LEFT);
+            styleLeft.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            // set style of cell: right-center
+            CellStyle styleRight = workbook.createCellStyle();
+            styleRight.setWrapText(true);
+            styleRight.setAlignment(HorizontalAlignment.RIGHT);
+            styleRight.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            CellStyle styleLongContent = workbook.createCellStyle();
+            styleLongContent.setWrapText(false);
+            styleLongContent.setAlignment(HorizontalAlignment.LEFT);
+            styleLongContent.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            Sheet listTimetablingTeacher = workbook.createSheet("Danh sách SV");
+            // title row
+            int row = 0;
+            Row rowTitle = listTimetablingTeacher.createRow(row);
+            Cell cellTitle = rowTitle.createCell(0);
+            cellTitle.setCellValue("DANH SÁCH SV THEO GIẢNG VIÊN");
+            cellTitle.setCellStyle(styleHeader);
+            listTimetablingTeacher.addMergedRegion(new CellRangeAddress(0, 0, 0, 5));
+            // header row
+            row += 1;
+            Row headerRow = listTimetablingTeacher.createRow(row);
+
+            Cell cellSTT = headerRow.createCell(0);
+            cellSTT.setCellValue("STT");
+            cellSTT.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(0, ((int) (6 * 1.14388)) * 256);
+
+            Cell cellStudentName = headerRow.createCell(1);
+            cellStudentName.setCellValue("Tên sinh viên");
+            cellStudentName.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(1, ((int) (12 * 1.14388)) * 256);
+
+            Cell cellStudentCode = headerRow.createCell(2);
+            cellStudentCode.setCellValue("Mã sinh viên");
+            cellStudentCode.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(2, ((int) (12 * 1.14388)) * 256);
+
+            Cell cellClassCode = headerRow.createCell(3);
+            cellClassCode.setCellValue("Mã lớp học");
+            cellClassCode.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(3, ((int) (12 * 1.14388)) * 256);
+
+            Cell cellProjectName = headerRow.createCell(4);
+            cellProjectName.setCellValue("Tên đồ án");
+            cellProjectName.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(4, ((int) (24 * 1.14388)) * 256);
+
+            Cell cellProjectType = headerRow.createCell(5);
+            cellProjectType.setCellValue("Loại đồ án");
+            cellProjectType.setCellStyle(styleHeader);
+            listTimetablingTeacher.setColumnWidth(5, ((int) (12 * 1.14388)) * 256);
+
+            for (TimetableStudentResponse.TimetableDetail classEntity : entities) {
+                row += 1;
+                Row rowClass = listTimetablingTeacher.createRow(row);
+
+                Cell stt = rowClass.createCell(0);
+                stt.setCellValue(row - 1);
+                stt.setCellStyle(styleLeft);
+
+                Cell studentName = rowClass.createCell(1);
+                studentName.setCellValue(StringUtils.isBlank(classEntity.getStudentName()) ? "" : classEntity.getStudentName());
+                studentName.setCellStyle(styleLeft);
+
+                Cell studentCode = rowClass.createCell(2);
+                studentCode.setCellValue(StringUtils.isBlank(classEntity.getStudentCode()) ? "" : classEntity.getStudentCode());
+                studentCode.setCellStyle(styleLeft);
+
+                Cell classCode = rowClass.createCell(3);
+                classCode.setCellValue(StringUtils.isBlank(classEntity.getClassCode()) ? "" : classEntity.getClassCode());
+                classCode.setCellStyle(styleLeft);
+
+                Cell projectName = rowClass.createCell(4);
+                projectName.setCellValue(StringUtils.isBlank(classEntity.getProjectName()) ? "" : classEntity.getProjectName());
+                projectName.setCellStyle(styleLeft);
+
+                Cell projectType = rowClass.createCell(5);
+                projectType.setCellValue(StringUtils.isBlank(classEntity.getProjectType()) ? "" : classEntity.getProjectType());
+                projectType.setCellStyle(styleLeft);
+            }
+
+            workbook.write(bos);
+            byte[] bytes = bos.toByteArray();
+            InputStream inputStream = new ByteArrayInputStream(bytes);
+            return new InputStreamResource(inputStream);
+        } catch (Exception exception) {
+            log.error("Export timetabling student result failed", exception);
             throw new Sc5Exception(ErrorEnum.INTERNAL_SERVER_ERROR);
         }
     }

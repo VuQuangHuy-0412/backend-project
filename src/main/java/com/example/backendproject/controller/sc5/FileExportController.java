@@ -40,4 +40,26 @@ public class FileExportController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName)
                 .body(resource);
     }
+
+    @GetMapping(value = "/admin/timetabling-teacher-result/list/excel")
+    @ApiDescription(value = "Xuất file Excel danh sách lớp của GV sau khi phân công", code = "timetabling_teacher_result_export_excel")
+    public ResponseEntity<?> exportListTimetablingTeacherResult(Long dataset, Long teacherId) {
+        String fileName = "timetabling_teacher_" + System.currentTimeMillis() + ".xlsx";
+        InputStreamResource resource = fileExportService.exportListTimetablingTeacherResult(dataset, teacherId);
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName)
+                .body(resource);
+    }
+
+    @GetMapping(value = "/admin/timetabling-student-result/list/excel")
+    @ApiDescription(value = "Xuất file Excel danh sách sinh viên của GV sau khi phân công", code = "timetabling_student_result_export_excel")
+    public ResponseEntity<?> exportListTimetablingStudentResult(Long dataset, Long teacherId) {
+        String fileName = "timetabling_student_" + System.currentTimeMillis() + ".xlsx";
+        InputStreamResource resource = fileExportService.exportListTimetablingStudentResult(dataset, teacherId);
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName)
+                .body(resource);
+    }
 }
