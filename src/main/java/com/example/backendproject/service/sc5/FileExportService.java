@@ -264,7 +264,8 @@ public class FileExportService {
                 program.setCellStyle(styleLeft);
 
                 Cell teacherId = rowClass.createCell(14);
-                teacherId.setCellValue(classEntity.getTeacherId());
+                teacherId.setCellValue(classEntity.getTeacher() == null ? "" :
+                        (StringUtils.isBlank(classEntity.getTeacher().getFullName()) ? "" : classEntity.getTeacher().getFullName()));
                 teacherId.setCellStyle(styleLeft);
             }
 

@@ -188,13 +188,15 @@ public class TimetablingService {
         }
 
         for (ClassEntity classEntity : classEntities) {
-            Optional<SubjectEntity> subjectEntity = subjectRepository.findById(classEntity.getSubjectId());
-            Optional<LanguageEntity> languageEntity = languageRepository.findById(classEntity.getLanguageId());
-            data.add(new TimetableResponse.TimetableDetail(classEntity.getDayOfWeek(),
-                    classEntity.getStartTime() + "-" + classEntity.getEndTime(),
-                    subjectEntity.isEmpty() ? classEntity.getName() : subjectEntity.get().getName(),
-                    classEntity.getCode(), classEntity.getWeek(),
-                    classEntity.getProgram(), languageEntity.isEmpty() ? "" : languageEntity.get().getName()));
+            if (classEntity.getSubjectId() != null && classEntity.getLanguageId() != null) {
+                Optional<SubjectEntity> subjectEntity = subjectRepository.findById(classEntity.getSubjectId());
+                Optional<LanguageEntity> languageEntity = languageRepository.findById(classEntity.getLanguageId());
+                data.add(new TimetableResponse.TimetableDetail(classEntity.getDayOfWeek(),
+                        classEntity.getStartTime() + "-" + classEntity.getEndTime(),
+                        subjectEntity.isEmpty() ? classEntity.getName() : subjectEntity.get().getName(),
+                        classEntity.getCode(), classEntity.getWeek(),
+                        classEntity.getProgram(), languageEntity.isEmpty() ? "" : languageEntity.get().getName()));
+            }
         }
 
         response.setData(data);
