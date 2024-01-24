@@ -194,7 +194,7 @@ public class TimetablingService {
                 data.add(new TimetableResponse.TimetableDetail(classEntity.getDayOfWeek(),
                         classEntity.getStartTime() + "-" + classEntity.getEndTime(),
                         subjectEntity.isEmpty() ? classEntity.getName() : subjectEntity.get().getName(),
-                        classEntity.getCode(), classEntity.getWeek(),
+                        classEntity.getCode(), classEntity.getBuilding() + "-" + classEntity.getRoom(), classEntity.getWeek(),
                         classEntity.getProgram(), languageEntity.isEmpty() ? "" : languageEntity.get().getName()));
             }
         }

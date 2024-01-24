@@ -19,6 +19,7 @@ public class TimetableResponse {
         public String timeTeaching;
         public String className;
         public String classCode;
+        public String room;
         public String week;
         public String program;
         public String languageName;
