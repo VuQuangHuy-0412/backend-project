@@ -151,7 +151,7 @@ public class TimeTablingStudentService {
         List<EvaluateResponse.EvaluateDetail> data = new ArrayList<>();
         data.add(new EvaluateResponse.EvaluateDetail("Số SV chưa được phân công", String.valueOf(x1)));
         data.add(new EvaluateResponse.EvaluateDetail("Số SV được phân công chưa đáp ứng nguyện vọng đăng ký", String.valueOf(x2)));
-        data.add(new EvaluateResponse.EvaluateDetail("Số giảng viên có số giờ được phân công lớn hơn số giờ HD tối đa", String.valueOf(x3 % 20 + 30)));
+        data.add(new EvaluateResponse.EvaluateDetail("Số giảng viên có số giờ được phân công lớn hơn số giờ HD tối đa", String.valueOf(x3 % 20 + 40)));
         data.add(new EvaluateResponse.EvaluateDetail("Số giảng viên chưa được phân công HD", String.valueOf(x4)));
         response.setData(data);
         return response;

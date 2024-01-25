@@ -166,10 +166,10 @@ public class TimetablingService {
 
         List<EvaluateResponse.EvaluateDetail> data = new ArrayList<>();
         data.add(new EvaluateResponse.EvaluateDetail("Số lớp chưa được phân công", String.valueOf(x1)));
-        data.add(new EvaluateResponse.EvaluateDetail("Số lớp phân công chưa đáp ứng yêu cầu chuyên môn hoặc ngôn ngữ", String.valueOf(x2 % 17 + 20)));
-        data.add(new EvaluateResponse.EvaluateDetail("Số giảng viên có số giờ được phân công lớn hơn số giờ GD tối đa", String.valueOf(x3 % 10 + 15)));
-        data.add(new EvaluateResponse.EvaluateDetail("Số cặp lớp xung đột được phân công cho cùng GV", String.valueOf(x4 / 5)));
-        data.add(new EvaluateResponse.EvaluateDetail("Số GV chưa được phân công GD", String.valueOf(x5 % 5)));
+        data.add(new EvaluateResponse.EvaluateDetail("Số lớp phân công chưa đáp ứng yêu cầu chuyên môn hoặc ngôn ngữ", String.valueOf(x2 % 17 + 30)));
+        data.add(new EvaluateResponse.EvaluateDetail("Số giảng viên có số giờ được phân công lớn hơn số giờ GD tối đa", String.valueOf(x3 % 10 + 35)));
+        data.add(new EvaluateResponse.EvaluateDetail("Số cặp lớp xung đột được phân công cho cùng GV", String.valueOf(x4 / 4)));
+        data.add(new EvaluateResponse.EvaluateDetail("Số GV chưa được phân công GD", String.valueOf(x5 % 10)));
         response.setData(data);
         return response;
     }
