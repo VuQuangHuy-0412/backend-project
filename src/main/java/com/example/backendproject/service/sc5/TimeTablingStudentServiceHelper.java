@@ -6,6 +6,7 @@ import com.example.backendproject.config.constant.TeacherConstant;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.sc5.*;
 import com.example.backendproject.model.geneticalgorithm.InputData;
+import com.example.backendproject.model.geneticalgorithm.Population;
 import com.example.backendproject.model.geneticalgorithm.PopulationStudent;
 import com.example.backendproject.repository.sc5.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,6 +16,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -29,6 +31,7 @@ public class TimeTablingStudentServiceHelper {
     public static final Integer POPULATION_SIZE = 500;
     public static final Integer NUM_OF_CROSS = 50;
     public static final Integer NUM_LOOP = 1000;
+    public static final Long TIME_LIMIT = 15 * 60 * 1000L;
 
     public TimeTablingStudentServiceHelper(TeacherRepository teacherRepository,
                                            StudentProjectRepository studentProjectRepository,
@@ -54,6 +57,7 @@ public class TimeTablingStudentServiceHelper {
             InputData inputData = getInputData(entity.getDataset());
             PopulationStudent population = initPopulation(inputData);
 
+            Long startTime = Instant.now().toEpochMilli();
             for (int i = 0; i < NUM_LOOP; i++) {
                 evaluateConstraint(inputData, population);
                 if (i == NUM_LOOP - 1) {
@@ -68,6 +72,14 @@ public class TimeTablingStudentServiceHelper {
                 entity.setErrorMessage(String.valueOf(i));
                 entity.setUpdatedAt(new Date());
                 timetablingProcessRepository.save(entity);
+
+                long now = Instant.now().toEpochMilli();
+
+                if (now - startTime > TIME_LIMIT) {
+                    PopulationStudent.Member bestSolution = getTheMostObjectiveResult(population);
+                    log.info("Solution: {}", objectMapper.writeValueAsString(bestSolution));
+                    break;
+                }
             }
 
             PopulationStudent.Member bestSolution = getTheMostObjectiveResult(population);

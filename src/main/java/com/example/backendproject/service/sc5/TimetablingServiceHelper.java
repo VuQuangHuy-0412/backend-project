@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -36,6 +37,8 @@ public class TimetablingServiceHelper {
     public static final Integer POPULATION_SIZE = 500;
     public static final Integer NUM_OF_CROSS = 50;
     public static final Integer NUM_LOOP = 1000;
+
+    public static final Long TIME_LIMIT = 15 * 60 * 1000L;
 
     public TimetablingServiceHelper(TeacherRepository teacherRepository,
                                     LanguageTeacherMappingRepository languageTeacherMappingRepository,
@@ -71,6 +74,7 @@ public class TimetablingServiceHelper {
             InputData inputData = getInputData(entity.getDataset());
             Population population = initPopulation(inputData);
 
+            Long startTime = Instant.now().toEpochMilli();
             for (int i = 0; i < NUM_LOOP; i++) {
                 evaluateConstraint(inputData, population);
                 if (i == NUM_LOOP - 1) {
@@ -85,6 +89,14 @@ public class TimetablingServiceHelper {
                 entity.setErrorMessage(String.valueOf(i));
                 entity.setUpdatedAt(new Date());
                 timetablingProcessRepository.save(entity);
+
+                long now = Instant.now().toEpochMilli();
+
+                if (now - startTime > TIME_LIMIT) {
+                    Population.Member bestSolution = getTheMostObjectiveResult(population);
+                    log.info("Solution: {}", objectMapper.writeValueAsString(bestSolution));
+                    break;
+                }
             }
 
             Population.Member bestSolution = getTheMostObjectiveResult(population);
