@@ -8,7 +8,6 @@ import com.example.backendproject.mapper.StudentProjectMapper;
 import com.example.backendproject.mapper.TeacherMapper;
 import com.example.backendproject.model.geneticalgorithm.InputData;
 import com.example.backendproject.model.sc5.EvaluateResponse;
-import com.example.backendproject.model.sc5.TimetableResponse;
 import com.example.backendproject.model.sc5.TimetableStudent;
 import com.example.backendproject.model.sc5.TimetableStudentResponse;
 import com.example.backendproject.repository.sc5.*;
@@ -56,7 +55,7 @@ public class TimeTablingStudentService {
         this.timeTablingStudentServiceHelper = timeTablingStudentServiceHelper;
     }
 
-    public void timetablingStudent(Long dataset) throws JsonProcessingException {
+    public void timetablingStudent(Long dataset) {
         adminLogService.log("timetablingStudent", null);
         TimetablingProcessEntity entity = timetablingProcessRepository.findByTypeAndDataset("student", dataset);
         if (entity != null) {
@@ -151,7 +150,7 @@ public class TimeTablingStudentService {
         List<EvaluateResponse.EvaluateDetail> data = new ArrayList<>();
         data.add(new EvaluateResponse.EvaluateDetail("Số SV chưa được phân công", String.valueOf(x1)));
         data.add(new EvaluateResponse.EvaluateDetail("Số SV được phân công chưa đáp ứng nguyện vọng đăng ký", String.valueOf(x2)));
-        data.add(new EvaluateResponse.EvaluateDetail("Số giảng viên có số giờ được phân công lớn hơn số giờ HD tối đa", String.valueOf(x3 % 20 + dataset == 9 ? 30 : 40)));
+        data.add(new EvaluateResponse.EvaluateDetail("Số giảng viên có số giờ được phân công lớn hơn số giờ HD tối đa", String.valueOf(x3)));
         data.add(new EvaluateResponse.EvaluateDetail("Số giảng viên chưa được phân công HD", String.valueOf(x4)));
         response.setData(data);
         return response;

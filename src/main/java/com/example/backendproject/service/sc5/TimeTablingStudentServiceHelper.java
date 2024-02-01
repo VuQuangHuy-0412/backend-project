@@ -6,7 +6,6 @@ import com.example.backendproject.config.constant.TeacherConstant;
 import com.example.backendproject.config.exception.Sc5Exception;
 import com.example.backendproject.entity.sc5.*;
 import com.example.backendproject.model.geneticalgorithm.InputData;
-import com.example.backendproject.model.geneticalgorithm.Population;
 import com.example.backendproject.model.geneticalgorithm.PopulationStudent;
 import com.example.backendproject.repository.sc5.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,9 +27,9 @@ public class TimeTablingStudentServiceHelper {
     private final CustomConstraintRepository customConstraintRepository;
     private final ObjectMapper objectMapper;
     private final TimetablingProcessRepository timetablingProcessRepository;
-    public static final Integer POPULATION_SIZE = 10;
-    public static final Integer NUM_OF_CROSS = 2;
-    public static final Integer NUM_LOOP = 20;
+    public static final Integer POPULATION_SIZE = 500;
+    public static final Integer NUM_OF_CROSS = 100;
+    public static final Integer NUM_LOOP = 1000;
     public static final Long TIME_LIMIT = 15 * 60 * 1000L;
 
     public TimeTablingStudentServiceHelper(TeacherRepository teacherRepository,
@@ -48,7 +47,7 @@ public class TimeTablingStudentServiceHelper {
     }
 
     @Async("async-thread-pool")
-    public void timetablingStudentAsync(TimetablingProcessEntity entity) throws JsonProcessingException {
+    public void timetablingStudentAsync(TimetablingProcessEntity entity) {
         entity.setStatus("PROCESSING");
         entity.setUpdatedAt(new Date());
         timetablingProcessRepository.save(entity);

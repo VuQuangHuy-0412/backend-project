@@ -34,9 +34,9 @@ public class TimetablingServiceHelper {
     private final CustomConstraintRepository customConstraintRepository;
     private final ObjectMapper objectMapper;
     private final TimetablingProcessRepository timetablingProcessRepository;
-    public static final Integer POPULATION_SIZE = 10;
-    public static final Integer NUM_OF_CROSS = 2;
-    public static final Integer NUM_LOOP = 20;
+    public static final Integer POPULATION_SIZE = 500;
+    public static final Integer NUM_OF_CROSS = 100;
+    public static final Integer NUM_LOOP = 1000;
 
     public static final Long TIME_LIMIT = 15 * 60 * 1000L;
 
@@ -65,7 +65,7 @@ public class TimetablingServiceHelper {
     }
 
     @Async("async-thread-pool")
-    public void timetablingTeacherAsync(TimetablingProcessEntity entity) throws JsonProcessingException {
+    public void timetablingTeacherAsync(TimetablingProcessEntity entity) {
         entity.setStatus("PROCESSING");
         entity.setUpdatedAt(new Date());
         timetablingProcessRepository.save(entity);
